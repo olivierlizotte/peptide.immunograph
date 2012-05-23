@@ -39,7 +39,11 @@ public class DefaultNode {
 	
 	public DefaultNode(String nodeID, EmbeddedGraphDatabase graphDb)
 	{
-		theNode = graphDb.getNodeById(Long.valueOf(nodeID));	
+		theNode = graphDb.getNodeById(Long.valueOf(nodeID));
+	}
+	
+	public void Initialize()
+	{
 		// GETTING THE PROPERTIES
 		for (String p : theNode.getPropertyKeys()){
 			String value = "";

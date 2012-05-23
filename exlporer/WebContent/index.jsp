@@ -57,29 +57,33 @@ function CreateComments(myComments)
 	        data: myComments
 	    });
 	    
-	    commentGrid = Ext.create('Ext.panel.Panel', {
+	    commentGrid = Ext.create('Ext.container.Container', {
 	        title: 'Comments',
-	        height: 240,
+	        //height: 240,
 	        layout: {
-	            type: 'vbox',       // Arrange child items vertically
-	            align: 'stretch',    // Each takes up full width
+	            type: 'vbox',      
+	            align: 'stretch'    
 	        },
-	        items: [{               // Results grid specified as a config object with an xtype of 'grid'
+        	border: false,
+            //bodyPadding: 0,
+	        items: [{             
 	            xtype: 'grid',
 	            hideHeaders: true,
 	            columns: [{text:'Comments', flex:1, dataIndex:'comment', renderer: columnDesc}],
-	            store: nodeStoreComment, // A dummy empty data store
-	            flex: 3                                       // Use 1/3 of Container's height (hint to Box layout)
-	        	},
-	            {
-	        		xtype: 'splitter'   // A splitter between the two child items
+	            store: nodeStoreComment, 
+	            flex: 1                                      
+                //layout: 'fit'
 	        	},
 	            {
 	                xtype     : 'textareafield',
 	                name      : 'newCommentField',
 	                emptyText : "Add comment...",
-	                flex: 1,
-	                bodyPadding: 1,
+	                //height : 80,
+	                maxHeight:40,
+	                //flex: 1,
+	                //bodyPadding: 0,
+	                //padding : 0,
+	                margins: '5 0 -5 0',
 	                enableKeyEvents: true,
 	                listeners: {
 	                	keypress: function(field,e)
@@ -89,6 +93,7 @@ function CreateComments(myComments)
 	                		{
 	                    		AddComment(field, e);
 	                    		field.reset();
+	                    		e.stopEvent();
 	                		}
 	                    	else
 	                    		if(theCode == 32)//space bar, trap it
@@ -161,12 +166,13 @@ function AddComment(field, event) {
 function CreateAttributes(attribs)
 {
 	return Ext.create('Ext.grid.property.Grid', {        
-		height:240,
+		//height:240,
         //renderTo: 'attribute-container',
-        propertyNames: {
+        /*propertyNames: {
             tested: 'QA',
             borderWidth: 'Border Width'
-        },
+        },//*/
+    	border: false,
         hideHeaders : true,
         source: attribs
     });
@@ -180,6 +186,7 @@ function CreateViewport()
         align: 'stretch',
         type: 'vbox'
     },
+	border: false,
     renderTo: Ext.getBody(),
     items: [    {
                     xtype: 'panel',
@@ -187,11 +194,13 @@ function CreateViewport()
                         align: 'stretch',
                         type: 'hbox'
                     },
+                    margins: '0 0 0 0',
                     collapseDirection: 'top',
                     collapsible: true,
                     frameHeader: false,
                     hideCollapseTool: false,
                     preventHeader: false,
+                	border: false,
                     title: 'Immuno Graph',
                     flex: 1,
                     items: [
@@ -199,12 +208,12 @@ function CreateViewport()
                             xtype: 'panel',
                             minHeight: 100,
                             minWidth: 100,
-                            layout: {
-                                type: 'absolute'
-                            },
+                            layout: 'fit',
                             collapseDirection: 'left',
                             collapsible: true,
                             title: 'Navigation',
+                            floatable: false,
+                            margins: '0 0 0 0',
                             flex: 0.4,
                             id: 'idNavigation'
                         },
@@ -217,34 +226,43 @@ function CreateViewport()
                                 align: 'stretch',
                                 type: 'vbox'
                             },
+                            margins: '0 0 0 0',
                             flex: 1,
+                        	border: false,
                             items: [
                                 {
                                     xtype: 'container',
-                                    height: 200,
+                                    //height: 200,
                                     layout: {
                                         align: 'stretch',
                                         type: 'hbox'
                                     },
+                                	border: false,
+                                    margins: '0 0 0 0',
                                     flex: 1,
                                     items: [
                                         {
                                             xtype: 'panel',
-                                            title: 'Attributes',
+                                            title: 'Attributes [' + currentNodeType + ']',
+                                            margins: '0 0 0 0',
                                             flex: 1.5,
+                                            layout: 'fit',
                                             id : 'idAttributes',
-                                            items: [CreateAttributes(myAttributeObject)]                                            
+                                            items: [CreateAttributes(myAttributeObject)]
                                         },
                                         {
                                             xtype: 'splitter'
                                         },
                                         {
-                                            xtype: 'container',//panel',
+                                            xtype: 'panel',//panel',
                                             collapseDirection: 'right',
                                             collapsible: true,
                                             title: 'Comments',
+                                        	border: false,
+                                            margins: '0 0 0 0',
                                             flex: 1,
                                             id: 'idComments',
+                                            layout: 'fit',
                                             items: [CreateComments(myCommentData)]
                                         }//*/
                                     ]
@@ -257,6 +275,7 @@ function CreateViewport()
                                     collapseDirection: 'top',
                                     collapsible: true,
                                     title: 'Graphs',
+                                    margins: '0 0 0 0',
                                     flex: 1,
                                     id: 'idGraphs'                                                                
                                 }
@@ -273,6 +292,8 @@ function CreateViewport()
                     collapsed: false,
                     collapsible: true,
                     title: 'List',
+                	border: false,
+                    margins: '0 0 0 0',
                     flex: 1,
                     id: 'idGrid',
 				    loader:{url:<%='"'+"createGrid.jsp?id="+session.getAttribute("id").toString()+'"' %>, scripts:true, autoLoad:true}
@@ -281,13 +302,17 @@ function CreateViewport()
         });
 }
 
+Ext.onReady(function() {
+	init();
+});
+
 function init()
 {
 	viewport = CreateViewport();	
 }
 
 </script>
-<body onload="init();">
+<body>
 
 </body>
 </html>

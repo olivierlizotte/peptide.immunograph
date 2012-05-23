@@ -34,6 +34,7 @@
 	try 
 	{
 		DefaultNode theNode = new DefaultNode(nodeID, graphDb);
+		theNode.Initialize();//TODO optimize this call to prevent preloading when key is not empty 
 		theNode.printGridDataJSON(out, key);
 	} catch (Exception e) 
 	{
