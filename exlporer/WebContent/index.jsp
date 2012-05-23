@@ -277,6 +277,7 @@ function CreateViewport()
                                     title: 'Graphs',
                                     margins: '0 0 0 0',
                                     flex: 1,
+                                    layout: 'fit',
                                     id: 'idGraphs'                                                                
                                 }
                             ]
@@ -291,10 +292,15 @@ function CreateViewport()
                     animCollapse: false,
                     collapsed: false,
                     collapsible: true,
+                    collapseDirection: 'top',
                     title: 'List',
                 	border: false,
                     margins: '0 0 0 0',
                     flex: 1,
+                    layout: {
+                        align: 'stretch',
+                        type: 'hbox'
+                    },
                     id: 'idGrid',
 				    loader:{url:<%='"'+"createGrid.jsp?id="+session.getAttribute("id").toString()+'"' %>, scripts:true, autoLoad:true}
                 }
