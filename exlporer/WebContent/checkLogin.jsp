@@ -9,6 +9,8 @@ if(session.getAttribute("userName") == null){
 	String passwd = request.getParameter("passwd");
 	if (Login.checkPassword(userName, passwd)){
 		session.setAttribute("user", userName);
+		session.setMaxInactiveInterval(5);
+
 		response.sendRedirect("index.jsp");
 	}else{
 		response.sendRedirect("login.jsp?fail=T");

@@ -10,7 +10,7 @@ else
 	session.setAttribute( "id", 1);//"noneEntered");
 %>
 
-<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+
 
 <html>
 <head>
@@ -20,9 +20,13 @@ else
 <!-- CSS Files -->
 <link type="text/css" href="msg.css" rel="stylesheet" />
 
+<!-- JavaScript -->
+<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
 <!-- Ext JS Library file -->
 <script type="text/javascript" src="ExtJS/bootstrap.js"></script>
 <link rel="stylesheet" type="text/css" href="ExtJS/resources/css/ext-all.css" />
+<!-- XmlHttpRequest -->
+<script type="text/javascript" src="js/xhtr.js"></script>
 
 </head>
 <script type="text/javascript">
@@ -178,6 +182,26 @@ function CreateAttributes(attribs)
     });
 }
 
+function ShowChartsForm(){
+	var msgContent = 'Which chart do you want to draw?<br><br>';
+	msgContent += '<form name="chartsForm"> <input type="checkbox" name="lengthDistribution"/> Peptides length distribution<br>';
+	msgContent += '<input type="checkbox" name="volcanoplot"/> Volcano plot<br>';
+	Ext.Msg.show({
+		width:300,
+		title: 'Charts form',
+		msg: msgContent,
+		buttons: Ext.Msg.OKCANCEL,
+		fn: function(btn){
+			if (btn=='ok'){
+				if (document.chartsForm.lengthDistribution.value == 'on'){
+					//get information from DB and draw peptides length graph
+					fetchPeptidesLength(drawPeptidesLength);
+				}
+			}
+		}
+	});
+}
+
 function CreateViewport()
 {
 	return Ext.create('Ext.container.Viewport', {
@@ -272,17 +296,18 @@ function CreateViewport()
                                 },
                                 {
                                     xtype: 'panel',
+                                    border: false,
                                     layout: {
                                         align: 'stretch',
                                         type: 'hbox'
                                     },
                                     collapseDirection: 'top',
                                     collapsible: true,
-                                    title: 'Graphs',
+                                    title: '<button type="button" style="border-radius:40px;font-size:small;font-weight:bold;color:#2B498B;background:#B9D0EE;" onClick="ShowChartsForm()"> <img src="icons/bar_chart.png"/> Charts </button>',
                                     margins: '0 0 0 0',
                                     flex: 1,
                                     layout: 'fit',
-                                    id: 'idGraphs'                                                                
+                                    id: 'idGraphs'
                                 }
                             ]
                         }

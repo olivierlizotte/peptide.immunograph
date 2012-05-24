@@ -9,7 +9,8 @@ abstract public class DefaultTemplate {
 		switch(theAttributeName)
 		{
 			case "type":		return false; 
-			case "StringID":	return false;				
+			case "StringID":	return false;
+			case "passwd":		return false;
 		}
 		return true;
 	}
