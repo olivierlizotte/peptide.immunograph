@@ -58,9 +58,10 @@
 		var nodeStore = Ext.create('Ext.data.Store', {
 			storeId : 'nodeStoreID' + keyName,
 			model : 'nodeModel' + keyName,
-			sorters : gridSorters[keyName],
+			//TODO Fix sorting problems on infinite scroll grids
+			//sorters : gridSorters[keyName],
 			//New
-			pageSize : 50,
+			pageSize : gridData[keyName].length,//50000,
 			buffered : true,
 			purgePageCount : 0,
 			proxy : {
@@ -76,14 +77,15 @@
 		    groupHeaderTpl: 'Validated: {name} ({rows.length} Item{[values.rows.length > 1 ? "s" : ""]})'
 		});//*/
 
-		var theGrid = Ext
-				.create(
-						'Ext.grid.Panel',
+		var theGrid = Ext.create('Ext.grid.Panel',
 						{
 							id : 'grid' + currentNodeType + keyName,
-							//stateful: true,
-							//     collapsible: true,
+							//stateful: true,//TODO make sure there is no state corruption bug before using states
 							loadMask : true,
+		                    animCollapse: false,
+		                    collapsible: false,
+		                    flex: 1,
+		                    layout: 'fit',
 							iconCls : 'icon-grid',
 							//frame: true,
 							store : nodeStore,
@@ -91,13 +93,13 @@
 							//features: [groupingFeature],
 							columns : gridColumns[keyName],
 
-							//New
+							//New 
 							//width: 500,
-							height : 700,
-							verticalScroller : {
+							//height : 700,
+							/*verticalScroller : {
 								xtype : 'paginggridscroller',
 								activePrefetch : false
-							},
+							},//*/
 							loadMask : true,
 							disableSelection : true,
 							invalidateScrollerOnRefresh : false,
@@ -273,26 +275,33 @@
 			});//----------------END OF GRID FOCUS FIX--------------------------------------------------
 
 	Ext.require('Ext.tab.*');
-	//Ext.onReady(function() {
-	var keys = [];
-	var itemsTab = [];
 
-	if(key)
-		CreateGrid(key).renderTo = 'list-container';
-	else
+	Ext.onReady(function() 
 	{
-		for ( var keyA in gridFields)
-			itemsTab.push(CreateGrid(keyA));
+		//Ext.onReady(function() {
+		var keys = [];
+		var itemsTab = [];
 
-		var tabs = Ext.createWidget('tabpanel', {
-			renderTo : 'list-container',
-			activeTab : 0,
-			defaults : {
-				bodyPadding : 10
-			},
-			items : itemsTab
-		});
-	}
+		if(key)
+			CreateGrid(key).renderTo = 'list-container';
+		else
+		{
+			for ( var keyA in gridFields)
+				itemsTab.push(CreateGrid(keyA));
+
+			var tabs = Ext.createWidget('tabpanel', {
+				renderTo : 'list-container',
+				activeTab : 0,
+                flex: 1,
+                height : 400,
+                layout: 'fit',
+				/*defaults : {
+					bodyPadding : 10
+				},//*/
+				items : itemsTab
+			});
+		}
+	});
 </script>
 </html>
 

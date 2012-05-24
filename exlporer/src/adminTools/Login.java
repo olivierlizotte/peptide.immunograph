@@ -6,9 +6,13 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.index.Index;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 public class Login {
+	
+	// TODO get the user ID dynamically
+	static int userId = 1090;
 	
 	static void registerShutdownHook( final GraphDatabaseService graphDb )
 	{
@@ -45,8 +49,20 @@ public class Login {
 	
 	public static boolean checkPassword(String login, String passwd) throws NoSuchAlgorithmException {
 		String passwdToTest = convertString(passwd).toString();
+		String correctPasswd="";
+		//correctPasswd="f71dbe52628a3f83a77ab494817525c6";
 		
-		String correctPasswd="f71dbe52628a3f83a77ab494817525c6";
+		EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
+		try	{
+			registerShutdownHook( graphDb );
+			Index<Node> index = graphDb.index().forNodes("users");
+			Node userNode = index.get("name", login).getSingle();
+			correctPasswd = userNode.getProperty("passwd").toString();
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			graphDb.shutdown();
+		}
 		if (passwdToTest.trim().equals(correctPasswd.trim())){
 			return true;
 		}else{
@@ -59,11 +75,16 @@ public class Login {
 		try	{
 			registerShutdownHook( graphDb );
 			Transaction tx = graphDb.beginTx();
-				Node userNode = graphDb.createNode();
-				userNode.setProperty("type", "User");
-				userNode.setProperty("NickName", name);
-				userNode.setProperty("passwd", convertString(passwd));
-				System.out.println("User ID : " + userNode.getId());
+			Node userNode = graphDb.createNode();
+			userNode.setProperty("type", "User");
+			userNode.setProperty("name", name);
+			userNode.setProperty("passwd", convertString(passwd).toString());
+		
+			Index<Node> index = graphDb.index().forNodes("users");
+			index.add(userNode, "name", name);
+
+			
+			System.out.println("User ID : " + userNode.getId());
 			tx.success();
 			tx.finish();
 		}catch(Exception e){
@@ -71,9 +92,5 @@ public class Login {
 		}finally{
 			graphDb.shutdown();
 		}
-	}
-	
-	public static void main(){
-		Login.addUser("az", "az");
 	}
 }
