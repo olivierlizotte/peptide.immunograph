@@ -1,7 +1,8 @@
 <%@ page import="adminTools.*" %>
 
 <%
-Login.addUser("az","az");
+ Login.addUser("caronlio","olivier", "power");
+//Login.deleteUser("Olivier Caron-Lizotte");
 %>
 
 

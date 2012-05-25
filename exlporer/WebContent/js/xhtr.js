@@ -35,7 +35,7 @@ function fetchPeptidesLength(callback) {
 
 
 function drawPeptidesLength(sData) {
-	// On peut maintenant traiter les données sans encombrer l'objet XHR.
+	// On peut maintenant traiter les donnees sans encombrer l'objet XHR.
 	dataTab = sData.split("|")[0].split(",");
 	labels = sData.split("|")[1].split(",");
 	
