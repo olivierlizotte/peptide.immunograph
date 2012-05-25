@@ -35,6 +35,7 @@ void registerShutdownHook( final GraphDatabaseService graphDb )
 %>
 
 <%
+//This jsp will add a comment and send back the new list of comments as a result
 String nodeID =  request.getParameter("id");
 String userID =  request.getParameter("user");
 String comment = request.getParameter("comment");

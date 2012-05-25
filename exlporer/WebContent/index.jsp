@@ -272,7 +272,7 @@ function CreateViewport()
                                 },
                                 {
                                     xtype: 'panel',
-                                    collapseDirection: 'top',
+                                    collapseDirection: 'bottom',
                                     collapsible: true,
                                     title: 'Graphs',
                                     margins: '0 0 0 0',
