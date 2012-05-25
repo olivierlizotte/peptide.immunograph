@@ -296,19 +296,18 @@ function CreateViewport()
                                 },
                                 {
                                     xtype: 'panel',
+                                    layout: { align: 'stretch',
+                                    	      type: 'hbox'
+                                    		},
                                     collapseDirection: 'bottom',
                                     collapsible: true,
                                     title: '<button type="button" style="border-radius:40px;font-size:small;font-weight:bold;color:#2B498B;background:#B9D0EE;" onClick="ShowChartsForm()"> <img src="icons/bar_chart.png"/> Charts </button>',
                                     margins: '0 0 0 0',
                                     flex: 1,
                                     layout: 'fit',
-                                    id: 'idGraphs'                                                                
-                                    border: false,
-                                    layout: {
-                                        align: 'stretch',
-                                        type: 'hbox'
+                                    id: 'idGraphs',                                                                
+                                    border: true
                                     }
-                                }
                             ]
                         }
                     ]
