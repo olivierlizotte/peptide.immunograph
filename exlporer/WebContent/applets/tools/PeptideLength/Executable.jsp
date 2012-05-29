@@ -16,13 +16,32 @@
 <%@ page import="java.util.List"%>
 <%@ page import="java.util.Map"%>
 <%@ page import="java.util.Map.Entry"%>
+<%!
+void registerShutdownHook( final GraphDatabaseService graphDb )
+{
+    // Registers a shutdown hook for the Neo4j instance so that it
+    // shuts down nicely when the VM exits (even if you "Ctrl-C" the
+    // running example before it's completed)
+    Runtime.getRuntime().addShutdownHook( new Thread()
+    {
+        @Override
+        public void run()
+		{
+            graphDb.shutdown();
+		}
+	} );
+}
+%>
 <%
+String nodeID = request.getAttribute("id");
+Strinf relationType = request.getAttribute("rel");
 
 // QUERY : start n=node(1) match n-[:Result]->t-[:Listed]->p where p.type="Peptide" return p.Sequence
 
 EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
 
-String cypherQuery = "start n=node(1) match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide\" return p.Sequence";
+//String cypherQuery = "start n=node(" + request.getAttribute("id") + ") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide\" return p.Sequence";
+String cypherQuery = "start n=node(" + nodeID + ") match n-[:" + relationType + "]->p where has(p.Sequence) return p.Sequence";
 // Map containing information about the peptides lengths. 
 // To each size corresponds the number of peptides in this category
 Map<Integer,Integer> lengths = new HashMap<Integer,Integer>();
@@ -32,50 +51,45 @@ try
 	// VERY IMPORTANT : use the org.neo4j.cypher.javacompat.* and not the org.neo4j.cypher.*
 	// otherwise can't iterate over the ExecutionResult
 	ExecutionResult result = engine.execute( cypherQuery );
-	String rows="";
-	int tmp=0;
+	
 	int currentLength=0;
-	for ( Map<String, Object> row : result ){
-	    for ( Entry<String, Object> column : row.entrySet() ){
+	for ( Map<String, Object> row : result )
+	{
+	    for ( Entry<String, Object> column : row.entrySet() )
+	    {
 	        // get the length of the peptide
-	    	currentLength=column.getValue().toString().trim().length();
+	    	currentLength = column.getValue().toString().trim().length();
+	        
 	        // if the key is already in the map, increment the number
-	        if(lengths.containsKey(currentLength)){
-	        	tmp=lengths.get(currentLength);
-	        	lengths.put(currentLength, tmp+1);        	
-	        }else{
-	        	// a peptide of the current length has not been found yet
-		    	lengths.put(currentLength,1);
-	        }
+	        if(lengths.containsKey(currentLength))
+	        	lengths.put(currentLength, lengths.get(currentLength) + 1);
+	        else  	// a peptide of the current length has not been found yet
+		    	lengths.put(currentLength,1);	        
 	    }
 	}
 	
 	// some peptides lengths are not represented by any peptide in the DB. 
 	// In order to get a proper histogram, the values for these lengths are set to 0
-	for(int i=0; i<Collections.max(lengths.keySet()) ; i+=1 ){
-		if (!lengths.containsKey(i)){
-			lengths.put(i,0);
-		}
-	}
+	for(int i=0; i<Collections.max(lengths.keySet()) ; i+=1 )
+		if (!lengths.containsKey(i))
+			lengths.put(i,0);	
 	
 	
-	// now use out.print method to transmit the result to xmlhttprequest x,y,z|a,b,c
-	// a,b,c are the lengths category, x,y,z the number of peptides in each one
-	String s="";
-	// first get the number of peptides in each category
-	for (int numbers : lengths.values()){
-		s+=numbers+",";
-	}
-	// remove the last comma
-	s = s.substring(0, s.length()-1);
-	s+="|";
-	// get the categories
-	for (int peptideLength : lengths.keySet()){
-		s+=peptideLength+",";
-	}
-	// remove the last comma
-	s = s.substring(0, s.length()-1);
-	out.print(s);
+	// now use out.print method to transmit the result
+	// 1,2,3,4,5,6,7,8,9,10 <- sizes
+	// 0,0,2,2,2,2,3,4,2,1  <- number of nodes with this value
+	
+	//First line (sequence length header)
+	out.print(lengths.keySet()[0]);
+	for (int i = 1; i < lengths.size(); i++)
+		out.print("," + lengths.keySet()[i]);
+	
+	out.println();
+
+	//Number of sequence per length
+	out.print(lengths.values()[0]);
+	for (int i = 1; i < lengths.size(); i++)
+		out.print("," + lengths.values()[i]);	
 }
 catch(Exception e)
 {
@@ -85,5 +99,4 @@ finally
 {
 	graphDb.shutdown();
 }
-//out.print("1,4,6,9,15,7,4,4,0");
 %>

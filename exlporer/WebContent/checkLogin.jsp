@@ -1,25 +1,7 @@
 <%@ page language="java" pageEncoding="UTF-8"%>
-<%@ page import="adminTools.*" %>
+<%@ page import="graphDB.users.*" %>
 <%@page import="javax.servlet.*" %>
 <%@page import="javax.servlet.http.*" %>
-<%
-/*
-if(session.getAttribute("userName") == null){
-	// not already connected
-	String userName = request.getParameter("username");
-	String passwd = request.getParameter("passwd");
-	if (Login.checkPassword(userName, passwd)){
-		session.setAttribute("user", userName);
-		session.setMaxInactiveInterval(5);
-
-		response.sendRedirect("index.jsp");
-	}else{
-		response.sendRedirect("login.jsp?fail=T");
-	}
-}else{
-	// session already started
-}//*/
-%>
 <%
 	String result;
 	String loginUsername = request.getParameter("loginUsername");
@@ -31,13 +13,19 @@ if(session.getAttribute("userName") == null){
 		{
 			result = "{success:true}";
 			session.setAttribute("user", loginUsername);
-			session.setMaxInactiveInterval(60);
+			session.setMaxInactiveInterval(3600);
 			session.setAttribute("userNodeID", userID);
 		}
 		else
+		{
+			Thread.sleep(1000);
 			result = "{success:false,errors:{reason:'Login failed.Try again'}}";
+		}
  
-	} else {
+	}
+	else 
+	{
+		Thread.sleep(1000);
 		result = "{success:false,errors:{reason:'Login failed.Try again'}}";
 	}
 %>

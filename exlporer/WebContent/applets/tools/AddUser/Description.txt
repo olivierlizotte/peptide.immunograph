@@ -1,0 +1,1 @@
+AddUser :: This tool adds a user (if it does not already exists).

@@ -1,0 +1,8 @@
+AuthUserFile /u/caronlo/public_html/files/.htpasswd
+AuthGroupFile /dev/null
+AuthName "Documentation access"
+AuthType Basic
+
+<Limit GET POST>
+require valid-user
+</Limit>

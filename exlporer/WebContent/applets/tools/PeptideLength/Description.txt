@@ -1,0 +1,2 @@
+PeptideLength :: <br>
+This tool creates a graph of the peptide length distribution from a list of nodes with the Sequence attribute.  

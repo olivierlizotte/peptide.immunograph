@@ -32,30 +32,34 @@ void registerShutdownHook( final GraphDatabaseService graphDb )
 %>
 
 <%
-EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
-try
-{	
-	registerShutdownHook( graphDb );
-
-	String nodeID = "1";
-
-	if( !session.getAttribute("id").toString().equals("noneEntered"))
-		nodeID = session.getAttribute("id").toString();
-	
-	DefaultNode theNode = new DefaultNode(nodeID, graphDb );
-	theNode.Initialize();
-	out.println("var currentNodeID=" + theNode.getId() + ";\n");
-	out.println("var currentNodeType=\""+theNode.getType()+"\";\n");
-	out.println(theNode.getAttributeJSON("myAttributeObject"));
-	
-	out.println(theNode.getCommentsVariable("myCommentData"));	
-}
-catch(Exception e)
+if(session.getAttribute("userNodeID") != null)
 {
-	e.printStackTrace();
-}
-finally
-{
-	graphDb.shutdown();
+	EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
+	try
+	{	
+		registerShutdownHook( graphDb );
+	
+		String nodeID = session.getAttribute("userNodeID").toString();
+	
+		//if( !session.getAttribute("id").toString().equals("noneEntered"))
+		if(request.getParameter("id") != null)
+			nodeID = request.getParameter("id");//session.getAttribute("id").toString();
+		
+		DefaultNode theNode = new DefaultNode(nodeID, graphDb );
+		theNode.Initialize();
+		out.println("var currentNodeID=" + theNode.getId() + ";\n");
+		out.println("var currentNodeType=\""+theNode.getType()+"\";\n");
+		out.println(theNode.getAttributeJSON("myAttributeObject"));
+		
+		out.println(theNode.getCommentsVariable("myCommentData"));	
+	}
+	catch(Exception e)
+	{
+		e.printStackTrace();
+	}
+	finally
+	{
+		graphDb.shutdown();
+	}
 }
 %>

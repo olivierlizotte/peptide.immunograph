@@ -1,4 +1,4 @@
-package adminTools;
+package graphDB.users;
 
 import graphDB.explore.DefaultTemplate;
 
@@ -10,12 +10,9 @@ import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
-public class Login {
+public class Login {	
 	
-	// TODO get the user ID dynamically
-	static int userId = 1090;
-	
-	static void registerShutdownHook( final GraphDatabaseService graphDb )
+	public static void registerShutdownHook( final GraphDatabaseService graphDb )
 	{
 	    // Registers a shutdown hook for the Neo4j instance so that it
 	    // shuts down nicely when the VM exits (even if you "Ctrl-C" the
@@ -83,7 +80,7 @@ public class Login {
 			Transaction tx = graphDb.beginTx();
 			
 			Index<Node> index = graphDb.index().forNodes("users");
-			Node userNodeExisting = index.get("name", name).getSingle();
+			Node userNodeExisting = index.get("name", nickName).getSingle();
 			if(userNodeExisting != null)
 				System.out.println("User already exists!");
 			else
@@ -94,7 +91,7 @@ public class Login {
 				userNode.setProperty("NickName", nickName);
 				userNode.setProperty("passwd", convertString(passwd).toString());
 		
-				index.add(userNode, "name", name);
+				index.add(userNode, "name", nickName);
 			
 				System.out.println("User ID : " + userNode.getId());
 			}
