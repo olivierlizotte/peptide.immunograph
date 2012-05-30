@@ -8,6 +8,7 @@ import javax.servlet.jsp.JspWriter;
 import org.neo4j.graphdb.*;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
+
 public class DefaultNode {
 
 	HashMap<String, String> theProperties = new HashMap<String,String>();
@@ -37,6 +38,10 @@ public class DefaultNode {
 		}
 	}
 	
+	/**
+	 * @param nodeID
+	 * @param graphDb
+	 */
 	public DefaultNode(String nodeID, EmbeddedGraphDatabase graphDb)
 	{
 		theNode = graphDb.getNodeById(Long.valueOf(nodeID));
