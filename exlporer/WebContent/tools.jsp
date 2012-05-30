@@ -4,6 +4,7 @@
     pageEncoding="ISO-8859-1"%>
 <%@ page import="java.util.*" %>
 <%@ page import="java.io.*" %>
+
 <html>
  <head>
 	<script type="text/javascript">
@@ -18,7 +19,24 @@
 	Here are your options:<br><br>
 	
 <%
-	String[] tools = DefaultTemplate.getTools(request.getParameter("id"));
+	String[] tools;
+
+	EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
+	try
+	{	
+		registerShutdownHook( graphDb );				
+
+		tools = DefaultTemplate.getTools(request.getParameter("id"));			
+	}
+	catch(Exception e)
+	{
+		e.printStackTrace();
+	}
+	finally
+	{
+		graphDb.shutdown();
+	}
+	
 	for(String path : tools)
 	{
 		String newDesc = path + "/Description.txt";
