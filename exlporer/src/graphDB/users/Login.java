@@ -60,8 +60,6 @@ public class Login {
 			{
 				userID = userNode.getId();
 				correctPasswd = userNode.getProperty("passwd").toString();
-			}else{
-				System.out.println("usernode null");
 			}
 		}catch(Exception e){
 			e.printStackTrace();
@@ -127,8 +125,5 @@ public class Login {
 		}finally{
 			graphDb.shutdown();
 		}
-	}
-	
-	public static void main(){
 	}
 }

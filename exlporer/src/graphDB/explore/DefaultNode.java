@@ -37,10 +37,6 @@ public class DefaultNode {
 		}
 	}
 	
-	/**
-	 * @param nodeID
-	 * @param graphDb
-	 */
 	public DefaultNode(String nodeID, EmbeddedGraphDatabase graphDb)
 	{
 		theNode = graphDb.getNodeById(Long.valueOf(nodeID));
