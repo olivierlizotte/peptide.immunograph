@@ -58,6 +58,12 @@ abstract public class DefaultTemplate {
 		} );
 	}//*/
 	
+	
+	/** Get the tools according to the type of node currently diplayed.
+	 * @param nodeID
+	 * @param graphDb
+	 * @return
+	 */
 	public static String[] getTools( String nodeID, EmbeddedGraphDatabase graphDb)
 	{
 		DefaultNode theNode = new DefaultNode(nodeID, graphDb );
@@ -75,6 +81,14 @@ abstract public class DefaultTemplate {
 		return new String[0];
 	}
 	
+	
+	/** Transform a Text referring to another node into a link to this node
+	 * @param text String
+	 * @param theNode neo4j Node
+	 * @param theUser neo4j Node
+	 * @param graphDb EmbeddedGraphDatabase
+	 * @return
+	 */
 	public static String checkForHashTags(String text, Node theNode, Node theUser, EmbeddedGraphDatabase graphDb)
 	{
 	    StringBuffer sb = new StringBuffer(text.length());	
