@@ -72,10 +72,12 @@
 		});
 		win.center();
 		win.show();
+		win.center();
 	});
 
 	function testFunction()
 	{ 
+		win.hide();
         login.getForm().submit({ 
             method:'POST', 
             waitTitle:'Connecting', 
@@ -93,7 +95,7 @@
 // you define as redirect. 
 
             success:function(){
-            	win.hide();
+            	//win.hide();
             	window.location.reload();
             },
 
@@ -102,11 +104,26 @@
 // at the user telling him / her as much.  
 
             failure:function(form, action){ 
-                if(action.failureType == 'server'){ 
+                if(action.failureType == 'server')
+                { 
                     obj = Ext.JSON.decode(action.response.responseText); 
-                    Ext.Msg.alert('Login Failed!', obj.errors.reason); 
-                }else{ 
-                    Ext.Msg.alert('Warning!', 'Authentication server is unreachable : ' + action.response.responseText); 
+
+                    Ext.MessageBox.show({
+                       title:'Login Failed!',
+                       msg: obj.errors.reason,
+                       buttons: Ext.MessageBox.OK,
+                       fn: function(){ win.show(); },
+                       icon: Ext.MessageBox.WARNING
+                   });
+                }else
+                {
+                    Ext.MessageBox.show({
+                       title:'Warning!',
+                       msg: 'Authentication server is unreachable : ' + action.response.responseText,
+                       buttons: Ext.MessageBox.OK,
+                       fn: function(){ win.show(); },
+                       icon: Ext.MessageBox.WARNING
+                   });
                 } 
                 login.getForm().reset(); 
             } 

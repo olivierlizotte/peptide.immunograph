@@ -96,6 +96,7 @@ function CreateComments(myComments)
 	        items: [{             
 	            xtype: 'grid',
 	            hideHeaders: true,
+	            border: false,
 	            columns: [{text:'Comments', flex:1, dataIndex:'comment', renderer: columnDesc}],
 	            store: nodeStoreComment, 
 	            flex: 1                                      
@@ -294,7 +295,7 @@ function CreateViewport()
                                             collapseDirection: 'right',
                                             collapsible: true,
                                             title: 'Comments',
-                                        	border: false,
+                                        	border: true,
                                             margins: '0 0 0 0',
                                             flex: 1,
                                             id: 'idComments',
@@ -335,8 +336,8 @@ function CreateViewport()
                     xtype: 'container',
                     animCollapse: false,
                     collapsed: false,
-                    collapsible: true,
-                    collapseDirection: 'top',
+                    //collapsible: false,
+                    //collapseDirection: 'top',
                     title: 'List',
                 	border: false,
                     loadMask: true,

@@ -2,6 +2,7 @@
 <%@ page import="graphDB.explore.*" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
+<%@ page import ="org.neo4j.kernel.EmbeddedGraphDatabase" %>
 <%@ page import="java.util.*" %>
 <%@ page import="java.io.*" %>
 <%!
@@ -41,7 +42,7 @@ void registerShutdownHook( final GraphDatabaseService graphDb )
 	{	
 		registerShutdownHook( graphDb );				
 
-		tools = DefaultTemplate.getTools(request.getParameter("id"));			
+		tools = DefaultTemplate.getTools(request.getParameter("id"), graphDb);			
 	}
 	catch(Exception e)
 	{
