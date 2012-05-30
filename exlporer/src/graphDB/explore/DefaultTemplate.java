@@ -50,8 +50,6 @@ abstract public class DefaultTemplate {
 		}
 		return true;
 	}
-	
-	
 	/**
 	 * Registers a shutdown hook for the Neo4j instance so that it
 	 * shuts down nicely when the VM exits (even if you "Ctrl-C" the
