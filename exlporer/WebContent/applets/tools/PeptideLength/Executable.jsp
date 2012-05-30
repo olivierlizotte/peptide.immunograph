@@ -33,8 +33,8 @@ void registerShutdownHook( final GraphDatabaseService graphDb )
 }
 %>
 <%
-String nodeID = request.getAttribute("id");
-Strinf relationType = request.getAttribute("rel");
+String nodeID = request.getAttribute("id").toString();
+String relationType = request.getAttribute("rel").toString();
 
 // QUERY : start n=node(1) match n-[:Result]->t-[:Listed]->p where p.type="Peptide" return p.Sequence
 
