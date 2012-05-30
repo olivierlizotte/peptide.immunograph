@@ -16,22 +16,18 @@ abstract public class DefaultTemplate {
 	
 	public static Boolean keepAttribute( String theAttributeName )
 	{
-		switch(theAttributeName)
-		{
-			case "type":		return false; 
-			case "StringID":	return false;
-			case "passwd":		return false;
-		}
+		if(theAttributeName == "type" ||
+				theAttributeName == "StringID" ||
+				theAttributeName == "passwd")
+			return false;
 		return true;
 	}
 
 	public static Boolean keepRelation( String theRelationName )
 	{
-		switch(theRelationName)
-		{
-			case "Comment":		return false;
-			//case "Hash":		return false;
-		}
+		if(theRelationName == "Comment")
+			//|| theRelationName == "Hash")
+			return false;
 		return true;
 	}
 /*
@@ -53,14 +49,17 @@ abstract public class DefaultTemplate {
 	public static String[] getTools( String nodeID, EmbeddedGraphDatabase graphDb)
 	{
 		DefaultNode theNode = new DefaultNode(nodeID, graphDb );
-		switch(theNode.getType())
+		String type = theNode.getType();
+		if(type == "Experiment")
 		{
-			case "Experiment":		String[] testE = {"applets/tools/PeptideLength"};
+			String[] testE = {"applets/tools/PeptideLength"};
 			return testE;
-			case "User":			String[] testU = {"applets/tools/AddUser"};
-			return testU;
 		}
-		
+		if(type == "User")
+		{			
+			String[] testU = {"applets/tools/AddUser"};
+			return testU;
+		}			
 		return new String[0];
 	}
 	
