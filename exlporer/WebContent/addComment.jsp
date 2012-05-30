@@ -41,9 +41,7 @@ if(session.getAttribute("user") != null)
 	String nodeID  = request.getParameter("id");
 	String comment = request.getParameter("comment");
 	String userID  = session.getAttribute("userNodeID").toString();
-
 	EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
-	
 	try
 	{				
 		String text = comment.replaceAll("\\r","<br/>");
