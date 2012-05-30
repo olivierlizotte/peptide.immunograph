@@ -52,9 +52,9 @@ if(session.getAttribute("user") != null)
 		text = text.replaceAll("\\\\", "&#92;");
 		registerShutdownHook( graphDb );
 		Node theNode = graphDb.getNodeById(Long.valueOf(nodeID));
-		Node theUser = graphDb.getNodeById(Long.valueOf(userID));
-	
+		Node theUser = graphDb.getNodeById(Long.valueOf(userID));		
 		Transaction tx = graphDb.beginTx();
+			text = DefaultTemplate.checkForHashTags(text, theNode, theUser, graphDb);
 			RelationshipType relType = DynamicRelationshipType.withName( "Comment" );	
 			theNode.createRelationshipTo(theUser, relType).setProperty("Text", text);
 		tx.success();

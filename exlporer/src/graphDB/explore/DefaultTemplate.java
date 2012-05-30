@@ -1,6 +1,12 @@
 package graphDB.explore;
 
-import org.neo4j.graphdb.GraphDatabaseService;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.neo4j.graphdb.DynamicRelationshipType;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.index.Index;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 abstract public class DefaultTemplate {
@@ -24,11 +30,11 @@ abstract public class DefaultTemplate {
 		switch(theRelationName)
 		{
 			case "Comment":		return false;
-			case "Hash":		return false;
+			//case "Hash":		return false;
 		}
 		return true;
 	}
-
+/*
 	public static void registerShutdownHook( final GraphDatabaseService graphDb )
 	{
 	    // Registers a shutdown hook for the Neo4j instance so that it
@@ -42,32 +48,48 @@ abstract public class DefaultTemplate {
 	            graphDb.shutdown();
 			}
 		} );
+	}//*/
+	
+	public static String[] getTools( String nodeID, EmbeddedGraphDatabase graphDb)
+	{
+		DefaultNode theNode = new DefaultNode(nodeID, graphDb );
+		switch(theNode.getType())
+		{
+			case "Experiment":		String[] testE = {"applets/tools/PeptideLength"};
+			return testE;
+			case "User":			String[] testU = {"applets/tools/AddUser"};
+			return testU;
+		}
+		
+		return new String[0];
 	}
 	
-	public static String[] getTools( String nodeID )
+	public static String checkForHashTags(String text, Node theNode, Node theUser, EmbeddedGraphDatabase graphDb)
 	{
-		EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
-		try
-		{	
-			registerShutdownHook( graphDb );				
-			
-			DefaultNode theNode = new DefaultNode(nodeID, graphDb );
-			switch(theNode.getType())
+	    StringBuffer sb = new StringBuffer(text.length());	
+		
+		Index<Node> index = graphDb.index().forNodes("hashtags");
+		
+		Pattern patt = Pattern.compile("(#[^<]*?) ");
+		Matcher m = patt.matcher(text);
+	    while (m.find()) 
+	    {
+	    	String tag = m.group(1);
+
+			Node tagNode = index.get("name", tag).getSingle();
+			if(tagNode == null)
 			{
-				case "Experiment":		String[] testE = {"applets/tools/PeptideLength"};
-				return testE;
-				case "User":			String[] testU = {"applets/tools/AddUser"};
-				return testU;
-			}	
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			graphDb.shutdown();
-		}
-		return new String[0];
-	} 
+				tagNode = graphDb.createNode();
+				tagNode.setProperty("name", tag);		
+				tagNode.setProperty("type", "HashTag");
+				index.add(tagNode, "name", tag);
+			}
+			RelationshipType relType = DynamicRelationshipType.withName( "Hash" );	
+			theNode.createRelationshipTo(tagNode, relType).setProperty("User", theUser.getProperty("NickName"));				
+			m.appendReplacement(sb, Matcher.quoteReplacement("<a href=index.jsp?id=" + tagNode.getId() + ">" + tag + "</a> "));
+	    }
+	    m.appendTail(sb);	
+	
+		return sb.toString();
+	}
 }

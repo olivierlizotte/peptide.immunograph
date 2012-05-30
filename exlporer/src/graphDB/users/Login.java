@@ -55,7 +55,7 @@ public class Login {
 		try	{
 			registerShutdownHook( graphDb );
 			Index<Node> index = graphDb.index().forNodes("users");
-			Node userNode = index.get("name", login).getSingle();
+			Node userNode = index.get("NickName", login).getSingle();
 			if(userNode != null)
 			{
 				userID = userNode.getId();
@@ -80,7 +80,7 @@ public class Login {
 			Transaction tx = graphDb.beginTx();
 			
 			Index<Node> index = graphDb.index().forNodes("users");
-			Node userNodeExisting = index.get("name", nickName).getSingle();
+			Node userNodeExisting = index.get("NickName", nickName).getSingle();
 			if(userNodeExisting != null)
 				System.out.println("User already exists!");
 			else
@@ -91,7 +91,7 @@ public class Login {
 				userNode.setProperty("NickName", nickName);
 				userNode.setProperty("passwd", convertString(passwd).toString());
 		
-				index.add(userNode, "name", nickName);
+				index.add(userNode, "NickName", nickName);
 			
 				System.out.println("User ID : " + userNode.getId());
 			}
@@ -103,7 +103,7 @@ public class Login {
 			graphDb.shutdown();
 		}
 	}
-
+	
 	public static void deleteUser(String name){
 		EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
 		try	{				
@@ -111,7 +111,7 @@ public class Login {
 			Transaction tx = graphDb.beginTx();
 			
 			Index<Node> index = graphDb.index().forNodes("users");
-			IndexHits<Node> nodes = index.get("name", name);
+			IndexHits<Node> nodes = index.get("NickName", name);
 			int nbElem = 0;
 			for (Node node : nodes) {
 				node.delete();
