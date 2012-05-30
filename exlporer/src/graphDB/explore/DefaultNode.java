@@ -8,7 +8,6 @@ import javax.servlet.jsp.JspWriter;
 import org.neo4j.graphdb.*;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
-
 public class DefaultNode {
 
 	HashMap<String, String> theProperties = new HashMap<String,String>();
