@@ -14,13 +14,13 @@ import org.neo4j.kernel.EmbeddedGraphDatabase;
  */
 abstract public class DefaultTemplate {
 
-	//public static String GraphDB = "/home/antoine/neo4j/data/graph.db";
-	public static String GraphDB = "C:\\_IRIC\\Neo4J\\data\\graph.db";
+	public static String GraphDB = "/home/antoine/neo4j/data/graph.db";
+	//public static String GraphDB = "C:\\_IRIC\\Neo4J\\data\\graph.db";
 	
 	
 	/** This function determines whether an attribute should be displayed or not in the explorer
 	 * @param theAttributeName attribute to test
-	 * @return
+	 * @return true if the attribute should be kept, false otherwise
 	 */
 	public static Boolean keepAttribute( String theAttributeName )
 	{
@@ -33,6 +33,10 @@ abstract public class DefaultTemplate {
 		return true;
 	}
 
+	/** This function determines whether an attribute should be displayed or not in the explorer
+	 * @param theRelationName the relation to test
+	 * @return true if the realtion should be kept, false otherwise
+	 */
 	public static Boolean keepRelation( String theRelationName )
 	{
 		switch(theRelationName)
