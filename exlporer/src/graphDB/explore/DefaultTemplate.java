@@ -9,11 +9,22 @@ import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
+
+/**
+ * This class determines the default behavior of the database explorer
+ *
+ */
 abstract public class DefaultTemplate {
 
-	//public static String GraphDB = "/home/antoine/neo4j/data/graph.db";
-	public static String GraphDB = "C:\\_IRIC\\Neo4J\\data\\graph.db";
+	public static String GraphDB = "/home/antoine/neo4j/data/graph.db";
+	//public static String GraphDB = "C:\\_IRIC\\Neo4J\\data\\graph.db";
 	
+	
+	/**
+	 * Decide which attributes of the node to display.
+	 * @param theAttributeName
+	 * @return true if the relation is to keep, false otherwise
+	 */
 	public static Boolean keepAttribute( String theAttributeName )
 	{
 		switch(theAttributeName)
@@ -24,7 +35,12 @@ abstract public class DefaultTemplate {
 		}
 		return true;
 	}
-
+	
+	/**
+	 * Decide which relations of the node to display.
+	 * @param theRelationName
+	 * @return true if the relation is to keep, false otherwise 
+	 */
 	public static Boolean keepRelation( String theRelationName )
 	{
 		switch(theRelationName)
@@ -34,12 +50,16 @@ abstract public class DefaultTemplate {
 		}
 		return true;
 	}
+	/**
+	 * Registers a shutdown hook for the Neo4j instance so that it
+	 * shuts down nicely when the VM exits (even if you "Ctrl-C" the
+	 * running example before it's completed).
+	 * @param graphDb a neo4j graph database
+	 */
+/*
 /*
 	public static void registerShutdownHook( final GraphDatabaseService graphDb )
 	{
-	    // Registers a shutdown hook for the Neo4j instance so that it
-	    // shuts down nicely when the VM exits (even if you "Ctrl-C" the
-	    // running example before it's completed)
 	    Runtime.getRuntime().addShutdownHook( new Thread()
 	    {
 	        @Override
