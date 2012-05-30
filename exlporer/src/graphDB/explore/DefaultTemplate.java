@@ -9,11 +9,19 @@ import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
+/** This class determines the default behavior of the explorer
+ *
+ */
 abstract public class DefaultTemplate {
 
 	//public static String GraphDB = "/home/antoine/neo4j/data/graph.db";
 	public static String GraphDB = "C:\\_IRIC\\Neo4J\\data\\graph.db";
 	
+	
+	/** This function determines whether an attribute should be displayed or not in the explorer
+	 * @param theAttributeName attribute to test
+	 * @return
+	 */
 	public static Boolean keepAttribute( String theAttributeName )
 	{
 		switch(theAttributeName)
