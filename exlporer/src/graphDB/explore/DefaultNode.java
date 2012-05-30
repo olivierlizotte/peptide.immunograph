@@ -218,7 +218,8 @@ public class DefaultNode {
 					else
 						out.print(",");
 					
-					out.print("{'Link':'<a href=\"index.jsp?id=" + n.getId() + "&rel=" + relationType.name() + "&dir=" + dir + "\">" + n.getProperty("type") + "</a>'");
+					
+					out.print("{'Link':'<a href=\"index.jsp?id=" + n.getId() + "&rel=" + relationType.name() + "&dir=" + dir + "\">" + getType(n) + "</a>'");
 	
 					//	writing the relation properties
 					for(String k: rel.getPropertyKeys())
@@ -276,14 +277,30 @@ public class DefaultNode {
 				//out.print("csvData['"+relationType+dir+"'] = '" + getCSV(relationType, dir).trim() + "';\n");
 			}
 		}		
-		} catch (IOException e)
+		} catch (Exception e)
 		{		
 			e.printStackTrace();
 		}			
 	}
 	
 	public String getType(){
-		return this.theNode.getProperty("type").toString();
+		try{
+			return this.theNode.getProperty("type").toString();
+		}
+		catch(Exception e)
+		{
+			return "";
+		}
+	}
+	
+	public static String getType(Node theNode){
+		try{
+			return theNode.getProperty("type").toString();
+		}
+		catch(Exception e)
+		{
+			return "";
+		}
 	}
 	/*
 	public String getCSV(String relationType, String dir)
