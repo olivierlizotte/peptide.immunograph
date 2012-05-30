@@ -16,16 +16,16 @@ abstract public class DefaultTemplate {
 	
 	public static Boolean keepAttribute( String theAttributeName )
 	{
-		if(theAttributeName == "type" ||
-				theAttributeName == "StringID" ||
-				theAttributeName == "passwd")
+		if("type".equals(theAttributeName) ||
+				"StringID".equals(theAttributeName) ||
+				"passwd".equals(theAttributeName))
 			return false;
 		return true;
 	}
 
 	public static Boolean keepRelation( String theRelationName )
 	{
-		if(theRelationName == "Comment")
+		if("Comment".equals(theRelationName))
 			//|| theRelationName == "Hash")
 			return false;
 		return true;
@@ -50,12 +50,12 @@ abstract public class DefaultTemplate {
 	{
 		DefaultNode theNode = new DefaultNode(nodeID, graphDb );
 		String type = theNode.getType();
-		if(type == "Experiment")
+		if("Experiment".equals(type))
 		{
 			String[] testE = {"applets/tools/PeptideLength"};
 			return testE;
 		}
-		if(type == "User")
+		if("User".equals(type))
 		{			
 			String[] testU = {"applets/tools/AddUser"};
 			return testU;
