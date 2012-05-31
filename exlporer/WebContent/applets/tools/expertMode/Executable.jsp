@@ -42,10 +42,27 @@ String getQueryResult(EmbeddedGraphDatabase graphDb, String cypherQuery){
 	    for ( Entry<String, Object> column : row.entrySet() ){
 	        rows += column.getKey() + ": " + column.getValue() + ";";
 	    }
-	    rows += "<br>";
+	    rows += "</br>";
 	}
 	return rows;
 }
+
+
+String getQueryResultForJs(EmbeddedGraphDatabase graphDb, String cypherQuery){
+	ExecutionEngine engine = new ExecutionEngine( graphDb );
+	// VERY IMPORTANT : use the org.neo4j.cypher.javacompat.* and not the org.neo4j.cypher.*
+	// otherwise can't iterate over the ExecutionResult
+	ExecutionResult result = engine.execute( cypherQuery );
+	String rows="";
+	for ( Map<String, Object> row : result ){
+	    for ( Entry<String, Object> column : row.entrySet() ){
+	        rows += column.getKey() + "," + column.getValue() + "|";
+	    }
+	    //rows += ";";
+	}
+	return rows;
+}
+
 
 %>
 <%
@@ -62,14 +79,14 @@ EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.Graph
 try
 {
 	System.out.println(cypherQuery);
-	out.println(cypherQuery);
+	//out.println(cypherQuery);
 	
-	String[] results = getQueryResult(graphDb, cypherQuery).split("<br>");
+	String[] results = getQueryResultForJs(graphDb, cypherQuery).split("<br>");
 	
 	for (String result : results){
 		//out.print("#"+result.split("\\[")[1].split("]")[0]+"#<br>");
 		
-		out.print("#"+result+"#<br>");
+		out.print(result);
 	}
 	
 }
