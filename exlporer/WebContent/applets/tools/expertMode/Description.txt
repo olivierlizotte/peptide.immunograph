@@ -1,0 +1,5 @@
+Expert Mode :: <br>
+This tool allows you to make a direct request to the database. 
+This is a NoSQL database. Thus,you will have to enter a cypher query.
+If you don't know what that is, check 
+<a href=http://docs.neo4j.org/chunked/1.4/cypher-query-lang.html>this tutorial</a>  
