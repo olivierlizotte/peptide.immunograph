@@ -14,8 +14,9 @@ import org.neo4j.kernel.EmbeddedGraphDatabase;
  */
 abstract public class DefaultTemplate {
 
-	//public static String GraphDB = "/home/antoine/neo4j/data/graph.db";
-	public static String GraphDB = "C:\\_IRIC\\Neo4J\\data\\graph.db";
+	public static String GraphDB = "/home/antoine/neo4j/data/graph.db";
+	//public static String GraphDB = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph.db";
+	//public static String GraphDB = "C:\\_IRIC\\Neo4J\\data\\graph.db";
 	
 	
 	/** This function determines whether an attribute should be displayed or not in the explorer
