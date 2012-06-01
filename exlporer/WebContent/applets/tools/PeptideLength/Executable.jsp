@@ -80,16 +80,20 @@ try
 	// 0,0,2,2,2,2,3,4,2,1  <- number of nodes with this value
 	
 	//First line (sequence length header)
-	out.print(lengths.keySet()[0]);
-	for (int i = 1; i < lengths.size(); i++)
-		out.print("," + lengths.keySet()[i]);
+	String sizes = "";
+	for (int length : lengths.keySet())
+		sizes += lengths.keySet() + ",";
+	sizes = sizes.substring(0, sizes.length()-1);
 	
-	out.println();
-
 	//Number of sequence per length
-	out.print(lengths.values()[0]);
-	for (int i = 1; i < lengths.size(); i++)
-		out.print("," + lengths.values()[i]);	
+	String numberOfSeq = "";
+	for (int nb : lengths.values())
+		numberOfSeq += lengths.values() + ",";
+	numberOfSeq = numberOfSeq.substring(0, numberOfSeq.length() - 1);
+	
+	out.println(sizes);
+	out.println();
+	out.println(numberOfSeq);
 }
 catch(Exception e)
 {
