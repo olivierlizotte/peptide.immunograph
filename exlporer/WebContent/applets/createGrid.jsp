@@ -187,7 +187,7 @@ if(session.getAttribute("userNodeID") != null)
 															plain : true,
 															//autoLoad: {url:'tool.jsp?name='+keyName+'&url='+document.URL, scripts:true},
 															loader : {
-																url : 'expertMode.jsp?url='
+																url : 'applets/tools/expertMode/Launcher.jsp?url='
 																		+ document.URL,
 																scripts : true,
 																autoLoad : true

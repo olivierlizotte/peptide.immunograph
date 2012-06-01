@@ -73,6 +73,12 @@ public class DefaultNode {
 		return "var " + varName + " = " + getComments(theNode) + ";\n";
 	}	
 	
+	
+	
+	/** Get the comment written by a user about the current Node. A comment is a relation of the graph with a "text property"
+	 * @param theNode neo4j Node
+	 * @return
+	 */
 	public static String getComments(Node theNode)
 	{
 		String output = "";
@@ -102,6 +108,11 @@ public class DefaultNode {
 			return "[" + output.substring(1) + "]";
 	}
 	
+	 /** Build a HashMap of relations. To each relationship type corresponds a list of nodes.
+	 * @param theRelationships
+	 * @param theNode
+	 * @return
+	 */
 	private static HashMap<RelationshipType, String> computeRelationMaps(Iterable<Relationship> theRelationships, Node theNode)
 	{
 		HashMap<RelationshipType, String> output = new HashMap<RelationshipType, String>();
@@ -162,6 +173,11 @@ public class DefaultNode {
 		return listOfAttributes;
 	}
 	
+	
+	/** Dynamically write javascript code to declare variables to fill the ExtJS panels
+	 * @param out
+	 * @param key
+	 */
 	public void printGridDataJSON(JspWriter out, String key)
 	{
 		try 
@@ -181,6 +197,10 @@ public class DefaultNode {
 		}
 	}
 	
+	
+	/** Get a default relation to display in the grid
+	 * @return
+	 */
 	public String getFirstRelationPlusDir()
 	{
 		if(outRelationsMap.size() > 0)
@@ -192,6 +212,14 @@ public class DefaultNode {
 		return "";
 	}
 	
+	/** Dynamically write javascript code to set variables to fill in the grid
+	 * @param relationsMap
+	 * @param listOfAttributes
+	 * @param dir
+	 * @param theNode
+	 * @param out
+	 * @param key
+	 */
 	private void computeGridDirection(HashMap<RelationshipType, String> relationsMap, 
 										HashMap<String, HashMap<String, String>> listOfAttributes,
 										Direction dir, Node theNode,
@@ -283,6 +311,7 @@ public class DefaultNode {
 		}			
 	}
 	
+	
 	public String getType(){
 		try{
 			return this.theNode.getProperty("type").toString();
@@ -330,6 +359,14 @@ public class DefaultNode {
 			return "";
 	}
 	
+	
+	/** Get the grid content as a String, represents csv format
+	 * @param relationType
+	 * @param dir
+	 * @param theNode
+	 * @param listOfAttributes
+	 * @return
+	 */
 	private static String getGridContent(RelationshipType relationType, 
 										 //List<Node> nodes, 
 										 Direction dir, 

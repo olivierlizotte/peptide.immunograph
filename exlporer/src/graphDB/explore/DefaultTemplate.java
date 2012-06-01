@@ -15,13 +15,13 @@ import org.neo4j.kernel.EmbeddedGraphDatabase;
 abstract public class DefaultTemplate {
 
 	public static String GraphDB = "/home/antoine/neo4j/data/graph.db";
-	//public static String GraphDB = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph.db";
 	//public static String GraphDB = "C:\\_IRIC\\Neo4J\\data\\graph.db";
 	
-	
+	//public static String GraphDB = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph.db";
+		
 	/** This function determines whether an attribute should be displayed or not in the explorer
 	 * @param theAttributeName attribute to test
-	 * @return
+	 * @return true if the attribute should be kept, false otherwise
 	 */
 	public static Boolean keepAttribute( String theAttributeName )
 	{
@@ -32,6 +32,10 @@ abstract public class DefaultTemplate {
 		return true;
 	}
 
+	/** This function determines whether an attribute should be displayed or not in the explorer
+	 * @param theRelationName the relation to test
+	 * @return true if the realtion should be kept, false otherwise
+	 */
 	public static Boolean keepRelation( String theRelationName )
 	{
 		if("Comment".equals(theRelationName))
@@ -55,6 +59,12 @@ abstract public class DefaultTemplate {
 		} );
 	}//*/
 	
+	
+	/** Get the tools according to the type of node currently diplayed.
+	 * @param nodeID
+	 * @param graphDb
+	 * @return
+	 */
 	public static String[] getTools( String nodeID, EmbeddedGraphDatabase graphDb)
 	{
 		DefaultNode theNode = new DefaultNode(nodeID, graphDb );
@@ -72,6 +82,14 @@ abstract public class DefaultTemplate {
 		return new String[0];
 	}
 	
+	
+	/** Transform a Text referring to another node into a link to this node
+	 * @param text String
+	 * @param theNode neo4j Node
+	 * @param theUser neo4j Node
+	 * @param graphDb EmbeddedGraphDatabase
+	 * @return
+	 */
 	public static String checkForHashTags(String text, Node theNode, Node theUser, EmbeddedGraphDatabase graphDb)
 	{
 	    StringBuffer sb = new StringBuffer(text.length());	
