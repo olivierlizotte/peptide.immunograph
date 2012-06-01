@@ -114,14 +114,14 @@ function CreateComments(myComments)
 	                margins: '5 0 -5 0',
 	                enableKeyEvents: true,
 	                listeners: {
-	                	keypress: function(field,e)
+	                	keypress: function(field,event)
 	                    {	
 	                		var theCode = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
 	                		if (theCode == 13)//If enter was pressed
 	                		{
-	                    		AddComment(field, e);
+	                    		AddComment(field, event);
 	                    		field.reset();
-	                    		e.stopEvent();
+	                    		event.stopEvent();
 	                		}
 	                    	else
 	                    		if(theCode == 32)//space bar, trap it
