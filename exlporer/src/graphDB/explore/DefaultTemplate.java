@@ -34,11 +34,12 @@ abstract public class DefaultTemplate {
 
 	/** This function determines whether an attribute should be displayed or not in the explorer
 	 * @param theRelationName the relation to test
-	 * @return true if the realtion should be kept, false otherwise
+	 * @return true if the relation should be kept, false otherwise
 	 */
 	public static Boolean keepRelation( String theRelationName )
 	{
-		if("Comment".equals(theRelationName))
+		if("Comment".equals(theRelationName) ||
+				"Tool_output".equals(theRelationName))
 			//|| theRelationName == "Hash")
 			return false;
 		return true;
