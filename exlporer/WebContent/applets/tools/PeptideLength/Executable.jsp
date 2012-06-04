@@ -85,6 +85,10 @@ String getPeptidesLengthDistribution(EmbeddedGraphDatabase graphDb, String cyphe
 }
 %>
 <%
+// TODO get a parameter to know which type of peptide to get the distribution from: SequenceSearch, Peptidome etc.
+// The data is stored in a node of type "Charts". It will have as attributes key the name of the chart 
+// and as value the data to use to draw it. keys will be for example :"Peptidome_peptideLength", "SequenceSearch_peptideLength"...
+
 String nodeID = request.getParameter("id").toString();
 String relationType = request.getParameter("rel").toString();
 
