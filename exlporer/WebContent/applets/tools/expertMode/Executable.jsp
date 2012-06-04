@@ -66,8 +66,8 @@ String getQueryResultForJs(EmbeddedGraphDatabase graphDb, String cypherQuery){
 
 %>
 <%
-//String nodeID = request.getAttribute("id").toString();
-//String relationType = request.getAttribute("rel").toString();
+String nodeID = request.getAttribute("id").toString();
+String relationType = request.getAttribute("rel").toString();
 
 
 

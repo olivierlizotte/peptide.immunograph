@@ -33,15 +33,18 @@ void registerShutdownHook( final GraphDatabaseService graphDb )
 }
 %>
 <%
-String nodeID = request.getAttribute("id").toString();
-String relationType = request.getAttribute("rel").toString();
+String nodeID = request.getParameter("id").toString();
+String relationType = request.getParameter("rel").toString();
 
 // QUERY : start n=node(1) match n-[:Result]->t-[:Listed]->p where p.type="Peptide" return p.Sequence
 
 EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
 
 //String cypherQuery = "start n=node(" + request.getAttribute("id") + ") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide\" return p.Sequence";
-String cypherQuery = "start n=node(" + nodeID + ") match n-[:" + relationType + "]->p where has(p.Sequence) return p.Sequence";
+
+//good?:  String cypherQuery = "start n=node(" + nodeID + ") match n-[:" + relationType + "]->p where has(p.Sequence) return p.Sequence";
+String cypherQuery ="start n=node(1) match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide\" return p.Sequence";
+
 // Map containing information about the peptides lengths. 
 // To each size corresponds the number of peptides in this category
 Map<Integer,Integer> lengths = new HashMap<Integer,Integer>();
@@ -82,15 +85,22 @@ try
 	//First line (sequence length header)
 	String sizes = "";
 	for (int length : lengths.keySet())
-		sizes += lengths.keySet() + ",";
+		sizes += length + ",";
 	sizes = sizes.substring(0, sizes.length()-1);
 	
 	//Number of sequence per length
 	String numberOfSeq = "";
 	for (int nb : lengths.values())
-		numberOfSeq += lengths.values() + ",";
+		numberOfSeq += nb + ",";
 	numberOfSeq = numberOfSeq.substring(0, numberOfSeq.length() - 1);
 	
+	
+	
+	
+	
+	System.out.println(sizes);
+	System.out.println();
+	System.out.println(numberOfSeq);
 	out.println(sizes);
 	out.println();
 	out.println(numberOfSeq);

@@ -82,7 +82,6 @@ abstract public class DefaultTemplate {
 		return new String[0];
 	}
 	
-	
 	/** Transform a Text referring to another node into a link to this node
 	 * @param text String
 	 * @param theNode neo4j Node
