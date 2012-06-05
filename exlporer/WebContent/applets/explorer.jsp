@@ -36,6 +36,7 @@ Ext.Loader.setConfig({
 
 <%@include file="createGrid.jsp"%>
 
+
 MessageTop = function(){
     var msgCt;
 
@@ -368,7 +369,10 @@ Ext.onReady(function() {
 	viewport = CreateViewport();
 });
 
+
 </script>
+<%@include file="drawCharts.jsp"%>
+
 <body>
 
 </body>
