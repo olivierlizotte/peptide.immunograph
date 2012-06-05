@@ -26,6 +26,8 @@ else
 <script type="text/javascript" src="js/xhtr.js"></script>
 
 </head>
+
+
 <script type="text/javascript">
 
 Ext.Loader.setConfig({
@@ -35,7 +37,8 @@ Ext.Loader.setConfig({
 <%@include file="getInfo.jsp"%>
 
 <%@include file="createGrid.jsp"%>
-
+charts=[];
+<%@include file="drawCharts.jsp"%>
 
 MessageTop = function(){
     var msgCt;
@@ -315,16 +318,14 @@ function CreateViewport()
                                     		},
                                     collapseDirection: 'bottom',
                                     collapsible: true,
+                                    autoScroll: true,
                                     title: '<button type="button" style="border-radius:40px;font-size:small;font-weight:bold;color:#2B498B;background:#B9D0EE;" onClick="ShowChartsForm()"> <img src="icons/bar_chart.png"/> Charts </button>',
                                     margins: '0 0 0 0',
                                     flex: 1,
-                                    layout: 'fit',
+                                    //layout: 'fit',
                                     id: 'idGraphs',                                                               
                                     border: false,
-                                    layout: {
-                                        align: 'stretch',
-                                        type: 'hbox'
-                                    }
+                                    items:charts
                                 }
                             ]
                         }
@@ -371,9 +372,10 @@ Ext.onReady(function() {
 
 
 </script>
-<%@include file="drawCharts.jsp"%>
+
 
 <body>
 
 </body>
+
 </html>

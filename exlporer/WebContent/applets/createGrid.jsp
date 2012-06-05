@@ -26,6 +26,7 @@ if(session.getAttribute("userNodeID") != null)
 //		nodeID = session.getAttribute("id").toString();	
 
 	EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase(DefaultTemplate.GraphDB);
+	
 	try 
 	{
 		DefaultNode theNode = new DefaultNode(nodeID, graphDb);
