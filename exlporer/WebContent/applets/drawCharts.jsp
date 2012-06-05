@@ -40,18 +40,40 @@ String nodeID = session.getAttribute("userNodeID").toString();
 if(request.getParameter("id") != null)
 	nodeID = request.getParameter("id");
 //only if there are any charts to draw
-boolean chartsToDraw = graphDb.getNodeById(Integer.valueOf(nodeID)).hasRelationship(DynamicRelationshipType.withName("Tool_output"));
+boolean chartsToDraw = graphDb.getNodeById(Integer.valueOf(nodeID)).
+								hasRelationship(DynamicRelationshipType.
+								withName("Tool_output"));
 if(chartsToDraw){
+	int graphNumber=0;
+	Node chartsNode = graphDb.getNodeById(Integer.valueOf(nodeID)).
+			getSingleRelationship(DynamicRelationshipType.withName("Tool_output"), Direction.OUTGOING).
+			getEndNode();
+	for(String chartName : chartsNode.getPropertyKeys()){
+		// the node has an attribute named "type", ignore it!
+		if (!chartName.equals("type")){
+			graphNumber+=1;
+			String value=chartsNode.getProperty(chartName).toString();
+			String[] xaxis = value.split("\n")[0].split(",");
+			String[] yaxis = value.split("\n")[1].split(",");
+			/* store the data in a Ext.data.JsonStore:
+				window.store1 = Ext.create('Ext.data.JsonStore', {
+    				fields: ['name', 'data1'],
+    				data: [{name: 1, data1:2},
+    						{name: 2, data1:14},
+   							{name: 3, data1:56},
+    						{name: 4, data1:8},]
+				});
+			*/
+			out.println("window.store"+graphNumber+"= Ext.create('Ext.data.JsonStore', {"+
+				    "fields: ['xax', 'yax'],"+
+					"data: [");
+			for (int i=0 ; i < xaxis.length ; i+=1){
+				out.println("{xax:"+xaxis[i]+", yax:"+yaxis[i]+"},");
+			}
+			out.println("]});");
+		}
+	}
 %>
-
-
-window.store1 = Ext.create('Ext.data.JsonStore', {
-    fields: ['name', 'data1'],
-    data: [{name: 1, data1:2},
-    	{name: 2, data1:14},
-   		{name: 3, data1:56},
-    	{name: 4, data1:8}]
-});
 
 
 
@@ -60,7 +82,12 @@ window.store2 = Ext.create('Ext.data.JsonStore', {
     data: [{name: 1, data1:30},
     	{name: 2, data1:11},
    		{name: 3, data1:5},
-    	{name: 4, data1:8}]
+    	{name: 4, data1:8},
+    	{name: 5, data1:45},
+    	{name: 6, data1:23},
+    	{name: 7, data1:4},
+    	{name: 8, data1:15},
+    	{name: 9, data1:10}]
 });
 
 
@@ -69,14 +96,14 @@ var peptidesLengthChart = Ext.create('Ext.chart.Chart', {
            animate: true,
            shadow: true,
            //renderTo: 'idGraphs',
-           height:200,
-           width:500,
+           //height:200,
+           //width:500,
            store: store1,
            //layout:'fit',
            axes: [{
                type: 'Numeric',
                position: 'left',
-               fields: ['data1'],
+               fields: ['yax'],
                label: {
                    renderer: Ext.util.Format.numberRenderer('0,0')
                },
@@ -86,31 +113,32 @@ var peptidesLengthChart = Ext.create('Ext.chart.Chart', {
            }, {
                type: 'Category',
                position: 'bottom',
-               fields: ['name'],
+               fields: ['xax'],
                title: 'Month of the Year'
            }],
            series: [{
                type: 'column',
                axis: 'left',
+               gutter:0,
                highlight: true,
                tips: {
                  trackMouse: true,
-                 width: 140,
-                 height: 28,
+                 width: 30,
+                 //height: 28,
                  renderer: function(storeItem, item) {
-                   this.setTitle(storeItem.get('name') + ': ' + storeItem.get('data1') + ' $');
+                   this.setTitle(storeItem.get('xax') + ': ' + storeItem.get('yax') + ' $');
                  }
                },
                label: {
                  display: 'insideEnd',
                  'text-anchor': 'middle',
-                   field: 'data1',
+                   field: 'yax',
                    renderer: Ext.util.Format.numberRenderer('0'),
                    orientation: 'vertical',
                    color: '#333'
                },
-               xField: 'name',
-               yField: 'data1'
+               xField: 'xax',
+               yField: 'yax'
            }]
 });
 
@@ -119,8 +147,8 @@ var peptidesLengthChart2 = Ext.create('Ext.chart.Chart', {
     animate: true,
     shadow: true,
     //renderTo: 'idGraphs',
-    height:200,
-    width:500,
+    //height:200,
+    //width:500,
     store: store2,
     //layout:'fit',
     axes: [{
@@ -142,10 +170,11 @@ var peptidesLengthChart2 = Ext.create('Ext.chart.Chart', {
     series: [{
         type: 'column',
         axis: 'left',
+        gutter:0,
         highlight: true,
         tips: {
           trackMouse: true,
-          //width: 140,
+          width: 5,
           //height: 28,
           renderer: function(storeItem, item) {
             this.setTitle(storeItem.get('name') + ': ' + storeItem.get('data1') + ' $');

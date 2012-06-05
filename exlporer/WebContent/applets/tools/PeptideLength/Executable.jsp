@@ -102,33 +102,34 @@ EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.Graph
 String cypherQuery ="start n=node("+nodeID+") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide\" return p.Sequence";
 try{
 	Transaction tx = graphDb.beginTx();
-	// flag to check if the charts's node already exists
-	boolean flag=false;
 	// get the relashionship to the node storing information about charts. In theory there should only be one node concerned.
-	Iterable<Relationship> toolOutputs = graphDb.getNodeById(Integer.valueOf(nodeID)).getRelationships(Direction.OUTGOING, DynamicRelationshipType.withName("Tool_output"));
-	System.out.println("first IF"+toolOutputs.toString());
-	// in theory toolOutputs only parses one node.
-	for (Relationship toolOutput : toolOutputs){
-		flag=true;
+	// in theory only one node.
+	
+	// if the relationship doesn't existe yet, create it
+	if(!graphDb.getNodeById(Integer.valueOf(nodeID)).
+			hasRelationship(DynamicRelationshipType.withName("Tool_output"), Direction.OUTGOING)){
+		
+		Node charts = graphDb.createNode();
+		charts.setProperty("type", "Charts");
+		charts.setProperty("Peptidome_peptideLength", getPeptidesLengthDistribution(graphDb, cypherQuery));
+		graphDb.getNodeById(Integer.valueOf(nodeID)).
+				createRelationshipTo(charts, DynamicRelationshipType.withName("Tool_output"));
+		System.out.println("just created "+charts.getId());
+	}else{
+		Relationship toolOutput = graphDb.getNodeById(Integer.valueOf(nodeID)).
+				getSingleRelationship(DynamicRelationshipType.withName("Tool_output"), Direction.OUTGOING);
 		// then check if the data for this chart were already fetched from DB
 		if(!toolOutput.getEndNode().getProperty("Peptidome_peptideLength").equals(null)){
 			System.out.println("already exists"+toolOutput.getEndNode().getId());
 			// this information has already been stored in the DB!
-			// TODO: dialog message asknig if the user wants to overwrite it
+			// TODO: dialog message asking if the user wants to overwrite it
 		}//otherwise store the data to built chart
 		else{
 			System.out.println("create only data"+toolOutput.getEndNode().getId());
 			toolOutput.getEndNode().setProperty("Peptidome_peptideLength", getPeptidesLengthDistribution(graphDb, cypherQuery));				
 		}
 	}
-	// if for loop not entered, the node does not exist yet. time to create it!
-	if(!flag){
-		Node charts = graphDb.createNode();
-		charts.setProperty("type", "Charts");
-		charts.setProperty("Peptidome_peptideLength", getPeptidesLengthDistribution(graphDb, cypherQuery));
-		graphDb.getNodeById(Integer.valueOf(nodeID)).createRelationshipTo(charts, DynamicRelationshipType.withName("Tool_output"));
-		System.out.println("just created "+charts.getId());
-	}
+	
 	tx.success();
 	tx.finish();
 	out.println(getPeptidesLengthDistribution(graphDb, cypherQuery));
