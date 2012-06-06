@@ -9,7 +9,9 @@
 function Launch()
 {
 		$.post(	"applets/tools/expertMode/Executable.jsp",
-				{"query":document.getElementById("textQuery").value},
+				{"query":document.getElementById("textQuery").value, 
+				"id":<%=request.getParameter("id") %>,
+				"rel":<%= request.getParameter("rel")%>},
 				function(results)
 				{		
 					MessageTop.msg("Query executed successfuly!", "");

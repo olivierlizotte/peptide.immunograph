@@ -99,7 +99,13 @@ EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.Graph
 //String cypherQuery = "start n=node(" + request.getAttribute("id") + ") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide\" return p.Sequence";
 
 //String cypherQuery = "start n=node(" + nodeID + ") match n-[:" + relationType + "]->p where has(p.Sequence) return p.Sequence";
-String cypherQuery ="start n=node("+nodeID+") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide\" return p.Sequence";
+
+// 
+String cypherQueryPeptidome ="start n=node("+nodeID+") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide\" return p.Sequence";
+
+
+String cypherQueryPeptideIdentification ="start n=node("+nodeID+") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide Identification\" return p.Sequence";
+
 try{
 	Transaction tx = graphDb.beginTx();
 	// get the relashionship to the node storing information about charts. In theory there should only be one node concerned.
@@ -111,7 +117,7 @@ try{
 		
 		Node charts = graphDb.createNode();
 		charts.setProperty("type", "Charts");
-		charts.setProperty("Peptidome_peptideLength", getPeptidesLengthDistribution(graphDb, cypherQuery));
+		charts.setProperty("Peptidome_peptideLength", getPeptidesLengthDistribution(graphDb, cypherQueryPeptidome));
 		graphDb.getNodeById(Integer.valueOf(nodeID)).
 				createRelationshipTo(charts, DynamicRelationshipType.withName("Tool_output"));
 		System.out.println("just created "+charts.getId());
@@ -126,13 +132,13 @@ try{
 		}//otherwise store the data to built chart
 		else{
 			System.out.println("create only data"+toolOutput.getEndNode().getId());
-			toolOutput.getEndNode().setProperty("Peptidome_peptideLength", getPeptidesLengthDistribution(graphDb, cypherQuery));				
+			toolOutput.getEndNode().setProperty("Peptidome_peptideLength", getPeptidesLengthDistribution(graphDb, cypherQueryPeptidome));				
 		}
 	}
 	
 	tx.success();
 	tx.finish();
-	out.println(getPeptidesLengthDistribution(graphDb, cypherQuery));
+	out.println(getPeptidesLengthDistribution(graphDb, cypherQueryPeptidome));
 }
 catch(Exception e)
 {
