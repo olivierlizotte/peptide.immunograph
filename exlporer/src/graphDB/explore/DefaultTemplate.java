@@ -13,12 +13,46 @@ import org.neo4j.kernel.EmbeddedGraphDatabase;
 /** This class determines the default behavior of the explorer
  *
  */
-abstract public class DefaultTemplate {
-
-	public static String GraphDB = "/home/antoine/neo4j/data/graph.db";
+abstract public class DefaultTemplate 
+{
+	/** Registers a shutdown hook for the Neo4j instance so that it
+	    shuts down nicely when the VM exits (even if you "Ctrl-C" the
+	    running example before it's completed)
+	 * @param graphDb
+	 */
+	public static void registerShutdownHook( final GraphDatabaseService graphDb )
+	{
+	    // Registers a shutdown hook for the Neo4j instance so that it
+	    // shuts down nicely when the VM exits (even if you "Ctrl-C" the
+	    // running example before it's completed)
+	    Runtime.getRuntime().addShutdownHook( new Thread()
+	    {
+	        @Override
+	        public void run()
+			{
+	            graphDb.shutdown();
+			}
+		} );
+	}
+	
+	public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
+	
 	//public static String GraphDB = "C:\\_IRIC\\Neo4J\\data\\graph.db";
 	
 	//public static String GraphDB = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph.db";
+	
+	
+	private static EmbeddedGraphDatabase theGraph = null;
+	public static EmbeddedGraphDatabase graphDb()
+	{
+		if(theGraph == null)
+		{
+			theGraph = new EmbeddedGraphDatabase( DefaultTemplate.GraphDBString );
+			registerShutdownHook(theGraph);
+		}
+		return theGraph;
+	}
+	
 		
 	/** This function determines whether an attribute should be displayed or not in the explorer
 	 * @param theAttributeName attribute to test
@@ -67,9 +101,9 @@ abstract public class DefaultTemplate {
 	 * @param graphDb
 	 * @return
 	 */
-	public static String[] getTools( String nodeID, EmbeddedGraphDatabase graphDb)
+	public static String[] getTools( String nodeID )
 	{
-		DefaultNode theNode = new DefaultNode(nodeID, graphDb );
+		DefaultNode theNode = new DefaultNode(nodeID);
 		String type = theNode.getType();
 		if("Experiment".equals(type))
 		{

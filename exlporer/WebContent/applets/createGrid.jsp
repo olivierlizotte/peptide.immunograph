@@ -29,10 +29,9 @@ if(session.getAttribute("userNodeID") != null)
 	//	else
 	//		nodeID = session.getAttribute("id").toString();	
 	
-		EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase(DefaultTemplate.GraphDB);
 		try 
 		{
-			DefaultNode theNode = new DefaultNode(nodeID, graphDb);
+			DefaultNode theNode = new DefaultNode(nodeID);
 			theNode.Initialize();//TODO optimize this call to prevent preloading when key is not empty 
 			theNode.printGridDataJSON(out, key);
 		} catch (Exception e) 
@@ -40,7 +39,7 @@ if(session.getAttribute("userNodeID") != null)
 			e.printStackTrace();
 		} finally 
 		{
-			graphDb.shutdown();
+			//graphDb.shutdown();
 		}
 	}
 }
