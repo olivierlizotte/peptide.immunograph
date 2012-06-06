@@ -16,37 +16,37 @@
 <%@ page import="graphDB.explore.*" %>
 <%!
 void registerShutdownHook( final GraphDatabaseService graphDb )
-{
-    // Registers a shutdown hook for the Neo4j instance so that it
-    // shuts down nicely when the VM exits (even if you "Ctrl-C" the
-    // running example before it's completed)
-    Runtime.getRuntime().addShutdownHook( new Thread()
-    {
-        @Override
-        public void run()
-		{
-            graphDb.shutdown();
-		}
-	} );
-}
+	{
+	    // Registers a shutdown hook for the Neo4j instance so that it
+	    // shuts down nicely when the VM exits (even if you "Ctrl-C" the
+	    // running example before it's completed)
+	    Runtime.getRuntime().addShutdownHook( new Thread()
+	    {
+	        @Override
+	        public void run()
+			{
+	            graphDb.shutdown();
+			}
+		} );
+	}
 %>
-
 <%
 if(session.getAttribute("userNodeID") != null)
 {
 	EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
 	try
 	{	
-		registerShutdownHook( graphDb );
+		registerShutdownHook(graphDb);
 	
 		String nodeID = session.getAttribute("userNodeID").toString();
-	
 		//if( !session.getAttribute("id").toString().equals("noneEntered"))
 		if(request.getParameter("id") != null)
 			nodeID = request.getParameter("id");//session.getAttribute("id").toString();
 		
 		DefaultNode theNode = new DefaultNode(nodeID, graphDb );
 		theNode.Initialize();
+		session.setAttribute("currentNode", theNode);
+		
 		out.println("var currentNodeID=" + theNode.getId() + ";\n");
 		out.println("var currentNodeType=\""+theNode.getType()+"\";\n");
 		out.println(theNode.getAttributeJSON("myAttributeObject"));
