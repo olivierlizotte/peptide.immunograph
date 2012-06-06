@@ -1,3 +1,4 @@
+<%@page import="org.neo4j.graphdb.DynamicRelationshipType"%>
 <%@page import="scala.util.parsing.json.JSONFormat"%>
 <%@ page import="graphDB.explore.*" %>
 <%@ page import =" org.neo4j.cypher.javacompat.ExecutionEngine" %>
@@ -31,22 +32,11 @@ void registerShutdownHook( final GraphDatabaseService graphDb )
 		}
 	} );
 }
-%>
-<%
-String nodeID = request.getAttribute("id").toString();
-String relationType = request.getAttribute("rel").toString();
 
-// QUERY : start n=node(1) match n-[:Result]->t-[:Listed]->p where p.type="Peptide" return p.Sequence
-
-EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
-
-//String cypherQuery = "start n=node(" + request.getAttribute("id") + ") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide\" return p.Sequence";
-String cypherQuery = "start n=node(" + nodeID + ") match n-[:" + relationType + "]->p where has(p.Sequence) return p.Sequence";
-// Map containing information about the peptides lengths. 
-// To each size corresponds the number of peptides in this category
-Map<Integer,Integer> lengths = new HashMap<Integer,Integer>();
-try
-{	
+String getPeptidesLengthDistribution(EmbeddedGraphDatabase graphDb, String cypherQuery){
+	// Map containing information about the peptides lengths. 
+	// To each size corresponds the number of peptides in this category
+	Map<Integer,Integer> lengths = new HashMap<Integer,Integer>();
 	ExecutionEngine engine = new ExecutionEngine( graphDb );
 	// VERY IMPORTANT : use the org.neo4j.cypher.javacompat.* and not the org.neo4j.cypher.*
 	// otherwise can't iterate over the ExecutionResult
@@ -75,25 +65,74 @@ try
 			lengths.put(i,0);	
 	
 	
-	// now use out.print method to transmit the result
-	// 1,2,3,4,5,6,7,8,9,10 <- sizes
-	// 0,0,2,2,2,2,3,4,2,1  <- number of nodes with this value
-	
+		
 	//First line (sequence length header)
 	String sizes = "";
 	for (int length : lengths.keySet())
-		sizes += lengths.keySet() + ",";
+		sizes += length + ",";
 	sizes = sizes.substring(0, sizes.length()-1);
 	
 	//Number of sequence per length
 	String numberOfSeq = "";
 	for (int nb : lengths.values())
-		numberOfSeq += lengths.values() + ",";
+		numberOfSeq += nb + ",";
 	numberOfSeq = numberOfSeq.substring(0, numberOfSeq.length() - 1);
 	
-	out.println(sizes);
-	out.println();
-	out.println(numberOfSeq);
+	// now return the result
+	// 1,2,3,4,5,6,7,8,9,10 <- sizes
+	// 0,0,2,2,2,2,3,4,2,1  <- number of nodes with this value
+	return sizes+"\n"+numberOfSeq;
+}
+%>
+<%
+// TODO get a parameter to know which type of peptide to get the distribution from: SequenceSearch, Peptidome etc.
+// The data is stored in a node of type "Charts". It will have as attributes key the name of the chart 
+// and as value the data to use to draw it. keys will be for example :"Peptidome_peptideLength", "SequenceSearch_peptideLength"...
+
+String nodeID = request.getParameter("id").toString();
+String relationType = request.getParameter("rel").toString();
+
+// QUERY : start n=node(1) match n-[:Result]->t-[:Listed]->p where p.type="Peptide" return p.Sequence
+
+EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
+
+//String cypherQuery = "start n=node(" + request.getAttribute("id") + ") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide\" return p.Sequence";
+
+//String cypherQuery = "start n=node(" + nodeID + ") match n-[:" + relationType + "]->p where has(p.Sequence) return p.Sequence";
+String cypherQuery ="start n=node("+nodeID+") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide\" return p.Sequence";
+try{
+	Transaction tx = graphDb.beginTx();
+	// get the relashionship to the node storing information about charts. In theory there should only be one node concerned.
+	// in theory only one node.
+	
+	// if the relationship doesn't existe yet, create it
+	if(!graphDb.getNodeById(Integer.valueOf(nodeID)).
+			hasRelationship(DynamicRelationshipType.withName("Tool_output"), Direction.OUTGOING)){
+		
+		Node charts = graphDb.createNode();
+		charts.setProperty("type", "Charts");
+		charts.setProperty("Peptidome_peptideLength", getPeptidesLengthDistribution(graphDb, cypherQuery));
+		graphDb.getNodeById(Integer.valueOf(nodeID)).
+				createRelationshipTo(charts, DynamicRelationshipType.withName("Tool_output"));
+		System.out.println("just created "+charts.getId());
+	}else{
+		Relationship toolOutput = graphDb.getNodeById(Integer.valueOf(nodeID)).
+				getSingleRelationship(DynamicRelationshipType.withName("Tool_output"), Direction.OUTGOING);
+		// then check if the data for this chart were already fetched from DB
+		if(!toolOutput.getEndNode().getProperty("Peptidome_peptideLength").equals(null)){
+			System.out.println("already exists"+toolOutput.getEndNode().getId());
+			// this information has already been stored in the DB!
+			// TODO: dialog message asking if the user wants to overwrite it
+		}//otherwise store the data to built chart
+		else{
+			System.out.println("create only data"+toolOutput.getEndNode().getId());
+			toolOutput.getEndNode().setProperty("Peptidome_peptideLength", getPeptidesLengthDistribution(graphDb, cypherQuery));				
+		}
+	}
+	
+	tx.success();
+	tx.finish();
+	out.println(getPeptidesLengthDistribution(graphDb, cypherQuery));
 }
 catch(Exception e)
 {

@@ -24,12 +24,15 @@ void registerShutdownHook( final GraphDatabaseService graphDb )
 %>
 <html>
  <head>
+ 	
 	<script type="text/javascript">
 	function gotoUrl(theUrl)
 	{		
-		document.getElementById('contentToolDiv').innerHTML = '<object id="foo" name="foo" type="text/html" data="' + theUrl + '"></object>';
+		document.getElementById('contentToolDiv').innerHTML = '<object id="foo" name="foo" type="text/html" data="' + theUrl + '?id=' + <%=request.getParameter("id")%> +'&rel='+<%=request.getParameter("rel")%>+'"></object>';
 		//document.body.innerHTML = '<object id="foo" name="foo" type="text/html" data="' + theUrl + '"></object>';
 	}
+	
+		
 	</script>
  </head>
  <body><div id="contentToolDiv">
@@ -39,20 +42,14 @@ void registerShutdownHook( final GraphDatabaseService graphDb )
 	String[] tools;
 
 	EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
-	try
-	{	
+// 	try
+// 	{	
 		registerShutdownHook( graphDb );				
 
 		tools = DefaultTemplate.getTools(request.getParameter("id"), graphDb);			
-	}
-	catch(Exception e)
-	{
-		e.printStackTrace();
-	}
-	finally
-	{
-		graphDb.shutdown();
-	}
+	
+	// TEMPORARY	
+	graphDb.shutdown();
 	
 	for(String path : tools)
 	{
@@ -65,6 +62,19 @@ void registerShutdownHook( final GraphDatabaseService graphDb )
 		<br>
 		<%
 	}
+	
+	
+	
+	
+// 	}
+// 	catch(Exception e)
+// 	{
+// 		e.printStackTrace();
+// 	}
+// 	finally
+// 	{
+// 		graphDb.shutdown();
+// 	}
 %>
 	</div>
  </body>

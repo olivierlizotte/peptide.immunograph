@@ -34,7 +34,11 @@ public class XmlToDb extends DefaultHandler
 	
 	String nickName;
 	
-	public XmlToDb(String userName) {
+	static int MaxTx = 10000;
+	int doTx = 0;;
+	
+	public XmlToDb(String userName) 
+	{
 		super();
 		
 		graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
@@ -102,6 +106,17 @@ public class XmlToDb extends DefaultHandler
 	//For each tag, create or retrieve node
 	public void startElement (String uri, String name, String qName, Attributes atts)
 	{
+		doTx++;
+		if(doTx > MaxTx)
+		{
+			doTx = 0;
+			this.tx.success();
+			this.tx.finish();
+			System.gc();
+			System.out.println("GC called...");
+			this.tx = graphDb.beginTx();
+		}
+		
 		if("Node".equals(qName))
 		{
 			if(atts.getValue("Get") != null)

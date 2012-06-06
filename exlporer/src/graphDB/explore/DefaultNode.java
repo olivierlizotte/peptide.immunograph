@@ -404,4 +404,30 @@ public class DefaultNode {
 	{
 		return theNode.getId();
 	}	
+	
+	public String getChildren(  )
+	{
+		String result = "{ name: '" + getType() + "', children: [";
+				
+		for(RelationshipType relationType : inRelationsMap.keySet())
+		{
+			int i = 0;
+			for (Relationship rel : theNode.getRelationships(Direction.INCOMING, relationType))
+			{			
+				i++;
+			}
+			result += "{name:'" + relationType.name() + "',size:" + i + "},";
+		}		
+		for(RelationshipType relationType : outRelationsMap.keySet())
+		{
+			int i = 0;
+			for (Relationship rel : theNode.getRelationships(Direction.OUTGOING, relationType))
+			{			
+				i++;
+			}
+			result += "{name:'" + relationType.name() + "',size:" + i + "},";
+		}
+		result += "]};";
+		return result;
+	}
 }

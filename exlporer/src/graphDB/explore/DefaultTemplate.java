@@ -4,6 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.neo4j.graphdb.DynamicRelationshipType;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.index.Index;
@@ -34,11 +35,12 @@ abstract public class DefaultTemplate {
 
 	/** This function determines whether an attribute should be displayed or not in the explorer
 	 * @param theRelationName the relation to test
-	 * @return true if the realtion should be kept, false otherwise
+	 * @return true if the relation should be kept, false otherwise
 	 */
 	public static Boolean keepRelation( String theRelationName )
 	{
-		if("Comment".equals(theRelationName))
+		if("Comment".equals(theRelationName) ||
+				"Tool_output".equals(theRelationName))
 			//|| theRelationName == "Hash")
 			return false;
 		return true;
@@ -82,7 +84,6 @@ abstract public class DefaultTemplate {
 		return new String[0];
 	}
 	
-	
 	/** Transform a Text referring to another node into a link to this node
 	 * @param text String
 	 * @param theNode neo4j Node
@@ -118,4 +119,5 @@ abstract public class DefaultTemplate {
 	
 		return sb.toString();
 	}
+	
 }
