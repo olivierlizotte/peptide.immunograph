@@ -10,7 +10,6 @@ import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
-import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -34,33 +33,22 @@ public class XmlToDb extends DefaultHandler
 	
 	String nickName;
 	
-	public XmlToDb(String userName) {
+	static int MaxTx = 10000;
+	int doTx = 0;;
+	
+	public XmlToDb(String userName) 
+	{
 		super();
 		
-		graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
+		graphDb = DefaultTemplate.graphDb();
 		
 		//indexing the nodes is essential in order to be able to use the following request type :
 		// "start n=node:nodes(StringID="RAW1") return n"
 		// DRAWBACK : it takes time and memory......
-		registerShutdownHook( graphDb );
+				
 		nodeMap = new HashMap<String, Node>();
 		nickName = userName;
 	}
-
-	public static void registerShutdownHook( final GraphDatabaseService graphDb )
-	{
-	    // Registers a shutdown hook for the Neo4j instance so that it
-	    // shuts down nicely when the VM exits (even if you "Ctrl-C" the
-	    // running example before it's completed)
-	    Runtime.getRuntime().addShutdownHook( new Thread()
-	    {
-	        @Override
-	        public void run()
-			{
-	            graphDb.shutdown();
-			}
-		} );
-	}	
 	
 	public String cleanText(String s)
 	{
@@ -102,6 +90,17 @@ public class XmlToDb extends DefaultHandler
 	//For each tag, create or retrieve node
 	public void startElement (String uri, String name, String qName, Attributes atts)
 	{
+		doTx++;
+		if(doTx > MaxTx)
+		{
+			doTx = 0;
+			this.tx.success();
+			this.tx.finish();
+			System.gc();
+			System.out.println("GC called...");
+			this.tx = graphDb.beginTx();
+		}
+		
 		if("Node".equals(qName))
 		{
 			if(atts.getValue("Get") != null)
@@ -203,7 +202,6 @@ public class XmlToDb extends DefaultHandler
 		
 		this.tx.success();
 		this.tx.finish();
-		this.graphDb.shutdown();
 	}
 		
 	//Read file and feed DB 

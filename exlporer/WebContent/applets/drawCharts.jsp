@@ -15,39 +15,26 @@
 <%@ page import="java.util.*" %>
 <%@ page import="java.io.*" %>
 <%@ page import="graphDB.explore.*" %>
-<%!
 
-void registerShutdownHook2( final GraphDatabaseService graphDb )
-	{
-	    // Registers a shutdown hook for the Neo4j instance so that it
-	    // shuts down nicely when the VM exits (even if you "Ctrl-C" the
-	    // running example before it's completed)
-	    Runtime.getRuntime().addShutdownHook( new Thread()
-	    {
-	        @Override
-	        public void run()
-			{
-	            graphDb.shutdown();
-			}
-		} );
-	}
-%>
 <%
-EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
+//EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
 try{
-registerShutdownHook2(graphDb);
-String nodeID = session.getAttribute("userNodeID").toString();
-if(request.getParameter("id") != null)
-	nodeID = request.getParameter("id");
+	//registerShutdownHook2(graphDb);
+//String nodeID = request.getParameter("id");
+
+DefaultNode theNode = (DefaultNode)session.getAttribute("currentNode");
+boolean chartsToDraw = theNode.NODE().hasRelationship(DynamicRelationshipType.withName("Tool_output"));
+
 //only if there are any charts to draw
-boolean chartsToDraw = graphDb.getNodeById(Integer.valueOf(nodeID)).
-								hasRelationship(DynamicRelationshipType.
-								withName("Tool_output"));
+//boolean chartsToDraw = graphDb.getNodeById(Long.valueOf(nodeID)).
+//								hasRelationship(DynamicRelationshipType.
+//								withName("Tool_output"));
 if(chartsToDraw){
 	int graphNumber=0;
-	Node chartsNode = graphDb.getNodeById(Integer.valueOf(nodeID)).
+	Node chartsNode = theNode.NODE().
 			getSingleRelationship(DynamicRelationshipType.withName("Tool_output"), Direction.OUTGOING).
 			getEndNode();
+	
 	for(String chartName : chartsNode.getPropertyKeys()){
 		// the node has an attribute named "type", ignore it!
 		if (!chartName.equals("type")){
@@ -74,8 +61,6 @@ if(chartsToDraw){
 		}
 	}
 %>
-
-
 
 window.store2 = Ext.create('Ext.data.JsonStore', {
     fields: ['name', 'data1'],
@@ -199,6 +184,6 @@ catch(Exception e)
 }
 finally
 {
-	graphDb.shutdown();
+	//graphDb.shutdown();
 }
 %>

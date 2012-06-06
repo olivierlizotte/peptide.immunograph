@@ -19,25 +19,28 @@
 String key = request.getParameter("key");
 if(session.getAttribute("userNodeID") != null)
 {	
-	String nodeID = session.getAttribute("userNodeID").toString();
-	if (request.getParameter("id") != null)
-		nodeID = request.getParameter("id");
-//	else
-//		nodeID = session.getAttribute("id").toString();	
-
-	EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase(DefaultTemplate.GraphDB);
+	if(session.getAttribute("currentNode") != null)
+		((DefaultNode)session.getAttribute("currentNode")).printGridDataJSON(out, key);
+	else
+	{
+		String nodeID = session.getAttribute("userNodeID").toString();
+		if (request.getParameter("id") != null)
+			nodeID = request.getParameter("id");
+	//	else
+	//		nodeID = session.getAttribute("id").toString();	
 	
-	try 
-	{
-		DefaultNode theNode = new DefaultNode(nodeID, graphDb);
-		theNode.Initialize();//TODO optimize this call to prevent preloading when key is not empty 
-		theNode.printGridDataJSON(out, key);
-	} catch (Exception e) 
-	{
-		e.printStackTrace();
-	} finally 
-	{
-		graphDb.shutdown();
+		try 
+		{
+			DefaultNode theNode = new DefaultNode(nodeID);
+			theNode.Initialize();//TODO optimize this call to prevent preloading when key is not empty 
+			theNode.printGridDataJSON(out, key);
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		} finally 
+		{
+			//graphDb.shutdown();
+		}
 	}
 }
 %>

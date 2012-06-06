@@ -6,10 +6,9 @@ import java.util.regex.Pattern;
 import javax.servlet.jsp.JspWriter;
 
 import org.neo4j.graphdb.*;
-import org.neo4j.kernel.EmbeddedGraphDatabase;
 
-public class DefaultNode {
-
+public class DefaultNode 
+{	
 	HashMap<String, String> theProperties = new HashMap<String,String>();
 	Iterable<Relationship> theRelationshipsIn;
 	Iterable<Relationship> theRelationshipsOut;
@@ -19,7 +18,12 @@ public class DefaultNode {
 	
 	HashMap<String, HashMap<String, String>> listOfAttributesOUT;
 	HashMap<String, HashMap<String, String>> listOfAttributesIN;
-	Node theNode;
+	
+	private Node theNode;
+	public Node NODE()
+	{
+		return theNode;
+	}	
 	
 	private static Pattern doublePattern = Pattern.compile("-?\\d+(\\.\\d*)?");
 	private static int numberOfDigits = 3;
@@ -37,13 +41,13 @@ public class DefaultNode {
 		}
 	}
 	
-	public DefaultNode(String nodeID, EmbeddedGraphDatabase graphDb)
+	public DefaultNode(String nodeID)
 	{
-		theNode = graphDb.getNodeById(Long.valueOf(nodeID));
+		theNode = DefaultTemplate.graphDb().getNodeById(Long.valueOf(nodeID));
 	}
 	
 	public void Initialize()
-	{
+	{		
 		// GETTING THE PROPERTIES
 		for (String p : theNode.getPropertyKeys()){
 			String value = "";
@@ -71,9 +75,7 @@ public class DefaultNode {
 	public String getCommentsVariable(String varName)
 	{
 		return "var " + varName + " = " + getComments(theNode) + ";\n";
-	}	
-	
-	
+	}		
 	
 	/** Get the comment written by a user about the current Node. A comment is a relation of the graph with a "text property"
 	 * @param theNode neo4j Node
@@ -314,7 +316,7 @@ public class DefaultNode {
 	
 	public String getType(){
 		try{
-			return this.theNode.getProperty("type").toString();
+			return theNode.getProperty("type").toString();
 		}
 		catch(Exception e)
 		{
@@ -322,9 +324,9 @@ public class DefaultNode {
 		}
 	}
 	
-	public static String getType(Node theNode){
+	public static String getType(Node aNode){
 		try{
-			return theNode.getProperty("type").toString();
+			return aNode.getProperty("type").toString();
 		}
 		catch(Exception e)
 		{
@@ -404,4 +406,30 @@ public class DefaultNode {
 	{
 		return theNode.getId();
 	}	
+	
+	public String getChildren(  )
+	{
+		String result = "{ name: '" + getType() + "', children: [";
+				
+		for(RelationshipType relationType : inRelationsMap.keySet())
+		{
+			int i = 0;
+			for (Relationship rel : theNode.getRelationships(Direction.INCOMING, relationType))
+			{			
+				i++;
+			}
+			result += "{name:'" + relationType.name() + "',size:" + i + "},";
+		}		
+		for(RelationshipType relationType : outRelationsMap.keySet())
+		{
+			int i = 0;
+			for (Relationship rel : theNode.getRelationships(Direction.OUTGOING, relationType))
+			{			
+				i++;
+			}
+			result += "{name:'" + relationType.name() + "',size:" + i*20 + "},";
+		}
+		result += "]};";
+		return result;
+	}
 }

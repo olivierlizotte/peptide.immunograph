@@ -17,22 +17,6 @@
 <%@ page import="java.util.*" %>
 <%@ page import="java.io.*" %>
 <%@ page import="graphDB.explore.*" %>
-<%!
-void registerShutdownHook( final GraphDatabaseService graphDb )
-{
-    // Registers a shutdown hook for the Neo4j instance so that it
-    // shuts down nicely when the VM exits (even if you "Ctrl-C" the
-    // running example before it's completed)
-    Runtime.getRuntime().addShutdownHook( new Thread()
-    {
-        @Override
-        public void run()
-		{
-            graphDb.shutdown();
-		}
-	} );
-}
-%>
 
 <%
 if(session.getAttribute("user") != null)
@@ -42,7 +26,7 @@ if(session.getAttribute("user") != null)
 	String comment = request.getParameter("comment");
 	String userID  = session.getAttribute("userNodeID").toString();
 
-	EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
+	EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
 	
 	try
 	{				
@@ -50,7 +34,7 @@ if(session.getAttribute("user") != null)
 		text = text.replaceAll("\\n","<br/>");
 		text = text.replaceAll("\\\"", "&#34;");
 		text = text.replaceAll("\\\\", "&#92;");
-		registerShutdownHook( graphDb );
+		
 		Node theNode = graphDb.getNodeById(Long.valueOf(nodeID));
 		Node theUser = graphDb.getNodeById(Long.valueOf(userID));		
 		Transaction tx = graphDb.beginTx();
@@ -66,10 +50,6 @@ if(session.getAttribute("user") != null)
 	{
 		e.printStackTrace();
 		//out.println("-=" + userID + "=-");	
-	}
-	finally
-	{
-		graphDb.shutdown();
 	}
 }
 %>

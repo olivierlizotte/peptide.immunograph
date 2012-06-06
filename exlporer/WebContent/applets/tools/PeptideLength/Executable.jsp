@@ -18,21 +18,6 @@
 <%@ page import="java.util.Map"%>
 <%@ page import="java.util.Map.Entry"%>
 <%!
-void registerShutdownHook( final GraphDatabaseService graphDb )
-{
-    // Registers a shutdown hook for the Neo4j instance so that it
-    // shuts down nicely when the VM exits (even if you "Ctrl-C" the
-    // running example before it's completed)
-    Runtime.getRuntime().addShutdownHook( new Thread()
-    {
-        @Override
-        public void run()
-		{
-            graphDb.shutdown();
-		}
-	} );
-}
-
 String getPeptidesLengthDistribution(EmbeddedGraphDatabase graphDb, String cypherQuery){
 	// Map containing information about the peptides lengths. 
 	// To each size corresponds the number of peptides in this category
@@ -94,7 +79,7 @@ String relationType = request.getParameter("rel").toString();
 
 // QUERY : start n=node(1) match n-[:Result]->t-[:Listed]->p where p.type="Peptide" return p.Sequence
 
-EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
+EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
 
 //String cypherQuery = "start n=node(" + request.getAttribute("id") + ") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide\" return p.Sequence";
 
@@ -143,9 +128,5 @@ try{
 catch(Exception e)
 {
 	e.printStackTrace();
-}
-finally
-{
-	graphDb.shutdown();
 }
 %>

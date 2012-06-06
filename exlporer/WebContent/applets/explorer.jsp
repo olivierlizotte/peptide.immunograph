@@ -256,7 +256,13 @@ function CreateViewport()
                             floatable: false,
                             margins: '0 0 0 0',
                             flex: 0.4,
-                            id: 'idNavigation'
+                            id: 'idNavigation',
+                            loader: {
+                                url: 'createNav.jsp',
+                                contentType: 'html',
+                                autoLoad: true,
+                                loadMask: true
+                            },
                         },
                         {
                             xtype: 'splitter'

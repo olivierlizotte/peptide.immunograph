@@ -8,34 +8,12 @@ import java.security.NoSuchAlgorithmException;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
-import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 /** This class implements all the functions needed to deal with user accounts. Should only be used by administrators
  *
  */
-public class Login {	
-	
-	
-	/** Registers a shutdown hook for the Neo4j instance so that it
-	    shuts down nicely when the VM exits (even if you "Ctrl-C" the
-	    running example before it's completed)
-	 * @param graphDb
-	 */
-	public static void registerShutdownHook( final GraphDatabaseService graphDb )
-	{
-	    // Registers a shutdown hook for the Neo4j instance so that it
-	    // shuts down nicely when the VM exits (even if you "Ctrl-C" the
-	    // running example before it's completed)
-	    Runtime.getRuntime().addShutdownHook( new Thread()
-	    {
-	        @Override
-	        public void run()
-			{
-	            graphDb.shutdown();
-			}
-		} );
-	}
-	
+public class Login 
+{			
 	
 	/** Encrypting a string representing a password
 	 * @param s
@@ -71,11 +49,9 @@ public class Login {
 		String correctPasswd="";
 		//correctPasswd="f71dbe52628a3f83a77ab494817525c6";
 		
-		EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
 		long userID = -1;
 		try	{
-			registerShutdownHook( graphDb );
-			Index<Node> index = graphDb.index().forNodes("users");
+			Index<Node> index = DefaultTemplate.graphDb().index().forNodes("users");
 			Node userNode = index.get("NickName", login).getSingle();
 			if(userNode != null)
 			{
@@ -84,8 +60,6 @@ public class Login {
 			}
 		}catch(Exception e){
 			e.printStackTrace();
-		}finally{
-			graphDb.shutdown();
 		}
 		if (passwdToTest.trim().equals(correctPasswd.trim())){
 			return userID;
@@ -101,18 +75,16 @@ public class Login {
 	 * @param passwd
 	 */
 	public static void addUser(String name, String nickName, String passwd){
-		EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
 		try	{				
-			registerShutdownHook( graphDb );
-			Transaction tx = graphDb.beginTx();
+			Transaction tx = DefaultTemplate.graphDb().beginTx();
 			
-			Index<Node> index = graphDb.index().forNodes("users");
+			Index<Node> index = DefaultTemplate.graphDb().index().forNodes("users");
 			Node userNodeExisting = index.get("NickName", nickName).getSingle();
 			if(userNodeExisting != null)
 				System.out.println("User already exists!");
 			else
 			{
-				Node userNode = graphDb.createNode();
+				Node userNode = DefaultTemplate.graphDb().createNode();
 				userNode.setProperty("type", "User");
 				userNode.setProperty("name", name);
 				userNode.setProperty("NickName", nickName);
@@ -126,8 +98,6 @@ public class Login {
 			tx.finish();
 		}catch(Exception e){
 			e.printStackTrace();
-		}finally{
-			graphDb.shutdown();
 		}
 	}
 	
@@ -136,12 +106,10 @@ public class Login {
 	 * @param nickName
 	 */
 	public static void deleteUser(String nickName){
-		EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
 		try	{				
-			registerShutdownHook( graphDb );
-			Transaction tx = graphDb.beginTx();
+			Transaction tx = DefaultTemplate.graphDb().beginTx();
 			
-			Index<Node> index = graphDb.index().forNodes("users");
+			Index<Node> index = DefaultTemplate.graphDb().index().forNodes("users");
 			IndexHits<Node> nodes = index.get("NickName", nickName);
 			int nbElem = 0;
 			for (Node node : nodes) {
@@ -153,8 +121,6 @@ public class Login {
 			System.out.println("Deleted " + nbElem + " users.");
 		}catch(Exception e){
 			e.printStackTrace();
-		}finally{
-			graphDb.shutdown();
 		}
 	}
 }
