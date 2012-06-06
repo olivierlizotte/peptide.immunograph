@@ -1,13 +1,3 @@
-<%	
-/*
-if (request.getParameter("id") != null){
-	session.setAttribute( "id", request.getParameter("id") );
-}
-else
-	session.setAttribute( "id", 1);//"noneEntered");
-	*/
-%>
-
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
@@ -22,8 +12,14 @@ else
 <!-- Ext JS Library file -->
 <script type="text/javascript" src="ExtJS/bootstrap.js"></script>
 <link rel="stylesheet" type="text/css" href="ExtJS/resources/css/ext-all.css" />
-<!-- XmlHttpRequest -->
-<script type="text/javascript" src="js/xhtr.js"></script>
+
+    <script type="text/javascript" src="js/d3/d3.js"></script>
+    <script type="text/javascript" src="js/d3/d3.geom.js"></script>
+    <script type="text/javascript" src="js/d3/d3.layout.js"></script>	
+	<script type="text/javascript" src="js/jquery.tipsy.js"></script>
+    <link href="css/tipsy.css" rel="stylesheet" type="text/css" />
+    
+	<script type="text/javascript" src="js/graph.js"></script>
 
 </head>
 
@@ -37,7 +33,7 @@ Ext.Loader.setConfig({
 <%@include file="getInfo.jsp"%>
 
 <%@include file="createGrid.jsp"%>
-charts=[];
+var charts=[];
 <%@include file="drawCharts.jsp"%>
 
 MessageTop = function(){
@@ -258,9 +254,10 @@ function CreateViewport()
                             flex: 0.4,
                             id: 'idNavigation',
                             loader: {
-                                url: 'createNav.jsp',
+                                url: 'createNav.jsp?id='+currentNodeID,
                                 contentType: 'html',
                                 autoLoad: true,
+                                scripts: true,
                                 loadMask: true
                             },
                         },
