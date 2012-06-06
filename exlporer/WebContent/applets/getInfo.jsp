@@ -45,8 +45,6 @@ if(session.getAttribute("userNodeID") != null)
 		
 		DefaultNode theNode = new DefaultNode(nodeID, graphDb );
 		theNode.Initialize();
-		session.setAttribute("currentNode", theNode);
-		
 		out.println("var currentNodeID=" + theNode.getId() + ";\n");
 		out.println("var currentNodeType=\""+theNode.getType()+"\";\n");
 		out.println(theNode.getAttributeJSON("myAttributeObject"));
