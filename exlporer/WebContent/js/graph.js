@@ -18,13 +18,13 @@ function CreateGraph(jsonData, divNameParam)
 	if(force)
 		force.stop();
 		
-	currentWidth = $(document).width();
-    currentHeight = $(document).height();
-	
+	currentWidth = $("#"+divName).width();//$(document).width();
+    currentHeight = $("#"+divName).height();
+	    
 force = d3.layout.force()
     .on("tick", tick)
-    .charge(function(d) { return d._children ? -d.size / 100 : -30; })
-    .linkDistance(function(d) { return d.target._children ? 80 : 30; })
+    .charge(fcCharge)
+    .linkDistance(fcDistance)
     //.charge(function(d) { return d._children ? -Math.sqrt(d.size)/100 : -Math.sqrt(d.size);})
     //.linkDistance(function(d) { return d.target._children ? 180 : 30; })
     .size([currentWidth, currentHeight - 160]);
@@ -48,6 +48,33 @@ root.y = currentHeight / 2 - 80;
 updateGraph();
 }
 	  
+function fcSize(d) 
+{
+	var size = d.children ? 6.5 : Math.sqrt(d.size) / 10;
+	if(size < 20)
+		return 20;
+	else
+		return size;  
+}
+
+function fcCharge(d) 
+{
+	var size = d._children ? -d.size : -100;
+	if(size > -100)
+		return -100;
+	else
+		return size;  
+}
+
+function fcDistance(d) 
+{
+	var size = d.target._children ? 80 : 30;
+	if(size < 128)
+		return 128;
+	else
+		return size;  
+}
+
 function updateGraph() {
 
   var nodes = flatten(root),
@@ -81,14 +108,14 @@ function updateGraph() {
       .call(force.drag);
 
   node.transition()
-      .attr("r", function(d) { return d.children ? 6.5 : Math.sqrt(d.size) / 10;  }); 
+      .attr("r", fcSize); 
   
   // Enter any new nodes.
   node.enter().append("svg:circle")
       .attr("class", "node")
       .attr("cx", function(d) { return d.x; })
       .attr("cy", function(d) { return d.y; })
-      .attr("r", function(d) { return d.children ? 6.5 : Math.sqrt(d.size) / 10; })
+      .attr("r", fcSize)
       .style("fill", color)
       .on("click", click)
 	  .on("contextmenu", rightclick)
@@ -100,7 +127,7 @@ function updateGraph() {
         html: true, 
         title: function() {
           var d = this.__data__;//, c = colors(d.i);
-          return d.name;//'Hi there! My color is <span style="color:' + c + '">' + c + '</span>'; 
+          return d.name;
         }
       });
   // Exit any old nodes.
@@ -114,24 +141,19 @@ function tick() {
       .attr("y2", function(d) { return d.target.y; });
 
   node.attr("cx", function(d) { return d.x; })
-      .attr("cy", function(d) { return d.y; });
+      .attr("cy", function(d) { return d.y; });  
 }
 
 // Color leaf nodes orange, and packages white or blue.
 function color(d) {
-  return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
+  return d._children ? "#3182bd" : d.children ? "#fd8d3c" : "#c6dbef";
 }
 
 // Toggle children on click.
 function click(d) {
-  if (d.children) {
-    d._children = d.children;
-    d.children = null;
-  } else {
-    d.children = d._children;
-    d._children = null;
-  }
-  updateGraph();
+//TODO Open grid navigation panel on click	
+	if(d.url)
+		window.location = d.url;
 }
 
 function rightclick(d) {
@@ -164,9 +186,10 @@ function flatten(root) {
   root.size = recurse(root);
   return nodes;
 }
-//On Window Resize, recompute the graph
-$(window).resize(function() {
-	if(currentWidth != $(document).width() || currentHeight != $(document).height())
+
+function ResizeNavPanel()
+{
+	if(currentWidth != $("#"+divName).width() || currentHeight != $("#"+divName).height())
 	{		
 		if(root)
 		{
@@ -174,4 +197,6 @@ $(window).resize(function() {
 			CreateGraph(root, divName);
 		}
 	}	  
-});
+}
+//On Window Resize, recompute the graph
+$(window).resize(ResizeNavPanel);

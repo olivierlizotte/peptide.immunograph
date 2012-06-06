@@ -409,7 +409,7 @@ public class DefaultNode
 	
 	public String getChildren(  )
 	{
-		String result = "{ name: '" + getType() + "', children: [";
+		String result = "";
 				
 		for(RelationshipType relationType : inRelationsMap.keySet())
 		{
@@ -418,7 +418,7 @@ public class DefaultNode
 			{			
 				i++;
 			}
-			result += "{name:'" + relationType.name() + "',size:" + i + "},";
+			result += "{name:'" + relationType.name() + "',size:" + i*20 + ",url:'index.jsp?id=" + theNode.getId() + "&rel=" + relationType.name() + "&dir=INCOMING'},";
 		}		
 		for(RelationshipType relationType : outRelationsMap.keySet())
 		{
@@ -427,9 +427,11 @@ public class DefaultNode
 			{			
 				i++;
 			}
-			result += "{name:'" + relationType.name() + "',size:" + i*20 + "},";
+			result += "{name:'" + relationType.name() + "',size:" + i*20 + ",url:'index.jsp?id=" + theNode.getId() + "&rel=" + relationType.name() + "&dir=OUTGOING'},";
 		}
-		result += "]};";
-		return result;
+		if(result.length() > 0)
+			result = result.substring(0, result.length() - 1);
+		
+		return "{ name: '" + getType() + "', children: [" + result + "]};";
 	}
 }
