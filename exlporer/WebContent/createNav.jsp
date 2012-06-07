@@ -19,14 +19,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
  <head>
-<script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
-    <script type="text/javascript" src="js/d3/d3.js"></script>
-    <script type="text/javascript" src="js/d3/d3.geom.js"></script>
-    <script type="text/javascript" src="js/d3/d3.layout.js"></script>	
-	<script type="text/javascript" src="js/jquery.tipsy.js"></script>
-    <link href="css/tipsy.css" rel="stylesheet" type="text/css" />
-    
-	<script type="text/javascript" src="js/graph.js"></script>
 </head>
  <body style="height:100% auto;">     
     <div id="navigationID">	
@@ -60,5 +52,6 @@
 			CreateGraph(dataObject, "navigationID");
 		</script>
 	</div>
- </body>
+	<div class="tip" style="display:none; position:absolute;">Show THIS!</div>
+</body>
 </html>

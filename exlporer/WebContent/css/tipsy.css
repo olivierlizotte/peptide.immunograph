@@ -1,5 +1,5 @@
 .tipsy { font-size: 16px; position: absolute; padding: 5px; z-index: 100000; }
-  .tipsy-inner { background-color: #fff; color: #000; max-width: 200px; padding: 5px 8px 4px 8px; text-align: center; }
+  .tipsy-inner { background-color: #cdf; color: #000; max-width: 200px; padding: 5px 8px 4px 8px; text-align: center; }
 
   /* Rounded corners */
   .tipsy-inner { border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; }
@@ -10,10 +10,10 @@
   .tipsy-arrow { position: absolute; width: 0; height: 0; line-height: 0; border: 5px dashed #eee; }
   
   /* Rules to colour arrows */
-  .tipsy-arrow-n { border-bottom-color: #eee; }
-  .tipsy-arrow-s { border-top-color: #eee; }
-  .tipsy-arrow-e { border-left-color: #eee; }
-  .tipsy-arrow-w { border-right-color: #eee; }
+  .tipsy-arrow-n { border-bottom-color: #cde; }
+  .tipsy-arrow-s { border-top-color: #cde; }
+  .tipsy-arrow-e { border-left-color: #cde; }
+  .tipsy-arrow-w { border-right-color: #cde; }
   
 	.tipsy-n .tipsy-arrow { top: 0px; left: 50%; margin-left: -5px; border-bottom-style: solid; border-top: none; border-left-color: transparent; border-right-color: transparent; }
     .tipsy-nw .tipsy-arrow { top: 0; left: 10px; border-bottom-style: solid; border-top: none; border-left-color: transparent; border-right-color: transparent;}

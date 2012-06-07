@@ -411,27 +411,30 @@ public class DefaultNode
 	{
 		String result = "";
 				
+		int cpt = 0;
 		for(RelationshipType relationType : inRelationsMap.keySet())
 		{
 			int i = 0;
-			for (Relationship rel : theNode.getRelationships(Direction.INCOMING, relationType))
+			for (@SuppressWarnings("unused") Relationship rel : theNode.getRelationships(Direction.INCOMING, relationType))
 			{			
 				i++;
 			}
-			result += "{name:'" + relationType.name() + "',size:" + i*20 + ",url:'index.jsp?id=" + theNode.getId() + "&rel=" + relationType.name() + "&dir=INCOMING'},";
+			result += "{name:'" + relationType.name() + "',size:" + i + ",url:'index.jsp?id=" + theNode.getId() + "&rel=" + relationType.name() + "&dir=INCOMING'},";
+			cpt++;
 		}		
 		for(RelationshipType relationType : outRelationsMap.keySet())
 		{
 			int i = 0;
-			for (Relationship rel : theNode.getRelationships(Direction.OUTGOING, relationType))
+			for (@SuppressWarnings("unused") Relationship rel : theNode.getRelationships(Direction.OUTGOING, relationType))
 			{			
 				i++;
 			}
-			result += "{name:'" + relationType.name() + "',size:" + i*20 + ",url:'index.jsp?id=" + theNode.getId() + "&rel=" + relationType.name() + "&dir=OUTGOING'},";
+			result += "{name:'" + relationType.name() + "',size:" + i + ",url:'index.jsp?id=" + theNode.getId() + "&rel=" + relationType.name() + "&dir=OUTGOING'},";
+			cpt++;
 		}
 		if(result.length() > 0)
 			result = result.substring(0, result.length() - 1);
 		
-		return "{ name: '" + getType() + "', children: [" + result + "]};";
+		return "{ name: '" + getType() + "', size: " + cpt + ", children: [" + result + "]};";
 	}
 }

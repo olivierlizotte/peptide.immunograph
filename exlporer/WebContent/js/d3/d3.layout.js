@@ -292,7 +292,7 @@ d3.layout.force = function() {
     }
 
     // compute quadtree center of mass and apply charge forces
-    if (charge) {
+    if (charge && d3.geom) {
       d3_layout_forceAccumulate(q = d3.geom.quadtree(nodes), alpha, charges);
       i = -1; while (++i < n) {
         if (!(o = nodes[i]).fixed) {
