@@ -19,19 +19,28 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
  <head>
+<script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="js/d3/d3.js"></script>
+    <script type="text/javascript" src="js/d3/d3.geom.js"></script>
+    <script type="text/javascript" src="js/d3/d3.layout.js"></script>	
+	<script type="text/javascript" src="js/jquery.tipsy.js"></script>
+    <link href="css/tipsy.css" rel="stylesheet" type="text/css" />
+    
+	<script type="text/javascript" src="js/graph.js"></script>
 </head>
  <body style="height:100% auto;">     
     <div id="navigationID">	
 		<script type="text/javascript">
 		<%
 		DefaultNode theNode = (DefaultNode) session.getAttribute("currentNode");
-		if(session.getAttribute("userNodeID") != null)
+		//if(session.getAttribute("userNodeID") != null)
 		{	
 			//theNode = null;//(DefaultNode) session.getAttribute("currentNode");
 			
 			if(theNode == null)
 			{
-				String nodeID = session.getAttribute("userNodeID").toString();
+				//String nodeID = session.getAttribute("userNodeID").toString();
+				String nodeID = "1";
 				if (request.getParameter("id") != null)
 					nodeID = request.getParameter("id");
 				

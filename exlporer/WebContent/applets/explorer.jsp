@@ -7,7 +7,7 @@
 <link type="text/css" href="css/msg.css" rel="stylesheet" />
 
 <!-- JavaScript -->
-<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
 
 <!-- Ext JS Library file -->
 <script type="text/javascript" src="ExtJS/bootstrap.js"></script>
