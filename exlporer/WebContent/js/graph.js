@@ -132,8 +132,9 @@ function updateGraph()
       .style("fill", color);
 
   svgGroup.append("svg:text")	  
-  .attr("x", function(d) { return -(d.name.length * 0.5 * 5); })  
-  .attr("font-size", "11px") 
+  	  .attr("x", function(d) { return -(d.name.length * 0.5 * 5); })  
+  	  .attr("font-size", "10px")
+  	  .attr("stroke-width", ".04em")//"1px")
 	  .text(function(d) {      return d.name;    });
     
  $('svg g').tipsy({ 
