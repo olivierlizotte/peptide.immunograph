@@ -25,13 +25,14 @@
 		<script type="text/javascript">
 		<%
 		DefaultNode theNode = (DefaultNode) session.getAttribute("currentNode");
-		if(session.getAttribute("userNodeID") != null)
+		//if(session.getAttribute("userNodeID") != null)
 		{	
 			//theNode = null;//(DefaultNode) session.getAttribute("currentNode");
 			
 			if(theNode == null)
 			{
-				String nodeID = session.getAttribute("userNodeID").toString();
+				//String nodeID = session.getAttribute("userNodeID").toString();
+				String nodeID = "1";
 				if (request.getParameter("id") != null)
 					nodeID = request.getParameter("id");
 				
@@ -51,5 +52,6 @@
 			CreateGraph(dataObject, "navigationID");
 		</script>
 	</div>
- </body>
+	<div class="tip" style="display:none; position:absolute;">Show THIS!</div>
+</body>
 </html>

@@ -2,7 +2,7 @@
 	<head>
 	
 	<!-- JavaScript -->
-	<script type="text/javascript" src="../../../js/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="../../../js/jquery-1.7.2.min.js"></script>
 	<script type="text/javascript" src="../../../ExtJS/bootstrap.js"></script>
 	<link rel="stylesheet" type="text/css" href="../../../css/msg.css" />
 	<script type="text/javascript">
