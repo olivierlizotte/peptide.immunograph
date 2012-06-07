@@ -83,10 +83,8 @@ var navigate = function(panel, direction){
     Ext.getCmp('move-next').setDisabled(!layout.getNext());
     if (direction=='next'){
     	graphItemNumber+=1;
-    	alert(graphItemNumber);
     }else{
     	graphItemNumber+=1;
-    	alert(graphItemNumber);
     }
 };
 
