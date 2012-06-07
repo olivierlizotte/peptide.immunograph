@@ -123,9 +123,12 @@ function updateGraph()
 	  .on("contextmenu", rightclick)
       .call(force.drag);
   
+  //Update state of circles
   vis.selectAll("circle")
-  			.style("fill", color)
-  			.attr("r", fcSize);
+  		.transition()
+  			.delay(100)
+  			.attr("r", fcSize)  			
+  			.style("fill", color);
     
   svgGroup.append("svg:circle")
       .attr("r", fcSize)
