@@ -80,11 +80,7 @@ var peptidesLengthChart = Ext.create('Ext.chart.Chart', {
            style: 'background:#fff',
            animate: true,
            shadow: true,
-           //renderTo: 'idGraphs',
-           //height:200,
-           //width:500,
            store: store1,
-           //layout:'fit',
            axes: [{
                type: 'Numeric',
                position: 'left',
@@ -92,14 +88,14 @@ var peptidesLengthChart = Ext.create('Ext.chart.Chart', {
                label: {
                    renderer: Ext.util.Format.numberRenderer('0,0')
                },
-               title: 'Number of Hits',
+               title: 'Number of Peptides',
                grid: true,
                minimum: 0
            }, {
                type: 'Category',
                position: 'bottom',
                fields: ['xax'],
-               title: 'Month of the Year'
+               title: 'Peptides lengths'
            }],
            series: [{
                type: 'column',
@@ -108,10 +104,8 @@ var peptidesLengthChart = Ext.create('Ext.chart.Chart', {
                highlight: true,
                tips: {
                  trackMouse: true,
-                 width: 30,
-                 //height: 28,
                  renderer: function(storeItem, item) {
-                   this.setTitle(storeItem.get('xax') + ': ' + storeItem.get('yax') + ' $');
+                   this.setTitle(storeItem.get('xax') + ': ' + storeItem.get('yax'));
                  }
                },
                label: {

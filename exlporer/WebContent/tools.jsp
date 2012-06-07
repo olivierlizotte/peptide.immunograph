@@ -12,14 +12,15 @@
 	<script type="text/javascript">
 	function gotoUrl(theUrl)
 	{		
-		document.getElementById('contentToolDiv').innerHTML = '<object id="foo" name="foo" type="text/html" data="' + theUrl + '?id=' + <%=request.getParameter("id")%> +'&rel='+<%=request.getParameter("rel")%>+'"></object>';
+		document.getElementById('contentToolDiv').innerHTML = '<object id="foo" name="foo" type="text/html" data="' + theUrl + '?id=' + <%=request.getParameter("id")%> +'&rel='+<%=request.getParameter("rel")%>+'" style="height:100%; min-height:100%; min-width:100%;"></object>';
 		//document.body.innerHTML = '<object id="foo" name="foo" type="text/html" data="' + theUrl + '"></object>';
 	}
 	
 		
 	</script>
  </head>
- <body><div id="contentToolDiv">
+ <body >
+ <div id="contentToolDiv" style="height:100%; min-height:100%; min-width:100%;">
 	Here are your options:<br><br>
 	
 <%

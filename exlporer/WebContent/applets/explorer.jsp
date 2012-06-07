@@ -65,6 +65,19 @@ function columnDesc(val) {
         return val;
 }  
 
+var navigate = function(panel, direction){
+    // This routine could contain business logic required to manage the navigation steps.
+    // It would call setActiveItem as needed, manage navigation button state, handle any
+    // branching logic that might be required, handle alternate actions like cancellation
+    // or finalization, etc.  A complete wizard implementation could get pretty
+    // sophisticated depending on the complexity required, and should probably be
+    // done as a subclass of CardLayout in a real-world implementation.
+    var layout = panel.getLayout();
+    layout[direction]();
+    Ext.getCmp('move-prev').setDisabled(!layout.getPrev());
+    Ext.getCmp('move-next').setDisabled(!layout.getNext());
+};
+
 var viewport;
 var commentGrid;
 var nodeStoreComment;
@@ -181,10 +194,11 @@ function ShowChartsForm()
 {
 	 var win = new Ext.create('Ext.window.Window',{//Window({
 	        layout:'fit',
-	        width:300,
-	        height:300,
+	        height: 300,
+            width: 300,
 	        closable: true,
 	        resizable: true,
+	        id:'tool-win',
 //	        plain: true,
 	        title:'Tools',
 //	        border: false,	        
@@ -316,18 +330,32 @@ function CreateViewport()
                                 },
                                 {
                                     xtype: 'panel',
-                                    //layout: { align: 'stretch',
-                                    //	      type: 'hbox'
-                                    //		},
+                                    layout: 'card',
                                     collapseDirection: 'bottom',
                                     collapsible: true,
-                                    autoScroll: true,
                                     title: '<button type="button" style="border-radius:40px;font-size:small;font-weight:bold;color:#2B498B;background:#B9D0EE;" onClick="ShowChartsForm()"> <img src="icons/bar_chart.png"/> Charts </button>',
                                     margins: '0 0 0 0',
                                     flex: 1,
-                                    layout: 'fit',
                                     id: 'idGraphs',                                                               
                                     border: false,
+                                    bbar: [
+                                           {
+                                               id: 'move-prev',
+                                               text: 'Back',
+                                               handler: function(btn) {
+                                                   navigate(btn.up("panel"), "prev");
+                                               },
+                                               disabled: true
+                                           },
+                                           '->', // greedy spacer so that the buttons are aligned to each side
+                                           {
+                                               id: 'move-next',
+                                               text: 'Next',
+                                               handler: function(btn) {
+                                                   navigate(btn.up("panel"), "next");
+                                               }
+                                           }
+                                       ],
                                     items:charts
                                 }
                             ]

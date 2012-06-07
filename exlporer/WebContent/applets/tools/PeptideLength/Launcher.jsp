@@ -35,16 +35,23 @@
 			$.post(	"Executable.jsp",
 					{"id":<%=request.getParameter("id") %>,"rel":<%= request.getParameter("rel")%>}, 
 					function(results)
-					{				 	
+					{
 				 		MessageTop.msg("Table generated:", results);
 					});
 	}
+	
 	</script>
-		
 	</head>
-	<body>
+	<body >
 	<jsp:include page="Description.txt"/>
+	<div id="form"></div>
 	<br>
+	<br>
+	Draw Length distribution from: <br>
+	<input type="checkbox" id="peptidome"/> Peptidome <br>
+	<input type="checkbox" id="sequenceSearch"/> Sequence Search <br>
 	<button onclick="Launch()">Launch!</button>
 	</body>
+	<script type="text/javascript">
+	</script>
 </html>
