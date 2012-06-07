@@ -76,7 +76,7 @@ public class Login
 	 */
 	public static void addUser(String name, String nickName, String passwd){
 		try	{				
-			Transaction tx = DefaultTemplate.graphDb().beginTx();
+			Transaction tx = DefaultTemplate.graphDb().beginTx();			
 			
 			Index<Node> index = DefaultTemplate.graphDb().index().forNodes("users");
 			Node userNodeExisting = index.get("NickName", nickName).getSingle();

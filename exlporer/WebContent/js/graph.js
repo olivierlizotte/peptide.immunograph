@@ -7,10 +7,12 @@ var node,
 	currentHeight,
 	vis,
 	nodes,
-	links;
+	links,
+	fcOnClick;
 
-function CreateGraph(jsonData, divNameParam)
+function CreateGraph(jsonData, divNameParam, OnClick)
 {
+	fcOnClick = OnClick;
 	divName = divNameParam;
 	root = jsonData;
     if(node)
@@ -55,10 +57,8 @@ function fcSize(d)
 {
 	if(d.size <= 0)
 		return 24;
-	var size = (d._children ? Math.sqrt(d.cumulSize) : Math.sqrt(d.size));
-	if(size < 24)
-		return 24;
-	else if(size > 160)
+	var size = (d._children ? Math.sqrt(d.cumulSize) : Math.sqrt(d.size)) + 24;
+	if(size > 160)
 		return 160;
 	else
 		return size;  
@@ -66,7 +66,7 @@ function fcSize(d)
 
 function fcCharge(d) 
 {
-	var size = -fcSize(d)*10;
+	var size = -fcSize(d)*14;
 	if(size > -100)
 		return -100;
 	else
@@ -75,12 +75,12 @@ function fcCharge(d)
 
 function fcDistance(d) 
 {
-	var size = (fcSize(d.source) + fcSize(d.target)) * 2;	
+	var size = (fcSize(d.source) + fcSize(d.target)) * 4;	
 	
 	if(size < 40)
 		size = 40;
-	else if(size > 160)
-		size = 160;
+	else if(size > 240)
+		size = 240;
 	
 	return size;
 }
@@ -119,7 +119,7 @@ function updateGraph()
   var svgGroup = node.enter().append("svg:g")
       .attr("class", "node")      
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })       
-      .on("click", click)	  
+      .on("click", fcOnClick)	  
 	  .on("contextmenu", rightclick)
       .call(force.drag);
   
@@ -134,6 +134,7 @@ function updateGraph()
   svgGroup.append("svg:text")	  
   	  .attr("x", function(d) { return -(d.name.length * 0.5 * 5); })  
   	  .attr("font-size", "10px")
+  	  .attr("stroke", "#000")
   	  .attr("stroke-width", ".04em")//"1px")
 	  .text(function(d) {      return d.name;    });
     
@@ -164,11 +165,12 @@ function color(d) {
 }
 
 // Toggle children on click.
-function click(d) {
+//function click(d) {
 //TODO Open grid navigation panel on click	
-	if(d.url)
-		window.location = d.url;
-}
+//	if(d.url)
+//		window.location = d.url;
+//	OnClick(d);
+//}
 
 function rightclick(d) {
   if (d.children) {

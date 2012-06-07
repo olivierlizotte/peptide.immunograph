@@ -36,6 +36,7 @@ Ext.Loader.setConfig({
 var charts=[];
 <%@include file="drawCharts.jsp"%>
 
+
 MessageTop = function(){
     var msgCt;
 
@@ -277,14 +278,16 @@ function CreateViewport()
                             	border: true,
                                 preventHeader: true,
                             	id: 'idNavigation',
-                            	loader: 
+                            	html: "<div id='navigationID'></div>"
+                            	//autoEl: {tag: 'div', id:'navigationID'}
+                            	/*loader: 
                             	{
 	                                url: 'createNav.jsp?id='+currentNodeID,
                                 	contentType: 'html',
                                 	autoLoad: true,
                                 	scripts: true,
                                 	loadMask: true
-                            	},
+                            	},//*/
                             }]
                         },
                         {
@@ -409,9 +412,18 @@ function CreateViewport()
 //    });
 //Ext.getCmp('specific_panel_id').add(dynamicPanel);  
 
+function OnNodeClick(node)
+{
+	if(node.index >= 0)
+        Ext.getCmp('tabPanelGrid').setActiveTab(node.index);
+	
+	MessageTop.msg("Node clicked", node.name);
+}
 
 Ext.onReady(function() {
 	viewport = CreateViewport();
+
+	CreateGraph(dataObject, "navigationID", OnNodeClick);
 });
 
 
