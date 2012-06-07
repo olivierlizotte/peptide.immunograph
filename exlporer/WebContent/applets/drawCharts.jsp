@@ -89,7 +89,7 @@ var peptidesLengthChart = Ext.create('Ext.chart.Chart', {
                    renderer: Ext.util.Format.numberRenderer('0,0')
                },
                title: 'Number of Peptides',
-               grid: true,
+               //grid: true,
                minimum: 0
            }, {
                type: 'Category',
@@ -105,7 +105,7 @@ var peptidesLengthChart = Ext.create('Ext.chart.Chart', {
                tips: {
                  trackMouse: true,
                  renderer: function(storeItem, item) {
-                   this.setTitle(storeItem.get('xax') + ': ' + storeItem.get('yax'));
+                      this.setTitle(storeItem.get('xax') + ': ' + storeItem.get('yax'));
                  }
                },
                label: {
