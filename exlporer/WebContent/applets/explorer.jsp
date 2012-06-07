@@ -83,8 +83,10 @@ var navigate = function(panel, direction){
     Ext.getCmp('move-next').setDisabled(!layout.getNext());
     if (direction=='next'){
     	graphItemNumber+=1;
+    	document.getElementById('graphItemNumber').innerHTML='page:'+graphItemNumber+'/'+charts.length;
     }else{
-    	graphItemNumber+=1;
+    	graphItemNumber-=1;
+    	document.getElementById('graphItemNumber').innerHTML='page:'+graphItemNumber+'/'+charts.length;
     }
 };
 
@@ -357,7 +359,8 @@ function CreateViewport()
                                                },
                                                disabled: true
                                            },
-                                           //graphItemNumber+'/'+charts.length,
+                                           '->',
+                                           {text:'page:'+graphItemNumber+'/'+charts.length, id:'graphItemNumber'},
                                            '->', // greedy spacer so that the buttons are aligned to each side
                                            {
                                                id: 'move-next',
