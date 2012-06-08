@@ -438,24 +438,49 @@ public class DefaultNode
 		return "{index:'-1',name: '" + getType() + "', size: " + cpt + ", children: [" + result + "]};";
 	}
 	
-	public void getNavigationChart( JspWriter out )
+	private static HashMap<String, Long> computeNodeTypes(RelationshipType relationType, Direction dir, Node startNode)
+	{
+		HashMap<String, Long> listOfNodeTypes = new HashMap<String, Long>();
+		for (Relationship rel : startNode.getRelationships(dir, relationType))
+		{
+			Node n = rel.getOtherNode(startNode);
+			if(!listOfNodeTypes.containsKey(getType(n)))
+				listOfNodeTypes.put(getType(n), 1l);
+			else
+				listOfNodeTypes.put(getType(n), listOfNodeTypes.get(getType(n)) + 1);
+		}
+		return listOfNodeTypes;
+	}
+	
+	public String getNavigationChart(  )
 	{		
+		String result = "";
 		try 
 		{
-			//HashMap<RelationshipType, String> output = new HashMap<RelationshipType, String>();
-			int cpt = 0;
-			for(Relationship rel : theNode.getRelationships())
+			int index = 0;
+			for(RelationshipType relationType : outRelationsMap.keySet())
 			{
-				RelationshipType relationType = rel.getType();
-				if(DefaultTemplate.keepRelation(relationType.name()))
-				{		
-					out.println("{index:'" + cpt + "',name:'" + relationType.name() + "',size:" + rel.getNodes().length + ",url:'index.jsp?id=" + theNode.getId() + "&rel=" + relationType.name() + "},");
-					cpt++;
-				}
+				HashMap<String, Long> nodeTypes = computeNodeTypes(relationType, Direction.OUTGOING, theNode);
+				for(String key : nodeTypes.keySet())
+					result += "{relationIndex:" + index + ",relation:'" + relationType.name() + "',name:'" + key + "',size:" + nodeTypes.get(key) + ",url:'index.jsp?id=" + theNode.getId() + "&rel=" + relationType.name() + "&dir=OUTGOING'},";
+				
+				index++;
 			}
-		} catch (IOException e) {
+			for(RelationshipType relationType : inRelationsMap.keySet())
+			{
+				HashMap<String, Long> nodeTypes = computeNodeTypes(relationType, Direction.INCOMING, theNode);
+				for(String key : nodeTypes.keySet())
+					result += "{relationIndex:" + index + ",relation:'" + relationType.name() + "',name:'" + key + "',size:" + nodeTypes.get(key) + ",url:'index.jsp?id=" + theNode.getId() + "&rel=" + relationType.name() + "&dir=INCOMING'},";
+				index++;
+			}
+			if(result.length() > 0)
+				result = result.substring(0, result.length() - 1);			
+			
+			return "{relationIndex:-1,relation:'',name: '" + getType() + "', size: 1, children: [" + result + "]};";
+			
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		//return "{index:'-1',name: '" + getType() + "', size: " + cpt + ", children: [" + result + "]};";
+		return result;
 	}
 }

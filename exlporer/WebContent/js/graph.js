@@ -124,7 +124,7 @@ function updateGraph()
 
   svgLink.append("svg:text")	  
   	  .attr("y", "4")
-	  .text(function(d) {      return d.target.name;    });
+	  .text(function(d) {      return d.target.relation;    });
   
   // Exit any old links
   link.exit().remove();

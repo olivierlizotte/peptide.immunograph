@@ -34,7 +34,7 @@ if(session.getAttribute("userNodeID") != null)
 		
 		out.println(theNode.getCommentsVariable("myCommentData"));	
 		
-		out.println("var dataObject = " + theNode.getChildren());
+		out.println("var dataObject = " + theNode.getNavigationChart());
 	}
 	catch(Exception e)
 	{

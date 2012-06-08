@@ -428,10 +428,12 @@ function CreateViewport()
 
 function OnNodeClick(node)
 {
-	if(node.index >= 0)
-        Ext.getCmp('tabPanelGrid').setActiveTab(node.index);
+	if(node.relationIndex >= 0)
+	{
+        Ext.getCmp('tabPanelGrid').setActiveTab(node.relationIndex);
 	
-	MessageTop.msg("Node clicked", node.name);
+		MessageTop.msg("Node clicked", node.name + "<br> relationIndex = " + node.relationIndex);
+	}
 }
 
 Ext.onReady(function() {
