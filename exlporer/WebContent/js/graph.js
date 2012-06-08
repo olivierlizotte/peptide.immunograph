@@ -56,8 +56,8 @@ root = jsonData;
 function fcSize(d) 
 {
 	if(d.size <= 0)
-		return 24;
-	var size = (d._children ? Math.sqrt(d.cumulSize) : Math.sqrt(d.size)) + 24;
+		return 36;//24;
+	var size = (d._children ? Math.sqrt(d.cumulSize) : Math.sqrt(d.size)) + 36;//24;
 	if(size > 160)
 		return 160;
 	else
@@ -75,7 +75,7 @@ function fcCharge(d)
 
 function fcDistance(d) 
 {
-	var size = (fcSize(d.source) + fcSize(d.target)) * 4;	
+	var size = (fcSize(d.source) + fcSize(d.target)) * 2;	
 	
 	if(size < 40)
 		size = 40;
@@ -153,13 +153,10 @@ function updateGraph()
       .style("fill", color);
 
   svgGroup.append("svg:text")	  
-  	  .attr("x", function(d) { return -(d.name.length * 0.5 * 5); })  
-  	  .attr("font-size", "10px")
-  	  .attr("stroke", "#000")
-  	  .attr("stroke-width", ".04em")
+  	  .attr("x", function(d) { return -(d.name.length * 0.5 * 5); })
 	  .text(function(d) {      return d.name;    });
     
- $('svg g').tipsy({ 
+ $('svg g.node').tipsy({ 
         gravity: 'w', 
         html: true, 
         title: function() {
@@ -224,8 +221,17 @@ function ResizeNavPanel()
 	{		
 		if(root)
 		{
-			$("#" + divName).empty();
-			CreateGraph(root, divName);
+			currentWidth = $("#"+divName).width();
+		    currentHeight = $("#"+divName).height();
+			    
+			force.size([currentWidth, currentHeight]);
+	
+			vis.attr("width", currentWidth)
+			   .attr("height", currentHeight);
+			
+			updateGraph();
+		//	$("#" + divName).empty();
+		//	CreateGraph(root, divName);
 		}
 	}	  
 }

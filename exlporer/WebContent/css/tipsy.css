@@ -30,24 +30,33 @@
   
   .node {
  	fill: #000;
-  	stroke: #555;
+  	stroke: #fff;
   	stroke-width: 2.5px;
-  	opacity:.95;
+  	opacity: 1;
   }
 
+  .node text{
+    font-family: arial;
+  	font-size: 11px;
+  	stroke: #333;
+  	stroke-width: .95px;
+  	opacity: 1;
+  }
+  
   .link {
   	stroke: #000;
-  	stroke-width: 2.5px;
-  	opacity:.95;
+  	stroke-width: 2.14px;
+  	opacity:.9;
   }
   
   .link text{
+    font-family: courier;
     font-size:12px;
   	stroke: #000;
-  	stroke-width: .04em;
+  	stroke-width: 0.95px;
   	opacity:.95;
   }
-  
+    
   .link line{
   	opacity:.5;
   }

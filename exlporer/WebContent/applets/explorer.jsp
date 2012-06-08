@@ -289,7 +289,8 @@ function CreateViewport()
                                 layout: 'fit',       
                             	border: true,
                                 preventHeader: true,
-                            	id: 'idNavigation',
+                                listeners: {'resize': function () { ResizeNavPanel(); } },
+                                id: 'idNavigation',
                             	html: "<div id='navigationID'></div>"
                             	//autoEl: {tag: 'div', id:'navigationID'}
                             	/*loader: 
