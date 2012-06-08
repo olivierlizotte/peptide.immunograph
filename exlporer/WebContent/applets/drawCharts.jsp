@@ -15,7 +15,60 @@
 <%@ page import="java.util.*" %>
 <%@ page import="java.io.*" %>
 <%@ page import="graphDB.explore.*" %>
-
+<%@ page import="javax.servlet.jsp.JspWriter"%>
+<%!
+public void CreateExtJsChart(String chartName, String storeName, JspWriter out) {
+	try 
+	{
+	out.println("var "+chartName+"= Ext.create('Ext.chart.Chart', {"+
+        "style: 'background:#fff',\n"+
+        "animate: true,\n"+
+        "shadow: true,\n"+
+        "store: "+storeName+",\n"+
+        "axes: [{\n"+
+            "type: 'Numeric',\n"+
+            "position: 'left',\n"+
+            "fields: ['yax'],\n"+
+            "label: {\n"+
+            "    renderer: Ext.util.Format.numberRenderer('0,0')\n"+
+            "},\n"+
+            "title: 'Number of Peptides',\n"+
+            "minimum: 0\n"+
+        "}, {\n"+
+            "type: 'Category',\n"+
+            "position: 'bottom',\n"+
+             "fields: ['xax'],\n"+
+            "title: '"+chartName+"'\n"+
+        "}],\n"+
+        "series: [{\n"+
+            "type: 'column',\n"+
+            "axis: 'left',\n"+
+            "gutter:0,\n"+
+            "highlight: true,\n"+
+            "tips: {\n"+
+              "trackMouse: true,\n"+
+              "renderer: function(storeItem, item) {\n"+
+                   "this.setTitle(storeItem.get('xax') + ': ' + storeItem.get('yax'));\n"+
+              "}\n"+
+            "},\n"+
+            "label: {\n"+
+              "display: 'insideEnd',\n"+
+              "'text-anchor': 'middle',\n"+
+                "field: 'yax',\n"+
+                "renderer: Ext.util.Format.numberRenderer('0'),\n"+
+                "orientation: 'vertical',\n"+
+                "color: '#333'\n"+
+            "},\n"+
+            "xField: 'xax',\n"+
+            "yField: 'yax'\n"+
+        "}]\n"+
+	"});");
+	}catch	(IOException e) 
+		{
+			e.printStackTrace();
+		}
+}
+%>
 <%
 //EmbeddedGraphDatabase graphDb = new EmbeddedGraphDatabase( DefaultTemplate.GraphDB );
 try{
@@ -58,6 +111,8 @@ if(chartsToDraw){
 				out.println("{xax:"+xaxis[i]+", yax:"+yaxis[i]+"},");
 			}
 			out.println("]});");
+			CreateExtJsChart(chartName, "store"+graphNumber, out);
+			out.println("charts["+(graphNumber-1)+"] = "+chartName);
 		}
 	}
 %>
@@ -75,51 +130,6 @@ window.store2 = Ext.create('Ext.data.JsonStore', {
     	{name: 9, data1:10}]
 });
 
-
-var peptidesLengthChart = Ext.create('Ext.chart.Chart', {
-           style: 'background:#fff',
-           animate: true,
-           shadow: true,
-           store: store1,
-           axes: [{
-               type: 'Numeric',
-               position: 'left',
-               fields: ['yax'],
-               label: {
-                   renderer: Ext.util.Format.numberRenderer('0,0')
-               },
-               title: 'Number of Peptides',
-               //grid: true,
-               minimum: 0
-           }, {
-               type: 'Category',
-               position: 'bottom',
-               fields: ['xax'],
-               title: 'Peptides lengths'
-           }],
-           series: [{
-               type: 'column',
-               axis: 'left',
-               gutter:0,
-               highlight: true,
-               tips: {
-                 trackMouse: true,
-                 renderer: function(storeItem, item) {
-                      this.setTitle(storeItem.get('xax') + ': ' + storeItem.get('yax'));
-                 }
-               },
-               label: {
-                 display: 'insideEnd',
-                 'text-anchor': 'middle',
-                   field: 'yax',
-                   renderer: Ext.util.Format.numberRenderer('0'),
-                   orientation: 'vertical',
-                   color: '#333'
-               },
-               xField: 'xax',
-               yField: 'yax'
-           }]
-});
 
 var peptidesLengthChart2 = Ext.create('Ext.chart.Chart', {
     style: 'background:#fff',
@@ -156,7 +166,7 @@ var peptidesLengthChart2 = Ext.create('Ext.chart.Chart', {
           width: 5,
           //height: 28,
           renderer: function(storeItem, item) {
-            this.setTitle(storeItem.get('name') + ': ' + storeItem.get('data1') + ' $');
+            this.setTitle(storeItem.get('name') + ': ' + storeItem.get('data1'));
           }
         },
         label: {
@@ -172,8 +182,8 @@ var peptidesLengthChart2 = Ext.create('Ext.chart.Chart', {
     }]
 });
 
-var charts=[peptidesLengthChart, peptidesLengthChart2];
-//Ext.get('idGraphs').doLayout();
+charts[1] = peptidesLengthChart2;
+
 
 
 <%}

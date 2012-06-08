@@ -377,7 +377,11 @@ function CreateViewport()
                                                disabled: true
                                            },
                                            '->',
-                                           {text:'page:'+graphItemNumber+'/'+charts.length, id:'graphItemNumber'},
+                                           {
+                                        	   xtype:'text',
+                                        	   text:'page:'+graphItemNumber+'/'+charts.length, 
+                                        	   id:'graphItemNumber',
+                                           },
                                            '->', // greedy spacer so that the buttons are aligned to each side
                                            {
                                                id: 'move-next',

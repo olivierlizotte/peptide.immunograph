@@ -105,7 +105,12 @@ abstract public class DefaultTemplate
 	{
 		DefaultNode theNode = new DefaultNode(nodeID);
 		String type = theNode.getType();
-		if("Experiment".equals(type))
+		if("Peptidome".equals(type))
+		{
+			String[] testE = {"applets/tools/PeptideLength"};
+			return testE;
+		}
+		if("Sequence Search".equals(type))
 		{
 			String[] testE = {"applets/tools/PeptideLength"};
 			return testE;

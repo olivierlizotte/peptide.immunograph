@@ -85,12 +85,13 @@ EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
 
 //String cypherQuery = "start n=node(" + nodeID + ") match n-[:" + relationType + "]->p where has(p.Sequence) return p.Sequence";
 
-// 
-String cypherQueryPeptidome ="start n=node("+nodeID+") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide\" return p.Sequence";
+// String cypherQueryPeptidome ="start n=node("+nodeID+") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide\" return p.Sequence";
 
+//String cypherQueryPeptideIdentification ="start n=node("+nodeID+") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide Identification\" return p.Sequence";
 
-String cypherQueryPeptideIdentification ="start n=node("+nodeID+") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide Identification\" return p.Sequence";
-
+String cypherQuery ="start n=node("+nodeID+") match n-->p where has(p.Sequence) return p.Sequence";
+String nodeType=graphDb.getNodeById(Integer.valueOf(nodeID)).getProperty("type").toString();
+String chartName=nodeType.replaceAll(" ", "")+"_peptideLength";
 try{
 	Transaction tx = graphDb.beginTx();
 	// get the relashionship to the node storing information about charts. In theory there should only be one node concerned.
@@ -102,7 +103,7 @@ try{
 		
 		Node charts = graphDb.createNode();
 		charts.setProperty("type", "Charts");
-		charts.setProperty("Peptidome_peptideLength", getPeptidesLengthDistribution(graphDb, cypherQueryPeptidome));
+		charts.setProperty(chartName, getPeptidesLengthDistribution(graphDb, cypherQuery));
 		graphDb.getNodeById(Integer.valueOf(nodeID)).
 				createRelationshipTo(charts, DynamicRelationshipType.withName("Tool_output"));
 		System.out.println("just created "+charts.getId());
@@ -110,20 +111,22 @@ try{
 		Relationship toolOutput = graphDb.getNodeById(Integer.valueOf(nodeID)).
 				getSingleRelationship(DynamicRelationshipType.withName("Tool_output"), Direction.OUTGOING);
 		// then check if the data for this chart were already fetched from DB
-		if(!toolOutput.getEndNode().getProperty("Peptidome_peptideLength").equals(null)){
+		if(!toolOutput.getEndNode().getProperty(chartName).equals(null)){
 			System.out.println("already exists"+toolOutput.getEndNode().getId());
 			// this information has already been stored in the DB!
 			// TODO: dialog message asking if the user wants to overwrite it
+			toolOutput.getEndNode().setProperty(chartName, getPeptidesLengthDistribution(graphDb, cypherQuery));
+			System.out.println("RE-calculated "+toolOutput.getEndNode().getId());
 		}//otherwise store the data to built chart
 		else{
 			System.out.println("create only data"+toolOutput.getEndNode().getId());
-			toolOutput.getEndNode().setProperty("Peptidome_peptideLength", getPeptidesLengthDistribution(graphDb, cypherQueryPeptidome));				
+			toolOutput.getEndNode().setProperty(chartName, getPeptidesLengthDistribution(graphDb, cypherQuery));				
 		}
 	}
-	
+	Thread.sleep(4000);
 	tx.success();
 	tx.finish();
-	out.println(getPeptidesLengthDistribution(graphDb, cypherQueryPeptidome));
+	out.println(getPeptidesLengthDistribution(graphDb, cypherQuery));
 }
 catch(Exception e)
 {
