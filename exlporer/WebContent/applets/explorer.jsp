@@ -26,6 +26,8 @@
 
 <script type="text/javascript">
 
+var graphItemNumber=0;
+
 Ext.Loader.setConfig({
     enabled: true
 });
@@ -35,6 +37,9 @@ Ext.Loader.setConfig({
 <%@include file="createGrid.jsp"%>
 var charts=[];
 <%@include file="drawCharts.jsp"%>
+if (charts.length > 0){
+	graphItemNumber=1;
+}
 
 
 MessageTop = function(){
@@ -77,6 +82,13 @@ var navigate = function(panel, direction){
     layout[direction]();
     Ext.getCmp('move-prev').setDisabled(!layout.getPrev());
     Ext.getCmp('move-next').setDisabled(!layout.getNext());
+    if (direction=='next'){
+    	graphItemNumber+=1;
+    	document.getElementById('graphItemNumber').innerHTML='page:'+graphItemNumber+'/'+charts.length;
+    }else{
+    	graphItemNumber-=1;
+    	document.getElementById('graphItemNumber').innerHTML='page:'+graphItemNumber+'/'+charts.length;
+    }
 };
 
 var viewport;
@@ -363,6 +375,8 @@ function CreateViewport()
                                                },
                                                disabled: true
                                            },
+                                           '->',
+                                           {text:'page:'+graphItemNumber+'/'+charts.length, id:'graphItemNumber'},
                                            '->', // greedy spacer so that the buttons are aligned to each side
                                            {
                                                id: 'move-next',
