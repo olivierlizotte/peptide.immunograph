@@ -31,12 +31,15 @@
 	}();
 
 	function Launch()
-	{
-			$.post(	"Executable.jsp",
+	{		
+		document.getElementById("wait").innerHTML="<img src=../../../icons/waiting.gif width=\"150\" height=\"20\" /><br><img src=../../../icons/waitingGrandMa.png width=\"150\" height=\"150\" />";
+		$.post(	"Executable.jsp",
 					{"id":<%=request.getParameter("id") %>,"rel":<%= request.getParameter("rel")%>}, 
 					function(results)
 					{
 				 		MessageTop.msg("Table generated:", results);
+				 		//window.location.href='http://localhost:8080/exlporer/index.jsp?id='+'<%=request.getParameter("id") %>';
+				 		window.parent.location.reload();
 					});
 	}
 	
@@ -44,13 +47,16 @@
 	</head>
 	<body >
 	<jsp:include page="Description.txt"/>
-	<div id="form"></div>
 	<br>
+	<!-- <div id="form"></div>
 	<br>
+	 <br>
 	Draw Length distribution from: <br>
 	<input type="checkbox" id="peptidome"/> Peptidome <br>
-	<input type="checkbox" id="sequenceSearch"/> Sequence Search <br>
+	<input type="checkbox" id="sequenceSearch"/> Sequence Search <br> -->
 	<button onclick="Launch()">Launch!</button>
+	<br>
+	<div id="wait"></div>
 	</body>
 	<script type="text/javascript">
 	</script>
