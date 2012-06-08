@@ -281,6 +281,7 @@ if(session.getAttribute("userNodeID") != null)
 				itemsTab.push(CreateGrid(keyA));
 
 			Grid = Ext.createWidget('tabpanel', {
+			    id : 'tabPanelGrid',
 				activeTab : 0,
                 flex: 1,
                 height : 400,

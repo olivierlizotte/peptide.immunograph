@@ -33,6 +33,8 @@ if(session.getAttribute("userNodeID") != null)
 		out.println(theNode.getAttributeJSON("myAttributeObject"));
 		
 		out.println(theNode.getCommentsVariable("myCommentData"));	
+		
+		out.println("var dataObject = " + theNode.getChildren());
 	}
 	catch(Exception e)
 	{

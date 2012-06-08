@@ -41,6 +41,7 @@ if (charts.length > 0){
 	graphItemNumber=1;
 }
 
+
 MessageTop = function(){
     var msgCt;
 
@@ -121,12 +122,13 @@ function CreateComments(myComments)
 	        items: [{             
 	            xtype: 'grid',
 	            hideHeaders: true,
-	            border: false,
+	            border: true,
 	            columns: [{text:'Comments', flex:1, dataIndex:'comment', renderer: columnDesc}],
 	            store: nodeStoreComment, 
 	            flex: 1                                      
                 //layout: 'fit'
 	        	},
+	        	//{tag:'hr'},
 	            {
 	                xtype     : 'textareafield',
 	                name      : 'newCommentField',
@@ -196,7 +198,7 @@ function AddComment(field, event)
 function CreateAttributes(attribs)
 {
 	return Ext.create('Ext.grid.property.Grid', {        
-    	border: false,
+    	border: true,
         hideHeaders : true,
         source: attribs
     });
@@ -274,18 +276,31 @@ function CreateViewport()
                             layout: 'fit',
                             collapseDirection: 'left',
                             collapsible: true,
+                        	border: false,
                             title: 'Navigation',
                             floatable: false,
                             margins: '0 0 0 0',
                             flex: 0.4,
-                            id: 'idNavigation',
-                            loader: {
-                                url: 'createNav.jsp?id='+currentNodeID,
-                                contentType: 'html',
-                                autoLoad: true,
-                                scripts: true,
-                                loadMask: true
-                            },
+                            items:
+                            [{
+                                xtype: 'panel',  
+                                minHeight: 100,
+                                minWidth: 100,
+                                layout: 'fit',       
+                            	border: true,
+                                preventHeader: true,
+                            	id: 'idNavigation',
+                            	html: "<div id='navigationID'></div>"
+                            	//autoEl: {tag: 'div', id:'navigationID'}
+                            	/*loader: 
+                            	{
+	                                url: 'createNav.jsp?id='+currentNodeID,
+                                	contentType: 'html',
+                                	autoLoad: true,
+                                	scripts: true,
+                                	loadMask: true
+                            	},//*/
+                            }]
                         },
                         {
                             xtype: 'splitter'
@@ -317,6 +332,7 @@ function CreateViewport()
                                             margins: '0 0 0 0',
                                             flex: 1.5,
                                             layout: 'fit',
+                                        	border: false,
                                             id : 'idAttributes',
                                             items: [CreateAttributes(myAttributeObject)]
                                         },
@@ -328,7 +344,7 @@ function CreateViewport()
                                             collapseDirection: 'right',
                                             collapsible: true,
                                             title: 'Comments',
-                                        	border: true,
+                                        	border: false,
                                             margins: '0 0 0 0',
                                             flex: 1,
                                             id: 'idComments',
@@ -414,9 +430,18 @@ function CreateViewport()
 //    });
 //Ext.getCmp('specific_panel_id').add(dynamicPanel);  
 
+function OnNodeClick(node)
+{
+	if(node.index >= 0)
+        Ext.getCmp('tabPanelGrid').setActiveTab(node.index);
+	
+	MessageTop.msg("Node clicked", node.name);
+}
 
 Ext.onReady(function() {
 	viewport = CreateViewport();
+
+	CreateGraph(dataObject, "navigationID", OnNodeClick);
 });
 
 

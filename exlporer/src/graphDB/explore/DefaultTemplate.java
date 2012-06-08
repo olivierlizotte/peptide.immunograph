@@ -37,17 +37,17 @@ abstract public class DefaultTemplate
 	
 	public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
 	
-	//public static String GraphDB = "C:\\_IRIC\\Neo4J\\data\\graph.db";
+	//public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph.db";
 	
-	//public static String GraphDB = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph.db";
+	//public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph.db";
 	
-	
+	//Singleton pattern to force every user into a single database connexion object
 	private static EmbeddedGraphDatabase theGraph = null;
 	public static EmbeddedGraphDatabase graphDb()
 	{
 		if(theGraph == null)
 		{
-			theGraph = new EmbeddedGraphDatabase( DefaultTemplate.GraphDBString );
+			theGraph = new EmbeddedGraphDatabase( GraphDBString );
 			registerShutdownHook(theGraph);
 		}
 		return theGraph;
