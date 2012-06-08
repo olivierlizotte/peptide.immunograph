@@ -110,7 +110,7 @@ abstract public class DefaultTemplate
 			String[] testE = {"applets/tools/PeptideLength"};
 			return testE;
 		}
-		if("Peptide Identification".equals(type))
+		if("Sequence Search".equals(type))
 		{
 			String[] testE = {"applets/tools/PeptideLength"};
 			return testE;
