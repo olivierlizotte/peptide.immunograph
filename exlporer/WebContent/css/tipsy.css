@@ -37,7 +37,18 @@
 
   .link {
   	stroke: #000;
-  	stroke-width: 4.5px;
+  	stroke-width: 2.5px;
+  	opacity:.95;
+  }
+  
+  .link text{
+    font-size:12px;
+  	stroke: #000;
+  	stroke-width: .04em;
+  	opacity:.95;
+  }
+  
+  .link line{
   	opacity:.5;
   }
 

@@ -7,7 +7,7 @@ var node,
 	currentHeight,
 	vis,
 	nodes,
-	links,
+	links,svgLink,
 	fcOnClick;
 
 function CreateGraph(jsonData, divNameParam, OnClick)
@@ -46,7 +46,7 @@ function zoomt() {
 }//*/
 
 jsonData = jsonData;
-jsonData.fixed = false;
+jsonData.fixed = true;
 jsonData.x = currentWidth / 2;
 jsonData.y = currentHeight / 2;
 updateGraph();
@@ -85,6 +85,16 @@ function fcDistance(d)
 	return size;
 }
 
+function computeAngle(d)
+{
+	return Math.atan2(d.target.y-d.source.y, d.target.x-d.source.x) * 180/Math.PI;
+}
+
+function computeLength(d)
+{
+	return Math.sqrt((d.target.x - d.source.x) * (d.target.x - d.source.x) + (d.target.y - d.source.y) * (d.target.y - d.source.y)); 
+}
+
 function updateGraph() 
 {
 	nodes = flatten(root);
@@ -97,17 +107,25 @@ function updateGraph()
       .start();
 
   // Update the links
-  link = vis.selectAll("line.link")
+  //link = vis.selectAll("line.link")
+  link = vis.selectAll("g.link")
       .data(links, function(d) { return d.target.id; });
 
-  // Enter any new links
-  link.enter().insert("svg:line", ".node")
-      .attr("class", "link")
-      .attr("x1", function(d) { return d.source.x; })
-      .attr("y1", function(d) { return d.source.y; })
-      .attr("x2", function(d) { return d.target.x; })
-      .attr("y2", function(d) { return d.target.y; });
+  svgLink = link.enter().insert("svg:g", ".node")
+      .attr("class", "link");
+  
+  svgLink.append("svg:line")
+      .attr("y1", function(d) { return 8;})
+      .attr("y2", function(d) { return 8;});
+  
+  svgLink.append("svg:line")
+  	  .attr("y1", function(d) { return -8;})
+  	  .attr("y2", function(d) { return -8;});
 
+  svgLink.append("svg:text")	  
+  	  .attr("y", "4")
+	  .text(function(d) {      return d.target.name;    });
+  
   // Exit any old links
   link.exit().remove();
 
@@ -119,7 +137,7 @@ function updateGraph()
   var svgGroup = node.enter().append("svg:g")
       .attr("class", "node")      
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })       
-      .on("click", fcOnClick)	  
+      .on("mousedown", fcOnClick)	  
 	  .on("contextmenu", rightclick)
       .call(force.drag);
   
@@ -138,7 +156,7 @@ function updateGraph()
   	  .attr("x", function(d) { return -(d.name.length * 0.5 * 5); })  
   	  .attr("font-size", "10px")
   	  .attr("stroke", "#000")
-  	  .attr("stroke-width", ".04em")//"1px")
+  	  .attr("stroke-width", ".04em")
 	  .text(function(d) {      return d.name;    });
     
  $('svg g').tipsy({ 
@@ -153,27 +171,19 @@ function updateGraph()
   node.exit().remove();
 }
 
-function tick() {
-  link.attr("x1", function(d) { return d.source.x; })
-      .attr("y1", function(d) { return d.source.y; })
-      .attr("x2", function(d) { return d.target.x; })
-      .attr("y2", function(d) { return d.target.y; });
+function tick() 
+{
+	link.attr("transform", function(d) { return "translate(" + d.source.x + "," + d.source.y + ") rotate(" + computeAngle(d) + ",0,0)"; });
+	link.selectAll("line").attr("x2", function(d) { return computeLength(d); });
+	link.selectAll("text").attr("x", function(d) { return computeLength(d) * 0.5 - (d.target.name.length * 0.5 * 5); });
 
-  node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; }); 
+	node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; }); 
 }
 
 // Color leaf nodes orange, and packages white or blue.
 function color(d) {
   return d._children ? "#3182bd" : d.children ? "#fd8d3c" : "#c6dbef";
 }
-
-// Toggle children on click.
-//function click(d) {
-//TODO Open grid navigation panel on click	
-//	if(d.url)
-//		window.location = d.url;
-//	OnClick(d);
-//}
 
 function rightclick(d) {
   if (d.children) {

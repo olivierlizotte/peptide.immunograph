@@ -437,4 +437,25 @@ public class DefaultNode
 		
 		return "{index:'-1',name: '" + getType() + "', size: " + cpt + ", children: [" + result + "]};";
 	}
+	
+	public void getNavigationChart( JspWriter out )
+	{		
+		try 
+		{
+			//HashMap<RelationshipType, String> output = new HashMap<RelationshipType, String>();
+			int cpt = 0;
+			for(Relationship rel : theNode.getRelationships())
+			{
+				RelationshipType relationType = rel.getType();
+				if(DefaultTemplate.keepRelation(relationType.name()))
+				{		
+					out.println("{index:'" + cpt + "',name:'" + relationType.name() + "',size:" + rel.getNodes().length + ",url:'index.jsp?id=" + theNode.getId() + "&rel=" + relationType.name() + "},");
+					cpt++;
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		//return "{index:'-1',name: '" + getType() + "', size: " + cpt + ", children: [" + result + "]};";
+	}
 }
