@@ -42,32 +42,27 @@ String getPeptidesLengthDistribution(EmbeddedGraphDatabase graphDb, String cyphe
 		    	lengths.put(currentLength,1);	        
 	    }
 	}
-	
 	// some peptides lengths are not represented by any peptide in the DB. 
 	// In order to get a proper histogram, the values for these lengths are set to 0
 	for(int i=0; i<Collections.max(lengths.keySet()) ; i+=1 )
 		if (!lengths.containsKey(i))
 			lengths.put(i,0);	
-	
-	
-		
 	//First line (sequence length header)
 	String sizes = "";
 	for (int length : lengths.keySet())
 		sizes += length + ",";
 	sizes = sizes.substring(0, sizes.length()-1);
-	
 	//Number of sequence per length
 	String numberOfSeq = "";
 	for (int nb : lengths.values())
 		numberOfSeq += nb + ",";
 	numberOfSeq = numberOfSeq.substring(0, numberOfSeq.length() - 1);
-	
 	// now return the result
 	// 1,2,3,4,5,6,7,8,9,10 <- sizes
 	// 0,0,2,2,2,2,3,4,2,1  <- number of nodes with this value
 	return sizes+"\n"+numberOfSeq;
 }
+
 %>
 <%
 // TODO get a parameter to know which type of peptide to get the distribution from: SequenceSearch, Peptidome etc.
@@ -106,11 +101,13 @@ try{
 		charts.setProperty(chartName, getPeptidesLengthDistribution(graphDb, cypherQuery));
 		graphDb.getNodeById(Integer.valueOf(nodeID)).
 				createRelationshipTo(charts, DynamicRelationshipType.withName("Tool_output"));
+		DefaultTemplate.linkToExperimentNode(graphDb, charts, "Tool_output");
 		System.out.println("just created "+charts.getId());
 	}else{
 		Relationship toolOutput = graphDb.getNodeById(Integer.valueOf(nodeID)).
 				getSingleRelationship(DynamicRelationshipType.withName("Tool_output"), Direction.OUTGOING);
 		// then check if the data for this chart were already fetched from DB
+		
 		if(!toolOutput.getEndNode().getProperty(chartName).equals(null)){
 			System.out.println("already exists"+toolOutput.getEndNode().getId());
 			// this information has already been stored in the DB!
@@ -123,7 +120,7 @@ try{
 			toolOutput.getEndNode().setProperty(chartName, getPeptidesLengthDistribution(graphDb, cypherQuery));				
 		}
 	}
-	Thread.sleep(4000);
+
 	tx.success();
 	tx.finish();
 	out.println(getPeptidesLengthDistribution(graphDb, cypherQuery));

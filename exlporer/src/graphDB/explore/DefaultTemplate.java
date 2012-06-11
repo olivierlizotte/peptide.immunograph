@@ -3,10 +3,16 @@ package graphDB.explore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.ReturnableEvaluator;
+import org.neo4j.graphdb.StopEvaluator;
+import org.neo4j.graphdb.TraversalPosition;
+import org.neo4j.graphdb.Traverser;
+import org.neo4j.graphdb.Traverser.Order;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
@@ -159,4 +165,57 @@ abstract public class DefaultTemplate
 		return sb.toString();
 	}
 	
+	
+	
+	public static void linkToExperimentNode(EmbeddedGraphDatabase graphDb, Node node, String RelationName){
+		long startID = node.getId();
+		ReturnableEvaluator returnExperimentNode;
+		
+		// custom ReturnableEvaluator(). Returns the node if it is an "Experiment" one.
+		returnExperimentNode = new ReturnableEvaluator()
+		{
+		    public boolean isReturnableNode( TraversalPosition position )
+		    {
+		        // Return nodes that don't have any outgoing relationships,
+		        // only incoming relationships, i.e. leaf nodes.
+		        return (position.currentNode().getProperty("type").toString().trim().equals("Experiment"));
+		    }
+		};
+		
+		// custom stop evaluator. Stops the traversal if the node is an "Experiment" one.
+		// to be sure to stop at first Experiment Node found
+		StopEvaluator stopAtFirstEsperimentFound= new StopEvaluator()
+		 {
+		     // Block traversal if the node has a property with key 'key' and value
+		     // 'someValue'
+		     public boolean isStopNode( TraversalPosition position )
+		     {
+		         if ( position.isStartNode() )
+		         {
+		             return false;
+		         }
+		         Node currentNode = position.currentNode();
+		         Object property = currentNode.getProperty( "type", null );
+		         return property instanceof String &&
+		             ((String) property).equals( "Experiment" );
+		     }
+		 };
+		
+		Traverser experimentNode = graphDb.getNodeById(startID).traverse(Order.BREADTH_FIRST, 
+				stopAtFirstEsperimentFound, 
+				returnExperimentNode,
+				DynamicRelationshipType.withName("Result"), Direction.INCOMING, 
+				DynamicRelationshipType.withName("Source"), Direction.INCOMING, 
+				DynamicRelationshipType.withName("Listed"), Direction.INCOMING, 
+				DynamicRelationshipType.withName("Associated"), Direction.INCOMING, 
+				DynamicRelationshipType.withName("Sequence"), Direction.INCOMING,
+				DynamicRelationshipType.withName("Tool_output"), Direction.INCOMING
+				);
+		// there should only be one node there
+		for (Node n : experimentNode){
+			//System.out.println(n.getProperty("type"));
+			//System.out.println(n.getId());
+			n.createRelationshipTo(node, DynamicRelationshipType.withName(RelationName));
+		}
+	}
 }
