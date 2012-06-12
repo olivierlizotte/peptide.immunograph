@@ -13,6 +13,7 @@ function Launch()
 				{"aa":document.getElementById("aa").value,
 				"pos":document.getElementById("pos").value,
 				"start":document.getElementById("start").value,
+				"length":document.getElementById("length").value,
 				"id":<%=request.getParameter("id") %>,
 				"rel":<%= request.getParameter("rel")%>},
 				function(results)
@@ -28,6 +29,9 @@ function Launch()
 	<body>
 	<jsp:include page="Description.txt"/>
 	<br>
+	<br>
+	<fieldset style="border-color:#000000;">
+	<legend> AminoAcid search:</legend>
 	<br>
 	Find Sequences with 
 	<select name="aa" id="aa">
@@ -59,6 +63,12 @@ function Launch()
 							<option VALUE="Cterm">C terminus</option>
 						</select> aminoacid residue.
 	<br>
+	</fieldset>
+	<fieldset style="border-color:#000000;">
+	<legend>Sequence length</legend>
+	Only sequences of <input type="text" id="length" name="length" maxlength="3" size="2"/>
+	aminoacids.
+	</fieldset>
 	<button onclick="Launch()">Launch!</button>
 	<br>
 	<div id="wait"></div>

@@ -91,19 +91,26 @@ String nodeID = request.getParameter("id").toString();
 String relationType = request.getParameter("rel").toString();
 
 String aminoAcid = request.getParameter("aa");
-int position = Integer.valueOf(request.getParameter("pos"));
+int position = Integer.valueOf(request.getParameter("pos").toString().trim());
 String start = request.getParameter("start");
+String length = request.getParameter("length").toString().trim();
 
 String cypherQuery;
 // build regular expression to the start position that has been chosen
 if (start.equals("Nterm")){
 	cypherQuery ="start n=node("+nodeID+") "+
 				 "match n-->p "+
-				 "where has(p.Sequence) and p.Sequence=~/.{"+String.valueOf(position-1)+ "}"+aminoAcid+".*/  return ID(p)";
+				 "where has(p.Sequence) and p.Sequence=~/.{"+String.valueOf(position-1)+ "}"+aminoAcid+".*/ length return ID(p)";
 }else{
 	cypherQuery ="start n=node("+nodeID+") "+
 			 "match n-->p "+
-			 "where has(p.Sequence) and p.Sequence=~/.*"+aminoAcid+".{"+String.valueOf(position-1)+ "}/  return ID(p)";
+			 "where has(p.Sequence) and p.Sequence=~/.*"+aminoAcid+".{"+String.valueOf(position-1)+ "}/ length return ID(p)";
+}
+
+if(!length.equals("")){
+	cypherQuery.replace("length", "length(p.Sequence)="+length);
+}else{
+	cypherQuery.replace("length", "");
 }
 
 EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
