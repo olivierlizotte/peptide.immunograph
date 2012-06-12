@@ -218,7 +218,7 @@ function ShowChartsForm()
 //	        border: false,	        
 	        modal:'true',
 	        //items: [login]
-	        loader:{url:"tools.jsp?id="+currentNodeID, scripts:true, autoLoad:true, renderer:'html'}
+	        loader:{url:"tools.jsp?name=charts&id="+currentNodeID, scripts:true, autoLoad:true, renderer:'html'}
 		});
 	 	//win.load({url:"http://slashdot.org", scripts:true, autoLoad:true, renderer:'html'});
 		win.center();

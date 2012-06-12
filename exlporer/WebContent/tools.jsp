@@ -24,12 +24,17 @@
 	Here are your options:<br><br>
 	
 <%
-	String[] tools;
+	String[] tools = {};
 
 // 	try
 // 	{				
-
-		tools = DefaultTemplate.getTools(request.getParameter("id"));			
+	
+	if (request.getParameter("name").equals("charts")){
+		tools = DefaultTemplate.getChartsTools(request.getParameter("id"));
+	}
+	if(request.getParameter("name").equals("seq")){
+		tools = DefaultTemplate.getSequenceTools(request.getParameter("id"));
+	}
 		
 	for(String path : tools)
 	{

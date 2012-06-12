@@ -8,6 +8,7 @@
 	
 function Launch()
 {
+	document.getElementById("wait").innerHTML="<img src=../../../icons/waiting.gif width=\"150\" height=\"20\" />";
 		$.post(	"applets/tools/expertMode/Executable.jsp",
 				{"query":document.getElementById("textQuery").value, 
 				"id":<%=request.getParameter("id") %>,
@@ -57,6 +58,7 @@ function Launch()
 			 		grid.show();
 			 		
 				});
+		document.getElementById("wait").innerHTML="";
 }
 	</script>
 	</head>
@@ -65,7 +67,9 @@ function Launch()
 	<br>
 	<input type="text" name="textQuery" id="textQuery" size=200/>
 	<button onclick="Launch()">Launch!</button>
-	</br>
+	<br>
+	<div id="wait"></div>
+	<br>
 	<div id="query-result" style="background:white"></div>
 	</body>
 </html>

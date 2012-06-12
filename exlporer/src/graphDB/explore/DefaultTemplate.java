@@ -107,7 +107,7 @@ abstract public class DefaultTemplate
 	 * @param graphDb
 	 * @return
 	 */
-	public static String[] getTools( String nodeID )
+	public static String[] getChartsTools( String nodeID )
 	{
 		DefaultNode theNode = new DefaultNode(nodeID);
 		String type = theNode.getType();
@@ -126,6 +126,23 @@ abstract public class DefaultTemplate
 			String[] testU = {"applets/tools/AddUser"};
 			return testU;
 		}			
+		return new String[0];
+	}
+	
+	public static String[] getSequenceTools( String nodeID )
+	{
+		DefaultNode theNode = new DefaultNode(nodeID);
+		String type = theNode.getType();
+		if("Peptidome".equals(type))
+		{
+			String[] testE = {"applets/tools/SequenceAnalysis"};
+			return testE;
+		}
+		if("Sequence Search".equals(type))
+		{
+			String[] testE = {"applets/tools/SequenceAnalysis"};
+			return testE;
+		}
 		return new String[0];
 	}
 	

@@ -1,0 +1,3 @@
+Sequence Analysis :: <br>
+This tool allows you to search for an amino acid 
+at a specific position in a sequence and specify a sequence size.  

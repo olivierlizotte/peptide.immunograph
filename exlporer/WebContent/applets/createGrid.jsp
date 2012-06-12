@@ -107,7 +107,6 @@ if(session.getAttribute("userNodeID") != null)
 											xtype : 'button',
 											text : keyName + ' tools',
 											handler : function() {
-												//var attributeForm=createForm();
 												var toolWin = new Ext.create(
 														'Ext.Window',
 														{
@@ -120,16 +119,11 @@ if(session.getAttribute("userNodeID") != null)
 															x : 10,
 															y : 200,
 															plain : true,
-															//autoLoad: {url:'tool.jsp?name='+keyName+'&url='+document.URL, scripts:true},
 															loader : {
-																url : 'tool.jsp?name='
-																		+ keyName
-																		+ '&id='
-																		+ currentNodeID
-																		+ '&url='
-																		+ document.URL,
+																url : "tools.jsp?name=seq&id="+currentNodeID,
 																scripts : true,
-																autoLoad : true
+																autoLoad : true,
+																renderer : 'html'
 															},
 															layout : 'fit',
 														//items: attributeForm,
