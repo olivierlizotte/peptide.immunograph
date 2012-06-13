@@ -37,13 +37,9 @@
 					{"id":<%=request.getParameter("id") %>,"rel":<%= request.getParameter("rel")%>}, 
 					function(results)
 					{
-				 		//MessageTop.msg("Table generated:", results);
 				 		document.getElementById("res").innerHTML=results;
-				 		//window.location.href='http://localhost:8080/exlporer/index.jsp?id='+'<%=request.getParameter("id") %>';
-				 		//window.parent.location.reload();
+				 		window.parent.location.reload();
 					});
-		document.getElementById("wait").innerHTML="";
-		
 	}
 	
 	</script>

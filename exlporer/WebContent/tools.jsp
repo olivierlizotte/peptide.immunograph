@@ -33,7 +33,7 @@
 		tools = DefaultTemplate.getChartsTools(request.getParameter("id"));
 	}
 	if(request.getParameter("name").equals("seq")){
-		tools = DefaultTemplate.getSequenceTools(request.getParameter("id"));
+		tools = DefaultTemplate.getNodeSpecificTools(request.getParameter("id"));
 	}
 		
 	for(String path : tools)

@@ -18,11 +18,8 @@ function Launch()
 				"rel":<%= request.getParameter("rel")%>},
 				function(results)
 				{		
-					//MessageTop.msg("Query executed successfuly!", ""+results);
-			 		
-			 		document.getElementById("query-result").innerHTML = "</br><b>Result</b></br>"+results+"</br>";
+			 		window.parent.location.href='http://localhost:8080/exlporer/index.jsp?id='+results;
 				});
-		document.getElementById("wait").innerHTML="";
 }
 	</script>
 	</head>

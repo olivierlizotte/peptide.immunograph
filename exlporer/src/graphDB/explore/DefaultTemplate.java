@@ -3,17 +3,22 @@ package graphDB.explore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
+
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.ReturnableEvaluator;
 import org.neo4j.graphdb.StopEvaluator;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.TraversalPosition;
 import org.neo4j.graphdb.Traverser;
 import org.neo4j.graphdb.Traverser.Order;
 import org.neo4j.graphdb.index.Index;
+import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 /** This class determines the default behavior of the explorer
@@ -36,10 +41,29 @@ abstract public class DefaultTemplate
 	        @Override
 	        public void run()
 			{
+	        	removeAllTempElements(graphDb);
 	            graphDb.shutdown();
 			}
 		} );
 	}
+	
+	
+	public static void removeAllTempElements(GraphDatabaseService graphDb ){
+		Transaction tx = graphDb.beginTx();
+		Index<Node> index = DefaultTemplate.graphDb().index().forNodes("tempNodes");
+		IndexHits<Node> tempNodes = index.get("type", "tempNode");
+		while (tempNodes.hasNext()){
+			Node tempNode = tempNodes.next();
+			Iterable<Relationship> tempRels = tempNode.getRelationships();
+			for (Relationship rel : tempRels){
+				rel.delete();
+			}
+			tempNode.delete();
+		}
+		tx.success();
+		tx.finish();
+	}
+	
 	
 	public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
 	
@@ -68,7 +92,8 @@ abstract public class DefaultTemplate
 	{
 		if("type".equals(theAttributeName) ||
 				"StringID".equals(theAttributeName) ||
-				"passwd".equals(theAttributeName))
+				"passwd".equals(theAttributeName) ||
+				"created from id".equals(theAttributeName))
 			return false;
 		return true;
 	}
@@ -129,7 +154,7 @@ abstract public class DefaultTemplate
 		return new String[0];
 	}
 	
-	public static String[] getSequenceTools( String nodeID )
+	public static String[] getNodeSpecificTools( String nodeID )
 	{
 		DefaultNode theNode = new DefaultNode(nodeID);
 		String type = theNode.getType();
@@ -141,6 +166,11 @@ abstract public class DefaultTemplate
 		if("Sequence Search".equals(type))
 		{
 			String[] testE = {"applets/tools/SequenceAnalysis"};
+			return testE;
+		}
+		if("Temporary Node".equals(type))
+		{
+			String[] testE = {"applets/tools/DeleteNode"};
 			return testE;
 		}
 		return new String[0];

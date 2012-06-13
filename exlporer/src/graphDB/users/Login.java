@@ -80,6 +80,7 @@ public class Login
 			
 			Index<Node> index = DefaultTemplate.graphDb().index().forNodes("users");
 			Node userNodeExisting = index.get("NickName", nickName).getSingle();
+			
 			if(userNodeExisting != null)
 				System.out.println("User already exists!");
 			else
