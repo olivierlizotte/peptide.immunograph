@@ -35,6 +35,9 @@ vis = d3.select("#" + divName).append("svg:svg")
     .attr("width", currentWidth)
     .attr("height", currentHeight)
     .attr("pointer-events", "all");
+
+//Create timer for focus animation
+d3.timer(fcAnimation);
   //Zoom behavior breaks the node draging functionnality... so we ditch the zoom for the moment
   /*.append('svg:g')
     .call(d3.behavior.zoom().on("zoom", zoomt))
@@ -51,6 +54,12 @@ jsonData.x = currentWidth / 2;
 jsonData.y = currentHeight / 2;
 updateGraph();
 root = jsonData;
+}
+
+function fcAnimation()
+{
+    node.selectAll("circle").attr("stroke-width", fcStrokeWidth)
+    						.attr("stroke", fcStroke);
 }
 
 function fcSize(d) 
@@ -83,6 +92,38 @@ function fcDistance(d)
 		size = 240;
 	
 	return size;
+}
+
+var theFocus;
+var cptStroke = 5;
+var incrStroke = 0.18;//0.18
+function fcStrokeWidth(d)
+{
+	if(d.focus)
+	{
+		cptStroke += incrStroke;
+		if(cptStroke > 5 || cptStroke < 1)
+			incrStroke = - incrStroke;
+		return cptStroke;
+	}
+	else
+		return 2.5;
+}
+
+function fcStroke(d)
+{
+	if(d.focus)
+		return "#000";
+	else
+		return "#fff";
+}
+
+function fcText(d)
+{
+    //if(d.size && d.size > 1)
+  	//  return d.name + "<br>[" + d.size + "]";
+    //else
+  	return d.name;
 }
 
 function computeAngle(d)
@@ -137,8 +178,8 @@ function updateGraph()
   var svgGroup = node.enter().append("svg:g")
       .attr("class", "node")      
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })       
-      .on("mousedown", fcOnClick)	  
-	  .on("contextmenu", rightclick)
+      .on("mousedown", leftClick)	  
+	  .on("contextmenu", rightClick)
       .call(force.drag);
   
   //Update state of circles
@@ -150,18 +191,22 @@ function updateGraph()
     
   svgGroup.append("svg:circle")
       .attr("r", fcSize)
+//      .attr("stroke-width", fcStroke)
       .style("fill", color);
 
   svgGroup.append("svg:text")	  
   	  .attr("x", function(d) { return -(d.name.length * 0.5 * 5); })
-	  .text(function(d) {      return d.name;    });
+	  .text(fcText);
     
  $('svg g.node').tipsy({ 
         gravity: 'w', 
         html: true, 
         title: function() {
           var d = this.__data__;//, c = colors(d.i);
-          return d.name;
+          if(d.info)
+        	  return d.info;
+          else
+        	  return d.name;
         }
       });
   // Exit any old nodes.
@@ -174,7 +219,7 @@ function tick()
 	link.selectAll("line").attr("x2", function(d) { return computeLength(d); });
 	link.selectAll("text").attr("x", function(d) { return computeLength(d) * 0.5 - (d.target.name.length * 0.5 * 5); });
 
-	node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; }); 
+	node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });	
 }
 
 // Color leaf nodes orange, and packages white or blue.
@@ -182,7 +227,8 @@ function color(d) {
   return d._children ? "#3182bd" : d.children ? "#fd8d3c" : "#c6dbef";
 }
 
-function rightclick(d) {
+function rightClick(d) 
+{	
   if (d.children) {
     d._children = d.children;
     d.children = null;
@@ -194,6 +240,18 @@ function rightclick(d) {
   
   //stop showing browser menu
   d3.event.preventDefault();
+}
+
+function leftClick(d)
+{
+	if(!d.IsRoot)
+	{
+		if(theFocus)
+			theFocus.focus = false;
+		d.focus = true;
+		theFocus = d;
+		fcOnClick(d);
+	}
 }
 
 // Returns a list of all nodes under the root.
@@ -212,6 +270,7 @@ function flatten(root) {
     	return node.size;
   }
   root.cumulSize = recurse(root);
+  root.IsRoot = true;
   return nodes;
 }
 

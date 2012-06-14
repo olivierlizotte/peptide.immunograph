@@ -407,6 +407,18 @@ public class DefaultNode
 		return theNode.getId();
 	}	
 	
+	private static String ComputeChildrenInfo(Node theNode, RelationshipType relationType, Direction dir, int index)
+	{
+		int i = 0;
+		for (@SuppressWarnings("unused") Relationship rel : theNode.getRelationships(dir, relationType))
+			i++;
+		
+		return    "{index:'" + index + 
+				  "',name:'" + relationType.name() + 
+				  "',size:" + i + 
+				  ",url:'index.jsp?id=" + theNode.getId() + "&rel=" + relationType.name() + "&dir=" + dir + "'" +
+				  "},";
+	}
 	public String getChildren(  )
 	{
 		String result = "";
@@ -414,25 +426,15 @@ public class DefaultNode
 		int cpt = 0;
 		for(RelationshipType relationType : outRelationsMap.keySet())
 		{
-			int i = 0;
-			for (@SuppressWarnings("unused") Relationship rel : theNode.getRelationships(Direction.OUTGOING, relationType))
-			{			
-				i++;
-			}
-			result += "{index:'" + cpt + "',name:'" + relationType.name() + "',size:" + i + ",url:'index.jsp?id=" + theNode.getId() + "&rel=" + relationType.name() + "&dir=OUTGOING'},";
+			result += ComputeChildrenInfo(theNode, relationType, Direction.OUTGOING, cpt);
 			cpt++;
 		}
 		for(RelationshipType relationType : inRelationsMap.keySet())
 		{
-			int i = 0;
-			for (@SuppressWarnings("unused") Relationship rel : theNode.getRelationships(Direction.INCOMING, relationType))
-			{			
-				i++;
-			}
-			result += "{index:'" + cpt + "',name:'" + relationType.name() + "',size:" + i + ",url:'index.jsp?id=" + theNode.getId() + "&rel=" + relationType.name() + "&dir=INCOMING'},";
+			result += ComputeChildrenInfo(theNode, relationType, Direction.INCOMING, cpt);
 			cpt++;
 		}		
-		if(result.length() > 0)
+		if(result.length() > 0)//Remove last comma
 			result = result.substring(0, result.length() - 1);
 		
 		return "{index:'-1',name: '" + getType() + "', size: " + cpt + ", children: [" + result + "]};";
@@ -452,6 +454,20 @@ public class DefaultNode
 		return listOfNodeTypes;
 	}
 	
+	private static String ComputeNavigationInfo(Node theNode, RelationshipType relationType, Direction dir, int index)
+	{
+		String result = "";
+		HashMap<String, Long> nodeTypes = computeNodeTypes(relationType, dir, theNode);
+		for(String key : nodeTypes.keySet())
+			result += "{relationIndex:" + index + 
+				  	  ",relation:'" + relationType.name() + 
+				  	  "',name:'" + key + 
+				  	  "',size:" + nodeTypes.get(key) + 
+				  	  ",info:'Node type: <b>" + key + "</b><br><hr>Relation type: " + relationType.name() + "<br>Size of list: " +  nodeTypes.get(key) + 
+				  	  "',url:'index.jsp?id=" + theNode.getId() + "&rel=" + relationType.name() + "&dir=" + dir + "'},";
+		return result;
+	}
+	
 	public String getNavigationChart(  )
 	{		
 		String result = "";
@@ -460,17 +476,12 @@ public class DefaultNode
 			int index = 0;
 			for(RelationshipType relationType : outRelationsMap.keySet())
 			{
-				HashMap<String, Long> nodeTypes = computeNodeTypes(relationType, Direction.OUTGOING, theNode);
-				for(String key : nodeTypes.keySet())
-					result += "{relationIndex:" + index + ",relation:'" + relationType.name() + "',name:'" + key + "',size:" + nodeTypes.get(key) + ",url:'index.jsp?id=" + theNode.getId() + "&rel=" + relationType.name() + "&dir=OUTGOING'},";
-				
+				result += ComputeNavigationInfo(theNode, relationType, Direction.OUTGOING, index);
 				index++;
 			}
 			for(RelationshipType relationType : inRelationsMap.keySet())
 			{
-				HashMap<String, Long> nodeTypes = computeNodeTypes(relationType, Direction.INCOMING, theNode);
-				for(String key : nodeTypes.keySet())
-					result += "{relationIndex:" + index + ",relation:'" + relationType.name() + "',name:'" + key + "',size:" + nodeTypes.get(key) + ",url:'index.jsp?id=" + theNode.getId() + "&rel=" + relationType.name() + "&dir=INCOMING'},";
+				result += ComputeNavigationInfo(theNode, relationType, Direction.INCOMING, index);
 				index++;
 			}
 			if(result.length() > 0)
