@@ -470,7 +470,7 @@ public class DefaultNode
 	
 	public String getNavigationChart(  )
 	{		
-		String result = "";
+		String result = "{nodes:";
 		try 
 		{
 			int index = 0;
@@ -494,4 +494,49 @@ public class DefaultNode
 		}
 		return result;
 	}
+	
+	private static String getNodeInfo(Node theNode, int size, String toAdd)
+	{
+		String result = "{";
+	
+		if(theNode.hasProperty("name"))
+			result += "name:'" + theNode.getProperty("name") + "'";
+		else if(theNode.hasProperty("Name"))
+			result += "name:'" + theNode.getProperty("Name") + "'";
+		else
+			result += "name:'" + theNode.getProperty("type") + "'";
+		if(toAdd != null && !toAdd.isEmpty())
+			result += "," + toAdd;
+		return result + ",size:" + size + 
+						",info:'Node type: <b>" + theNode.getProperty("type") + "</b><br><hr>'" +
+						",url:'index.jsp?id=" + theNode.getId() + "'}";		
+	}	
+	
+	public static void getNavigationInfo(JspWriter out, Node theNode, String nomVar)
+	{
+		try 
+		{
+			out.println("var " + nomVar + " = {nodes:[" + getNodeInfo(theNode, 1, "IsRoot:'true'"));
+			String relations = "links:[";
+			
+			int cpt = 1;
+		    for(Relationship relation : theNode.getRelationships())//(Direction.OUTGOING))
+			{
+		    	if(DefaultTemplate.keepRelation(relation.getType().name()))
+		    	{
+			    	out.println("," + getNodeInfo(relation.getOtherNode(theNode), 1, "relation:'" + relation.getType().name() + "'"));
+					if(relation.getEndNode().getId() == theNode.getId())
+						relations += "{source:" + cpt + ",target:0,name:'" + relation.getType().name() + "'},";
+					else
+						relations += "{source:0,target:" + cpt + ",name:'" + relation.getType().name() + "'},";
+					cpt++;
+		    	}
+			}	    
+		    if(relations.length() > 0)
+		    	relations = relations.substring(0, relations.length() - 1);
+			out.println( "]," + relations + "]};");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}	//*/
 }

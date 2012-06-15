@@ -431,13 +431,25 @@ function CreateViewport()
 //    });
 //Ext.getCmp('specific_panel_id').add(dynamicPanel);  
 
+// This is assuming that the TabPanel is defined as a global variable 'myTabPanel'
+function setActiveTabByTitle( tabTitle ) 
+{
+	var tabPane = Ext.getCmp('tabPanelGrid');
+	for(tab in tabPane.items.items)
+		if(tabPane.items.items[tab].title == tabTitle)
+			tabPane.setActiveTab( Number(tab) );
+	//var tabs = tabPane.find( 'title', tabTitle );
+	//tabPane.setActiveTab( tabs[ 0 ] );
+}
+
 function OnNodeClick(node)
 {
-	if(node.relationIndex >= 0)
+	if(node && node.relation)//.relationIndex >= 0)
 	{
-        Ext.getCmp('tabPanelGrid').setActiveTab(node.relationIndex);
+		setActiveTabByTitle( node.relation );
+        //Ext.getCmp('tabPanelGrid').setActiveTab(node.relationIndex);
 	
-		MessageTop.msg("Node clicked", node.name + "<br> relationIndex = " + node.relationIndex);
+		MessageTop.msg("Node clicked", node.name + "<br> Showing relation " + node.relation);
 	}
 }
 

@@ -1,6 +1,7 @@
 var node,
     link,
     root,
+    jsonObj,
 	divName,
 	force,
 	currentWidth,
@@ -14,7 +15,7 @@ function CreateGraph(jsonData, divNameParam, OnClick)
 {
 	fcOnClick = OnClick;
 	divName = divNameParam;
-	root = jsonData;
+
     if(node)
 		node.exit().remove();
 	if(link)
@@ -48,12 +49,9 @@ function zoomt() {
   vis.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 }//*/
 
-jsonData = jsonData;
-jsonData.fixed = true;
-jsonData.x = currentWidth / 2;
-jsonData.y = currentHeight / 2;
+jsonObj = jsonData;
 updateGraph();
-root = jsonData;
+//root = jsonData;
 }
 
 function fcAnimation()
@@ -64,7 +62,7 @@ function fcAnimation()
 
 function fcSize(d) 
 {
-	if(d.size <= 0)
+	if(!d || d.size <= 0)
 		return 36;//24;
 	var size = (d._children ? Math.sqrt(d.cumulSize) : Math.sqrt(d.size)) + 36;//24;
 	if(size > 160)
@@ -84,6 +82,9 @@ function fcCharge(d)
 
 function fcDistance(d) 
 {
+	if(!d.source || !d.target)
+		return 100;
+	
 	var size = (fcSize(d.source) + fcSize(d.target)) * 2;	
 	
 	if(size < 40)
@@ -95,14 +96,14 @@ function fcDistance(d)
 }
 
 var theFocus;
-var cptStroke = 5;
-var incrStroke = 0.18;//0.18
+var cptStroke = 2.5;
+var incrStroke = 0.12;//0.18
 function fcStrokeWidth(d)
 {
 	if(d.focus)
 	{
 		cptStroke += incrStroke;
-		if(cptStroke > 5 || cptStroke < 1)
+		if(cptStroke > 4 || cptStroke < 1)
 			incrStroke = - incrStroke;
 		return cptStroke;
 	}
@@ -113,7 +114,7 @@ function fcStrokeWidth(d)
 function fcStroke(d)
 {
 	if(d.focus)
-		return "#000";
+		return "#04408c";
 	else
 		return "#fff";
 }
@@ -138,8 +139,13 @@ function computeLength(d)
 
 function updateGraph() 
 {
-	nodes = flatten(root);
-	links = d3.layout.tree().links(nodes);
+	nodes = jsonObj.nodes;//flatten(root);
+	links = jsonObj.links;//d3.layout.tree().links(nodes);
+
+	root = nodes[0];
+	root.fixed = true;
+	root.x = currentWidth / 2;
+	root.y = currentHeight / 2;
 	
   // Restart the force layout.
   force
@@ -165,7 +171,7 @@ function updateGraph()
 
   svgLink.append("svg:text")	  
   	  .attr("y", "4")
-	  .text(function(d) {      return d.target.relation;    });
+	  .text(function(d) {      return ">> " + d.name + " >>";    });
   
   // Exit any old links
   link.exit().remove();
@@ -177,7 +183,7 @@ function updateGraph()
   // Enter any new nodes.
   var svgGroup = node.enter().append("svg:g")
       .attr("class", "node")      
-      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })       
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
       .on("mousedown", leftClick)	  
 	  .on("contextmenu", rightClick)
       .call(force.drag);
@@ -187,12 +193,12 @@ function updateGraph()
   		.transition()
   			.delay(100)
   			.attr("r", fcSize)  			
-  			.style("fill", color);
+  			.style("fill", fcColor);
     
   svgGroup.append("svg:circle")
       .attr("r", fcSize)
 //      .attr("stroke-width", fcStroke)
-      .style("fill", color);
+      .style("fill", fcColor);
 
   svgGroup.append("svg:text")	  
   	  .attr("x", function(d) { return -(d.name.length * 0.5 * 5); })
@@ -223,8 +229,9 @@ function tick()
 }
 
 // Color leaf nodes orange, and packages white or blue.
-function color(d) {
-  return d._children ? "#3182bd" : d.children ? "#fd8d3c" : "#c6dbef";
+function fcColor(d) 
+{
+	return d._children ? "#3182bd" : d.IsRoot ? "#fd8d3c" : "#c6dbef";
 }
 
 function rightClick(d) 

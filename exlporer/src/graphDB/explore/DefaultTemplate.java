@@ -77,8 +77,15 @@ abstract public class DefaultTemplate
 	{
 		if(theGraph == null)
 		{
-			theGraph = new EmbeddedGraphDatabase( GraphDBString );
-			registerShutdownHook(theGraph);
+			try
+			{
+				theGraph = new EmbeddedGraphDatabase( GraphDBString );
+				registerShutdownHook(theGraph);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}			
 		}
 		return theGraph;
 	}
