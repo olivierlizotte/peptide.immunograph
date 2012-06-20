@@ -74,7 +74,7 @@ if(session.getAttribute("userNodeID") != null)
 		});
 		/*
 		var groupingFeature = Ext.create('Ext.grid.feature.Grouping',{
-		    groupHeaderTpl: 'Validated: {name} ({rows.length} Item{[values.rows.length > 1 ? "s" : ""]})'
+		    groupHeaderTpl: 'Validated: {name} ({rows.length} Item{[(values.rows.length > 1 ? "s" : "")]})'
 		});//*/
 
 		var theGrid = Ext.create('Ext.grid.Panel',
