@@ -42,26 +42,31 @@ abstract public class DefaultTemplate
 	        public void run()
 			{
 	        	removeAllTempElements(graphDb);
-	            graphDb.shutdown();
+	        	if(theGraph != null)
+	        		graphDb.shutdown();
 			}
 		} );
 	}
 	
 	
-	public static void removeAllTempElements(GraphDatabaseService graphDb ){
-		Transaction tx = graphDb.beginTx();
-		Index<Node> index = DefaultTemplate.graphDb().index().forNodes("tempNodes");
-		IndexHits<Node> tempNodes = index.get("type", "tempNode");
-		while (tempNodes.hasNext()){
-			Node tempNode = tempNodes.next();
-			Iterable<Relationship> tempRels = tempNode.getRelationships();
-			for (Relationship rel : tempRels){
-				rel.delete();
+	public static void removeAllTempElements(GraphDatabaseService graphDb )
+	{
+		if(theGraph != null)
+		{
+			Transaction tx = graphDb.beginTx();
+			Index<Node> index = theGraph.index().forNodes("tempNodes");
+			IndexHits<Node> tempNodes = index.get("type", "tempNode");
+			while (tempNodes.hasNext())
+			{
+				Node tempNode = tempNodes.next();
+				Iterable<Relationship> tempRels = tempNode.getRelationships();
+				for (Relationship rel : tempRels)
+					rel.delete();
+				tempNode.delete();
 			}
-			tempNode.delete();
+			tx.success();
+			tx.finish();
 		}
-		tx.success();
-		tx.finish();
 	}
 	
 	

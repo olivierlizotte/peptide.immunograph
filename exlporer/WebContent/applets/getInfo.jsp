@@ -34,7 +34,7 @@ if(session.getAttribute("userNodeID") != null)
 		
 		out.println(theNode.getCommentsVariable("myCommentData"));	
 		
-		DefaultNode.getNavigationInfo(out, theNode.NODE(), "dataObject");
+		NodeHelper.printNavigationNodes(out, theNode.NODE(), 2, "dataObject");
 	}
 	catch(Exception e)
 	{

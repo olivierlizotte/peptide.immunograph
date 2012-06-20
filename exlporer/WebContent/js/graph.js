@@ -64,7 +64,8 @@ function fcSize(d)
 {
 	if(!d || d.size <= 0)
 		return 36;//24;
-	var size = (d._children ? Math.sqrt(d.cumulSize) : Math.sqrt(d.size)) + 36;//24;
+	//var size = (d._children ? Math.sqrt(d.cumulSize) : Math.sqrt(d.size)) + 36;//24;
+	var size = (d._children ? Math.sqrt(d.size) : Math.sqrt(d.size)) + 36;//24;
 	if(size > 160)
 		return 160;
 	else
@@ -304,4 +305,4 @@ function ResizeNavPanel()
 
 //On Window Resize, recompute the graph
 //TODO Call CreateGraph AFTER ExtJS has finished resizing the panel
-$(window).resize(ResizeNavPanel);
+//$(window).resize(ResizeNavPanel);

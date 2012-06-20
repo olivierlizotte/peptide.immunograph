@@ -195,13 +195,74 @@ function AddComment(field, event)
 	return false; 
 }   
 
+function AddAttribute(btn, text)
+{
+	myAttributeObject[text] = "";
+	attribPanel.setSource(myAttributeObject);
+	MessageTop.msg('Button Click', 'You clicked the {0} button and entered the text "{1}".', btn, text);
+};
+
+
+var attribPanel;
+
 function CreateAttributes(attribs)
 {
-	return Ext.create('Ext.grid.property.Grid', {        
-    	border: true,
-        hideHeaders : true,
-        source: attribs
-    });
+	if(!attribPanel)
+	{
+		attribPanel = Ext.create('Ext.grid.property.Grid', {        
+	    	border: true,
+	        hideHeaders : true,
+	        editable:true,
+	        /*plugins: [
+	              Ext.create('Ext.grid.plugin.RowEditing', {
+	               	  clicksToEdit: 1
+	               	  /*listeners:{afteredit:
+	               			//scope:this,
+	               			//afteredit: 
+	               				function(roweditor, changes, record, rowIndex) 
+	               			{
+	               		    	//your save logic here - might look something like this:
+	               		    	Ext.Ajax.request({
+	               		      		url   : record.phantom ? '/users' : '/users/' + record.get('user_id'),
+	               		      		method: record.phantom ? 'POST'   : 'PUT',
+	               		      		params: changes,
+	               		      		success: function() {
+	               				        //post-processing here - this might include reloading the grid if there are calculated fields
+	               		     		}
+	               		    	});
+	               				MessageTop.msg("Attribute edited", "Congratulations");
+	               			}
+	               	  }
+	                 })
+	                ],//*/
+		   	bbar: [
+		   	{	   		
+		   		text   : "Add attribute",
+		   	    handler: function() 
+		   	    {
+		   	    	Ext.MessageBox.prompt('New Attribute', 'Please enter the name for the new attribute:', AddAttribute);
+		   	    }
+		   	},
+		   	{	   		
+		   		text   : "Save",
+		   	    handler: function() 
+		   	    {
+		   	    	Ext.Ajax.request({
+   		      				url   : "EditAttribute.jsp?id=" + currentNodeID,
+   		      				type  : 'POST',
+   		      				data  : myAttributeObject,
+   		      				dataType: "json",
+           		      		success: function(result) {
+           		      			myAttributeObject = jsonparse(result);
+           		      			attribPanel.setSource(myAttributeObject);           				        
+           		     		}
+           		    	});
+		   	    }
+		   	}],
+	        source: attribs
+	    });
+	}
+	return attribPanel;
 }
 
 function ShowChartsForm()
@@ -362,11 +423,23 @@ function CreateViewport()
                                     layout: 'card',
                                     collapseDirection: 'bottom',
                                     collapsible: true,
-                                    title: '<button type="button" style="border-radius:40px;font-size:small;font-weight:bold;color:#2B498B;background:#B9D0EE;" onClick="ShowChartsForm()"> <img src="icons/bar_chart.png"/> Charts </button>',
+                                    //title: '<button type="button" style="padding:0px,margin:0px,height:10px,border-radius:40px;font-size:small;font-weight:bold;color:#2B498B;background:#B9D0EE;" onClick="ShowChartsForm()"> <img src="icons/bar_chart.png"/> Charts </button>',
                                     margins: '0 0 0 0',
                                     flex: 1,
                                     id: 'idGraphs',                                                               
                                     border: false,
+                                    preventHeader: true,
+                                    tbar:[
+                                          {
+                                              id: 'idShowChartsForm',
+                                              icon: "icons/bar_chart.png",
+                                              text: 'Charts',
+                                              handler: function(btn) {
+                                            	  ShowChartsForm();                                              
+                                                  //navigate(btn.up("panel"), "prev");
+                                              }
+                                              //disabled: true
+                                          }],
                                     bbar: [
                                            {
                                                id: 'move-prev',
@@ -379,19 +452,20 @@ function CreateViewport()
                                            '->',
                                            {
                                         	   xtype:'text',
-                                        	   text:'page:'+graphItemNumber+'/'+charts.length, 
+                                        	   text:graphItemNumber+'/'+charts.length, 
                                         	   id:'graphItemNumber',
                                            },
                                            '->', // greedy spacer so that the buttons are aligned to each side
                                            {
                                                id: 'move-next',
                                                text: 'Next',
+                                               disabled: true,
                                                handler: function(btn) {
                                                    navigate(btn.up("panel"), "next");
                                                }
                                            }
                                        ],
-                                    items:charts
+                                    items: charts
                                 }
                             ]
                         }
