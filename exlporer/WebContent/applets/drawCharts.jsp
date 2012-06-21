@@ -40,7 +40,7 @@ public void CreateJsonStore(String[] xData, String[] yData, int graphNumber, Jsp
 		e.printStackTrace();
 	}
 }
-public void CreateExtJsChart(String chartName, String storeName, JspWriter out) {
+public void CreateExtJsChart(String chartName, String storeName, String title, JspWriter out) {
 	try {
 	out.println("var "+chartName+"= Ext.create('Ext.chart.Chart', {"+
         "style: 'background:#fff',\n"+
@@ -59,8 +59,8 @@ public void CreateExtJsChart(String chartName, String storeName, JspWriter out) 
         "}, {\n"+
             "type: 'Category',\n"+
             "position: 'bottom',\n"+
-            "fields: ['xax']\n"+
-            //"title: '"+chartName+"'\n"+
+            "fields: ['xax'],\n"+
+            "title: '"+title+"'\n"+
         "}],\n"+
         "series: [{\n"+
             "type: 'column',\n"+
@@ -105,22 +105,18 @@ try{
 	//								withName("Tool_output"));
 	for (Relationship chartsRel : theNode.NODE().getRelationships(DynamicRelationshipType.withName("Tool_output"), Direction.OUTGOING))
 	{
-		Node chartsNode = chartsRel.getEndNode();
-		for(String chartName : chartsNode.getPropertyKeys())
+		Node chartsNode = chartsRel.getOtherNode(theNode.NODE());
+		if(chartsNode.hasProperty("data") && chartsNode.hasProperty("Name") )
 		{
-			// the node has an attribute named "type", ignore it!
-			if (!chartName.equals("type"))
-			{
-				graphNumber+=1;
-				String value=chartsNode.getProperty(chartName).toString();
-				String[] xaxis = value.split("\n")[0].split(",");
-				String[] yaxis = value.split("\n")[1].split(",");
-				
-				CreateJsonStore(xaxis, yaxis, graphNumber, out);
-				CreateExtJsChart(chartName, "store"+graphNumber, out);
-				out.println("charts["+(graphNumber-1)+"] = "+chartName);
-			}
-		}	
+			graphNumber++;
+			String value=chartsNode.getProperty("data").toString();
+			String[] xaxis = value.split("\n")[0].split(",");
+			String[] yaxis = value.split("\n")[1].split(",");
+					
+			CreateJsonStore(xaxis, yaxis, graphNumber, out);
+			CreateExtJsChart("chart" + graphNumber, "store"+graphNumber, chartsNode.getProperty("Name").toString(), out);
+			out.println("charts["+(graphNumber-1)+"] = " + "chart" + graphNumber);
+		}
 	}
 }
 catch(Exception e)

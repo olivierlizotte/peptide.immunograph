@@ -85,7 +85,7 @@ EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
 //String cypherQueryPeptideIdentification ="start n=node("+nodeID+") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide Identification\" return p.Sequence";
 
 String cypherQuery ="start n=node("+nodeID+") match n-->p where has(p.Sequence) return p.Sequence";
-String nodeType=graphDb.getNodeById(Integer.valueOf(nodeID)).getProperty("type").toString();
+String nodeType = NodeHelper.getType(graphDb.getNodeById(Integer.valueOf(nodeID)));
 String chartName=nodeType.replaceAll(" ", "")+"_peptideLength";
 try{
 	Transaction tx = graphDb.beginTx();
@@ -93,17 +93,18 @@ try{
 	// in theory only one node.
 	
 	// if the relationship doesn't existe yet, create it
-	if(!graphDb.getNodeById(Integer.valueOf(nodeID)).
-			hasRelationship(DynamicRelationshipType.withName("Tool_output"), Direction.OUTGOING)){
-		
+	//if(!graphDb.getNodeById(Integer.valueOf(nodeID)).hasRelationship(DynamicRelationshipType.withName("Tool_output"), Direction.OUTGOING))
+	{		
 		Node charts = graphDb.createNode();
 		charts.setProperty("type", "Charts");
-		charts.setProperty(chartName, getPeptidesLengthDistribution(graphDb, cypherQuery));
+		charts.setProperty("type", "Charts");
+		charts.setProperty("Name", "Sequence Length [" + nodeType + "]");
+		charts.setProperty("data", getPeptidesLengthDistribution(graphDb, cypherQuery));
 		graphDb.getNodeById(Integer.valueOf(nodeID)).
 				createRelationshipTo(charts, DynamicRelationshipType.withName("Tool_output"));
 		DefaultTemplate.linkToExperimentNode(graphDb, charts, "Tool_output");
 		System.out.println("just created "+charts.getId());
-	}else{
+	}/*else{
 		Relationship toolOutput = graphDb.getNodeById(Integer.valueOf(nodeID)).
 				getSingleRelationship(DynamicRelationshipType.withName("Tool_output"), Direction.OUTGOING);
 		// then check if the data for this chart were already fetched from DB
@@ -119,7 +120,7 @@ try{
 			System.out.println("create only data"+toolOutput.getEndNode().getId());
 			toolOutput.getEndNode().setProperty(chartName, getPeptidesLengthDistribution(graphDb, cypherQuery));				
 		}
-	}
+	}//*/
 
 	tx.success();
 	tx.finish();
