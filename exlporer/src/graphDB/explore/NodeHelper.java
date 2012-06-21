@@ -2,6 +2,7 @@ package graphDB.explore;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import javax.servlet.jsp.JspWriter;
@@ -144,17 +145,33 @@ public class NodeHelper
 	{
 		int   theNodeIndex;
 		ArrayList<Integer> theRelationIndexes = new ArrayList<Integer>();
-		String theNodeInfo;
+		String strToAdd = "";
 		String theRelationInfo = "";
+		Node theNode;
+		int Size = 0;
+		public String getNodeInfo()
+		{
+			return NodeHelper.getNodeInfo(theNode, strToAdd, Size);
+		}
+		
+		public String getRelationInfo()
+		{
+			return theRelationInfo;
+		}
+		
 		public NavNode(int index, Node node)
 		{
 			theNodeIndex = index;
-			theNodeInfo = getNodeInfo(node, "IsRoot:true", 1);			
+			strToAdd = "IsRoot:true";
+			theNode = node;
+			Size = 1;
 		}
+		
 		public NavNode(int index, Node node, Relationship relation, int indexOther, int size)
 		{			
 			theNodeIndex = index;
-			theNodeInfo = getNodeInfo(node, "relation:'" + relation.getType().name() + "'", size);
+			strToAdd = "relation:'" + relation.getType().name() + "'";
+			theNode = node;			
 			if(relation.getEndNode().getId() == node.getId())
 				AddRelation(relation, indexOther, index);
 			else
@@ -184,24 +201,52 @@ public class NodeHelper
 			
 			out.println("var " + varName + " = {nodes:[");
 			NavNode root = new NavNode(0, theNode);
-			out.println("{" + root.theNodeInfo + "}");
+			//out.println("{" + root.theNodeInfo + "}");
 			
 			result.put(getType(theNode), root);			
-			getNavigationNodes(out, theNode, depth, result, 0);
+			getNavigationNodes(theNode, depth, result, 0);
 	
+			//Sort map based on index (required by D3.js to map with the correct relations)
+			List<Map.Entry<String, NavNode>> list = new LinkedList<Map.Entry<String, NavNode>>(result.entrySet());
+			 
+	        //sort list based on comparator
+	        Collections.sort(list, new Comparator<Map.Entry<String, NavNode>>() 
+	        {
+				public int compare(Entry<String, NavNode> arg0,	Entry<String, NavNode> arg1) 
+				{
+					if(arg0.getValue().theNodeIndex > arg1.getValue().theNodeIndex)
+						return 1;
+					else if(arg0.getValue().theNodeIndex < arg1.getValue().theNodeIndex)
+						return -1;
+					else
+						return 0;
+				}
+			});
+	        
 			//for (NavNode nav : result.values())
 			//	out.println("{" + nav.theNodeInfo + "},");
+			boolean isFirst = true;
+			for(Map.Entry<String, NavNode> item : list)
+			//for (NavNode nav : result.values())
+			{
+				if(isFirst)
+					isFirst = false;
+				else
+					out.print(",");
+			
+				out.println("{" + item.getValue().getNodeInfo() + "}");
+			}	
 			out.print("],links:[");
 			for (NavNode nav : result.values())
 				if(!nav.theRelationInfo.isEmpty())
-					out.println("{" + nav.theRelationInfo + "},");
+					out.println("{" + nav.getRelationInfo() + "},");
 			out.print("]};");		
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private static int CountNodes(Node root, RelationshipType relType)
+	public static int CountNodes(Node root, RelationshipType relType)
 	{
 		String query = "START a=node(" + root.getId() + ") MATCH a-[:" + relType.name() + "]-b RETURN COUNT(*)";
 		ExecutionEngine engine = new ExecutionEngine( DefaultTemplate.graphDb() );
@@ -214,39 +259,55 @@ public class NodeHelper
 		    {
 		    	return Integer.parseInt(obj.toString());
 		    }
-			//return row..size();
 		}
-		return 2;
+		return 0;
 	}
 	
-	private static HashMap<String, NavNode> getNavigationNodes(JspWriter out, Node theNode, int depth, HashMap<String, NavNode> result, int index) throws IOException
+	private static HashMap<String, NavNode> getNavigationNodes(Node theNode, int depth, HashMap<String, NavNode> result, int index) throws IOException
 	{	
 		if(depth > 0)
 		{	
 			for (Relationship relation : theNode.getRelationships())
 			{
-				//if (DefaultTemplate.keepRelation(relation.getType().name()))
+				Node theOtherNode = relation.getOtherNode(theNode);
+				if (theOtherNode.getId() != theNode.getId())//DefaultTemplate.keepRelation(relation.getType().name()))
 				{
-					NavNode nav = result.get(getType(relation.getOtherNode(theNode)));
+					NavNode nav = result.get(getType(theOtherNode));
 					if(nav == null)
 					{
-						nav = new NavNode(result.size(), relation.getOtherNode(theNode), relation, index, CountNodes(theNode, relation.getType()));
-						out.println(",{" + nav.theNodeInfo + "}");
+						nav = new NavNode(result.size(), relation.getOtherNode(theNode), relation, index, 1);//CountNodes(theNode, relation.getType()));
+						//out.println(",{" + nav.theNodeInfo + "}");
 						result.put(getType(relation.getOtherNode(theNode)), nav);
-						getNavigationNodes(out, relation.getOtherNode(theNode), depth-1, result, nav.theNodeIndex);
+						getNavigationNodes(relation.getOtherNode(theNode), depth-1, result, nav.theNodeIndex);
 					}
 					else
+					{
+						nav.Size++;
 						if(relation.getEndNode().getId() == theNode.getId())
 							nav.AddRelation(relation, nav.theNodeIndex, index);
 						else
-							nav.AddRelation(relation, index, nav.theNodeIndex);					
+							nav.AddRelation(relation, index, nav.theNodeIndex);
+					}
 				}
 			}
 		}
 		return result;
 	}
 	
-	
+	private static String getInfo(Node theNode, int size)	
+	{
+		String result = "Node type: <b>" + theNode.getProperty("type") + "</b><br><hr>";
+		if(size > 1)
+			result += "Number of elements:" + size + "<br>";
+		else
+		{
+			result += "Node ID :" + theNode.getId() + "<br>";
+			for (String key : theNode.getPropertyKeys())
+				if(DefaultTemplate.keepAttribute(key))
+					result += key + ":\"" + DefaultTemplate.Sanitize(theNode.getProperty(key).toString()) + "\"<br>";//*/				
+		}
+		return result;
+	}
 	private static String getNodeInfo(Node theNode, String toAdd, int size) {
 		String result = "";
 
@@ -258,10 +319,9 @@ public class NodeHelper
 			result += "name:'" + theNode.getProperty("type") + "'";
 		if (toAdd != null && !toAdd.isEmpty())
 			result += "," + toAdd;
-		return result 
+		return result 				
+				+ ",info:'" + getInfo(theNode, size) + "'"
 				+ ",size:" + size
-				+ ",info:'Node type: <b>"
-				+ theNode.getProperty("type") + "</b><br><hr>'"
 				+ ",url:'index.jsp?id=" + theNode.getId() + "'";
 	}	
 }

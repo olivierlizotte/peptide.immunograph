@@ -30,10 +30,7 @@ if(session.getAttribute("user") != null)
 	
 	try
 	{				
-		String text = comment.replaceAll("\\r","<br/>");
-		text = text.replaceAll("\\n","<br/>");
-		text = text.replaceAll("\\\"", "&#34;");
-		text = text.replaceAll("\\\\", "&#92;");
+		String text = DefaultTemplate.Sanitize(comment);
 		
 		Node theNode = graphDb.getNodeById(Long.valueOf(nodeID));
 		Node theUser = graphDb.getNodeById(Long.valueOf(userID));		

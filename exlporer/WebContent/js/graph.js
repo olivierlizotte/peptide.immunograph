@@ -208,12 +208,13 @@ function updateGraph()
  $('svg g.node').tipsy({ 
         gravity: 'w', 
         html: true, 
-        title: function() {
-          var d = this.__data__;//, c = colors(d.i);
-          if(d.info)
-        	  return d.info;
-          else
-        	  return d.name;
+        title: function() 
+        {
+        	var d = this.__data__;//, c = colors(d.i);
+        	if(d.info)
+        		return d.info;
+        	else
+        		return d.name;
         }
       });
   // Exit any old nodes.
@@ -232,11 +233,17 @@ function tick()
 // Color leaf nodes orange, and packages white or blue.
 function fcColor(d) 
 {
-	return d._children ? "#3182bd" : d.IsRoot ? "#fd8d3c" : "#c6dbef";
+	if(d.IsRoot)
+		return "#fd8d3c";
+	if(d.size > 1)
+		return "#70a0cf";
+	if(d._children)
+		return "#3182bd";
+	return "#c6dbef";
 }
 
 function rightClick(d) 
-{	
+{	/*
   if (d.children) {
     d._children = d.children;
     d.children = null;
@@ -245,7 +252,7 @@ function rightClick(d)
     d._children = null;
   }
   updateGraph();
-  
+  */
   //stop showing browser menu
   d3.event.preventDefault();
 }

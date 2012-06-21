@@ -70,9 +70,9 @@ abstract public class DefaultTemplate
 	}
 	
 	
-	//public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
+	public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
 	
-	public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph.db";
+	//public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph.db";
 	
 	//public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph.db";
 	
@@ -116,9 +116,9 @@ abstract public class DefaultTemplate
 	 */
 	public static Boolean keepRelation( String theRelationName )
 	{
-		if("Comment".equals(theRelationName) ||
-				"Tool_output".equals(theRelationName))
-			//|| theRelationName == "Hash")
+		if("Tool_output".equals(theRelationName) //|| "Comment".equals(theRelationName)				
+			//|| theRelationName == "Hash"
+				)
 			return false;
 		return true;
 	}
@@ -224,7 +224,14 @@ abstract public class DefaultTemplate
 		return sb.toString();
 	}
 	
-	
+	public static String Sanitize(String input)
+	{
+		String text = input.replaceAll("\\r","<br/>");
+		text = text.replaceAll("\\n","<br/>");
+		text = text.replaceAll("\\\"", "&#34;");
+		text = text.replaceAll("\\\\", "&#92;");
+		return text;
+	}	
 	
 	public static void linkToExperimentNode(EmbeddedGraphDatabase graphDb, Node node, String RelationName){
 		long startID = node.getId();
