@@ -59,7 +59,7 @@ public void CreateExtJsChart(String chartName, String storeName, JspWriter out) 
         "}, {\n"+
             "type: 'Category',\n"+
             "position: 'bottom',\n"+
-             "fields: ['xax']\n"+
+            "fields: ['xax']\n"+
             //"title: '"+chartName+"'\n"+
         "}],\n"+
         "series: [{\n"+
@@ -97,31 +97,28 @@ try{
 	//String nodeID = request.getParameter("id");
 	
 	DefaultNode theNode = (DefaultNode)session.getAttribute("currentNode");
-	boolean chartsToDraw = theNode.NODE().hasRelationship(DynamicRelationshipType.withName("Tool_output"));
-	
+
+	int graphNumber=0;
 	//only if there are any charts to draw
 	//boolean chartsToDraw = graphDb.getNodeById(Long.valueOf(nodeID)).
 	//								hasRelationship(DynamicRelationshipType.
 	//								withName("Tool_output"));
-	if(chartsToDraw){
-		int graphNumber=0;
-		Iterable<Relationship> chartsRels = theNode.NODE().
-				getRelationships(DynamicRelationshipType.withName("Tool_output"), Direction.OUTGOING);
-		
-		for (Relationship chartsRel : chartsRels){
-			Node chartsNode = chartsRel.getEndNode();
-			for(String chartName : chartsNode.getPropertyKeys()){
-				// the node has an attribute named "type", ignore it!
-				if (!chartName.equals("type")){
-					graphNumber+=1;
-					String value=chartsNode.getProperty(chartName).toString();
-					String[] xaxis = value.split("\n")[0].split(",");
-					String[] yaxis = value.split("\n")[1].split(",");
-					
-					CreateJsonStore(xaxis, yaxis, graphNumber, out);
-					CreateExtJsChart(chartName, "store"+graphNumber, out);
-					out.println("charts["+(graphNumber-1)+"] = "+chartName);
-				}
+	for (Relationship chartsRel : theNode.NODE().getRelationships(DynamicRelationshipType.withName("Tool_output"), Direction.OUTGOING))
+	{
+		Node chartsNode = chartsRel.getEndNode();
+		for(String chartName : chartsNode.getPropertyKeys())
+		{
+			// the node has an attribute named "type", ignore it!
+			if (!chartName.equals("type"))
+			{
+				graphNumber+=1;
+				String value=chartsNode.getProperty(chartName).toString();
+				String[] xaxis = value.split("\n")[0].split(",");
+				String[] yaxis = value.split("\n")[1].split(",");
+				
+				CreateJsonStore(xaxis, yaxis, graphNumber, out);
+				CreateExtJsChart(chartName, "store"+graphNumber, out);
+				out.println("charts["+(graphNumber-1)+"] = "+chartName);
 			}
 		}	
 	}
