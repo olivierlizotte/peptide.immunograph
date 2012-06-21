@@ -44,7 +44,7 @@ if(session.getAttribute("user") != null)
 		tx.success();
 		tx.finish();
 		
-		out.println("{" + DefaultNode.getComments(theNode) + "}");	
+		out.println("{" + NodeHelper.getComments(theNode) + "}");	
 	}
 	catch(Exception e)
 	{

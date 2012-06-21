@@ -250,11 +250,12 @@ function CreateAttributes(attribs)
 		   	    	Ext.Ajax.request({
    		      				url   : "EditAttribute.jsp?id=" + currentNodeID,
    		      				type  : 'POST',
-   		      				data  : myAttributeObject,
-   		      				dataType: "json",
+   		      				//data  : myAttributeObject,
+   		      				params: {json: Ext.encode(myAttributeObject)},
            		      		success: function(result) {
-           		      			myAttributeObject = jsonparse(result);
-           		      			attribPanel.setSource(myAttributeObject);           				        
+//           		      			myAttributeObject = eval(result.responseText);
+           		      			attribPanel.setSource(myAttributeObject);           
+           		      			MessageTop.msg("Success!", "Attributes saved");
            		     		}
            		    	});
 		   	    }
