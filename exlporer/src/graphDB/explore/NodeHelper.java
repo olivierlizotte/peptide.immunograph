@@ -126,6 +126,19 @@ public class NodeHelper
 			return "";
 		}
 	}
+	
+	public static String getName(Node aNode) {
+		try {
+			if(aNode.hasProperty("Name"))
+				return aNode.getProperty("Name").toString();
+			else if(aNode.hasProperty("name"))
+				return aNode.getProperty("name").toString();
+			else
+				return getType(aNode);
+		} catch (Exception e) {
+			return "";
+		}
+	}
 		
 	public static HashMap<String, Long> computeNodeTypes(RelationshipType relationType, Direction dir, Node startNode) 
 	{
@@ -311,15 +324,12 @@ public class NodeHelper
 	private static String getNodeInfo(Node theNode, String toAdd, int size) {
 		String result = "";
 
-		if (theNode.hasProperty("name"))
-			result += "name:'" + theNode.getProperty("name") + "'";
-		else if (theNode.hasProperty("Name"))
-			result += "name:'" + theNode.getProperty("Name") + "'";
-		else
-			result += "name:'" + theNode.getProperty("type") + "'";
+		result += "name:'" + getName(theNode) + "'";
+		
 		if (toAdd != null && !toAdd.isEmpty())
 			result += "," + toAdd;
-		return result 				
+		return result 		
+				+ ",type:'" + getType(theNode) + "'"
 				+ ",info:'" + getInfo(theNode, size) + "'"
 				+ ",size:" + size
 				+ ",url:'index.jsp?id=" + theNode.getId() + "'";

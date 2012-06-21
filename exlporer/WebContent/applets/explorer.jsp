@@ -460,7 +460,7 @@ function CreateViewport()
                                            {
                                                id: 'move-next',
                                                text: 'Next',
-                                               disabled: true,
+                                               disabled: (charts.length > 1? false: true),
                                                handler: function(btn) {
                                                    navigate(btn.up("panel"), "next");
                                                }
@@ -519,9 +519,9 @@ function setActiveTabByTitle( tabTitle )
 
 function OnNodeClick(node)
 {
-	if(node && node.relation)//.relationIndex >= 0)
+	if(node && node.type)//.relationIndex >= 0)
 	{
-		setActiveTabByTitle( node.relation );
+		setActiveTabByTitle( node.type );
         //Ext.getCmp('tabPanelGrid').setActiveTab(node.relationIndex);
 	
 		MessageTop.msg("Node clicked", node.name + "<br> Showing relation " + node.relation);

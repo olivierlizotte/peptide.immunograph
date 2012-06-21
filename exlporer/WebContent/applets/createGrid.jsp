@@ -69,12 +69,12 @@ if(session.getAttribute("userNodeID") != null)
 			},
 			//     autoLoad: true,
 			//EndNew
-			//        groupField: 'Validated',
+			        groupField: 'Relation',
 			data : gridData[keyName]
 		});
-		/*
+		
 		var groupingFeature = Ext.create('Ext.grid.feature.Grouping',{
-		    groupHeaderTpl: 'Validated: {name} ({rows.length} Item{[(values.rows.length > 1 ? "s" : "")]})'
+		    groupHeaderTpl: 'Relation: {name} ({rows.length} Item{[(values.rows.length > 1 ? "s" : "")]})'
 		});//*/
 
 		var theGrid = Ext.create('Ext.grid.Panel',
@@ -89,7 +89,7 @@ if(session.getAttribute("userNodeID") != null)
 							iconCls : 'icon-grid',
 							store : nodeStore,
 							title : gridName[keyName],
-							//features: [groupingFeature],
+							features: [groupingFeature],
 							columns : gridColumns[keyName],
 
 							loadMask : true,

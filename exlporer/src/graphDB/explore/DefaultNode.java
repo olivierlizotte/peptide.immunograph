@@ -81,10 +81,10 @@ public class DefaultNode {
 		String output = "var " + varName + " = {";
 
 		String AttributeObjectString = "";
-		for (String key : theProperties.keySet()) {
+		for (String key : theNode.getPropertyKeys()) {
 			if (DefaultTemplate.keepAttribute(key))
 				AttributeObjectString += ",\"" + key + "\":\""
-						+ DefaultTemplate.Sanitize(theProperties.get(key)) + "\"";
+						+ DefaultTemplate.Sanitize(theNode.getProperty(key).toString()) + "\"";
 		}
 		if (AttributeObjectString.isEmpty())
 			output += "};\n";
@@ -109,10 +109,9 @@ public class DefaultNode {
 			output += "var gridName = new Object();\n";
 			output += "var csvData = new Object();\n";
 			out.print(output);
-			computeGridDirection(outRelationsMap, listOfAttributesOUT,
-					Direction.OUTGOING, theNode, out, key);
-			computeGridDirection(inRelationsMap, listOfAttributesIN,
-					Direction.INCOMING, theNode, out, key);
+			computeGrid(theNode, out);
+			//computeGridDirection(inRelationsMap, listOfAttributesIN,
+				//	Direction.INCOMING, theNode, out, key);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -143,90 +142,78 @@ public class DefaultNode {
 	 * @param out
 	 * @param key
 	 */
-	private void computeGridDirection(
-			HashMap<RelationshipType, String> relationsMap,
-			HashMap<String, HashMap<String, String>> listOfAttributes,
-			Direction dir, Node theNode, JspWriter out, String key) {
-		try {
-			// String output = "";
-			for (RelationshipType relationType : relationsMap.keySet()) {
-				if (key == null || key == relationType.name()) {
-					out.println("gridData['" + relationType.name() + dir
-							+ "'] = [");
-
-					boolean isFirstRel = true;
-
-					for (Relationship rel : theNode.getRelationships(dir,
-							relationType)) {
-						Node n = rel.getOtherNode(theNode);
-
-						// Create link to node
-						if (isFirstRel)
-							isFirstRel = false;
-						else
-							out.print(",");
-
-						out.print("{'Link':'<a href=\"index.jsp?id="
-								+ n.getId() + "&rel=" + relationType.name()
-								+ "&dir=" + dir + "\">" + NodeHelper.getType(n) + "</a>'");
-
-						// writing the relation properties
-						for (String k : rel.getPropertyKeys()) {
-							if (DefaultTemplate.keepAttribute(k)) {
-								// converting to 3 digits number
-								String s = rel.getProperty(k).toString();
-								if (NodeHelper.isNumber(s))
-									s = NodeHelper.doubleFormat(s);
-
-								out.print(",'" + k + "':'" + s + "'");
-							}
-						}
-
-						// writing the node properties
-						for (String k : n.getPropertyKeys()) {
-							if (DefaultTemplate.keepAttribute(k)) {
-								// converting to 3 digits number
-								String s = n.getProperty(k).toString();
-								if (NodeHelper.isNumber(s))
-									s = NodeHelper.doubleFormat(s);
-
-								out.print(",'" + k + "':'" + s + "'");
-							}
-						}
-						out.println("}");
+	private static void computeGrid(Node theNode, JspWriter out) 
+	{
+		try 
+		{	
+			HashMap<String, HashMap<String, String>> listOfAttributes = new HashMap<String, HashMap<String, String>>();
+						
+			//Create a list of all node types and attributes
+			for(Relationship relation : theNode.getRelationships())
+			{
+				String strRelation = relation.getType().name();
+				if(DefaultTemplate.keepRelation(strRelation))
+				{
+					Node theOtherNode = relation.getOtherNode(theNode);
+					String theOtherType = NodeHelper.getType(theOtherNode);
+					if(!listOfAttributes.containsKey(theOtherType))
+					{
+						out.println("gridData['" + theOtherType	+ "'] = new Array();");
+						listOfAttributes.put(theOtherType, new HashMap<String, String>());
 					}
-
-					// remove the last comma
-					out.print("];\n");
-
-					out.print("gridColumns['" + relationType + dir + "'] = [");
-					out.print("{text:'Link', flex:1, dataIndex:'Link'}");
-					for (String attribute : listOfAttributes.get(
-							relationType.name()).keySet())
-						out.print(",{text:'" + attribute
-								+ "', flex:1, dataIndex:'" + attribute + "'}");
-					out.print("];\n");
-
-					out.print("gridFields['" + relationType + dir + "'] = [");
-					out.print("'Link'");
-					for (String attribute : listOfAttributes.get(
-							relationType.name()).keySet())
-						out.print(",'" + attribute + "'");
-					out.print("];\n");
-
-					out.print("gridSorters['" + relationType + dir + "'] = [");
-					out.print("'Link'");
-					for (String attribute : listOfAttributes.get(
-							relationType.name()).keySet())
-						out.print(",'" + attribute + "'");
-					out.print("];\n");
-
-					out.print("gridName['" + relationType + dir + "'] = '"
-							+ relationType.name() + "';\n");
-					// write csv data
-					// out.print("csvData['"+relationType+dir+"'] = '" +
-					// getCSV(relationType, dir).trim() + "';\n");
+	
+					out.println("gridData['" + theOtherType	+ "'].push({" + 
+							"'Link':'<a href=\"index.jsp?id="
+							+ theOtherNode.getId() + "\">" + NodeHelper.getName(theOtherNode) + "</a>'");
+	
+					//Add the properties of the relation
+					for(String key : relation.getPropertyKeys())
+					{
+						if(DefaultTemplate.keepAttribute(key))
+						{
+							out.print(",'" + key + "':'" + relation.getProperty(key) + "'");
+							listOfAttributes.get(theOtherType).put(key, key);
+						}
+					}
+					
+					//Add the properties of the node
+					for(String key : theOtherNode.getPropertyKeys())
+					{
+						if(DefaultTemplate.keepAttribute(key) && !DefaultTemplate.isNameAttribute(key))
+						{
+							out.print(",'" + key + "':'" + theOtherNode.getProperty(key) + "'");
+							listOfAttributes.get(theOtherType).put(key, key);
+						}
+					}
+					out.print(",Relation:'" + strRelation + "',Type:'" + theOtherType + "'});");
 				}
+			}
+			
+			for(String strType : listOfAttributes.keySet())
+			{
+				HashMap<String, String> attribs = listOfAttributes.get(strType);
+				
+				out.print("gridColumns['" + strType + "'] = [");
+				out.print("{text:'Link', flex:1, dataIndex:'Link'}");
+				out.print(",{text:'Relation', flex:1, dataIndex:'Relation', hidden:true}");
+				for (String attribute : attribs.keySet())
+					out.print(",{text:'" + attribute
+							+ "', flex:1, dataIndex:'" + attribute + "'}");
+				out.print("];\n");
+
+				out.print("gridFields['" + strType + "'] = [");
+				out.print("'Link','Relation'");
+				for (String attribute : attribs.keySet())
+					out.print(",'" + attribute + "'");
+				out.print("];\n");
+
+				out.print("gridSorters['" + strType + "'] = [");
+				out.print("'Link'");
+				for (String attribute : attribs.keySet())
+					out.print(",'" + attribute + "'");
+				out.print("];\n");
+
+				out.print("gridName['" + strType + "'] = '" + strType + "';\n");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -25,7 +25,7 @@ if(session.getAttribute("userNodeID") != null)
 			nodeID = request.getParameter("id");//session.getAttribute("id").toString();
 		
 		DefaultNode theNode = new DefaultNode(nodeID);
-		theNode.Initialize();
+		//theNode.Initialize();
 		session.setAttribute("currentNode", theNode);
 		
 		out.println("var currentNodeID=" + theNode.getId() + ";\n");

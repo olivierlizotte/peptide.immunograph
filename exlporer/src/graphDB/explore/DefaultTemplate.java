@@ -46,8 +46,7 @@ abstract public class DefaultTemplate
 	        		graphDb.shutdown();
 			}
 		} );
-	}
-	
+	}	
 	
 	public static void removeAllTempElements(GraphDatabaseService graphDb )
 	{
@@ -105,9 +104,22 @@ abstract public class DefaultTemplate
 		if("type".equals(theAttributeName) ||
 				"StringID".equals(theAttributeName) ||
 				"passwd".equals(theAttributeName) ||
-				"created from id".equals(theAttributeName))
+				"created from id".equals(theAttributeName) ||
+				"Peptidome_peptideLength".equals(theAttributeName))
 			return false;
 		return true;
+	}
+	
+	/** This function determines whether an attribute is a Name attribute
+	 * @param theAttributeName attribute to test
+	 * @return true if the attribute is a name
+	 */
+	public static Boolean isNameAttribute( String theAttributeName )
+	{
+		if("name".equals(theAttributeName) ||
+		   "Name".equals(theAttributeName))
+			return true;
+		return false;
 	}
 
 	/** This function determines whether an attribute should be displayed or not in the explorer
