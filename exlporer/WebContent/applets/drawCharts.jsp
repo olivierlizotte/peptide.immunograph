@@ -59,8 +59,8 @@ public void CreateExtJsChart(String chartName, String storeName, JspWriter out) 
         "}, {\n"+
             "type: 'Category',\n"+
             "position: 'bottom',\n"+
-             "fields: ['xax'],\n"+
-            "title: '"+chartName+"'\n"+
+             "fields: ['xax']\n"+
+            //"title: '"+chartName+"'\n"+
         "}],\n"+
         "series: [{\n"+
             "type: 'column',\n"+
