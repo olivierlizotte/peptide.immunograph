@@ -63,11 +63,11 @@ public class XmlToDb extends DefaultHandler
 		return s.trim();
 	}		
 	
-	public Node RetrieveNode(String strAttribute, String strValue)
+	public Node RetrieveNode(String strType, String strAttribute, String strValue)
 	{		
 		try
 		{
-			Index<Node> nodeIndex = graphDb.index().forNodes(strAttribute);
+			Index<Node> nodeIndex = graphDb.index().forNodes(strType);
 			IndexHits<Node> result = nodeIndex.get(strAttribute, strValue);
 			if(	result.size() == 1 )
 				return result.getSingle();
@@ -104,7 +104,7 @@ public class XmlToDb extends DefaultHandler
 		if("Node".equals(qName))
 		{
 			if(atts.getValue("Get") != null)
-				currentNode = RetrieveNode(cleanText(atts.getValue("Get")), cleanText(atts.getValue("Match")));
+				currentNode = RetrieveNode(cleanText(atts.getValue("Type")), cleanText(atts.getValue("Get")), cleanText(atts.getValue("Match")));
 			
 			if(currentNode == null)
 			{
@@ -156,8 +156,15 @@ public class XmlToDb extends DefaultHandler
 
 				if(currentNodeIndex != null)
 				{
-					Index<Node> nodeIndex = graphDb.index().forNodes(currentNodeIndex);
-			    	nodeIndex.add(currentNode, currentNodeIndex, currentNode.getProperty(currentNodeIndex));
+					try
+					{
+						Index<Node> nodeIndex = graphDb.index().forNodes(currentNode.getProperty("type").toString());
+						nodeIndex.add(currentNode, currentNodeIndex, currentNode.getProperty(currentNodeIndex));
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
 				}
 			}
 		}
