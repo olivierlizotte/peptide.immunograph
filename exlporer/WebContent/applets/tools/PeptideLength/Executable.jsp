@@ -60,7 +60,7 @@ String getPeptidesLengthDistribution(EmbeddedGraphDatabase graphDb, String cyphe
 	// now return the result
 	// 1,2,3,4,5,6,7,8,9,10 <- sizes
 	// 0,0,2,2,2,2,3,4,2,1  <- number of nodes with this value
-	return sizes+"\n"+numberOfSeq;
+	return sizes+"|"+numberOfSeq;
 }
 
 %>
@@ -97,7 +97,7 @@ try{
 	{		
 		Node charts = graphDb.createNode();
 		charts.setProperty("type", "Charts");
-		charts.setProperty("type", "Charts");
+		charts.setProperty("AxeY", "Number of Peptides");
 		charts.setProperty("Name", "Sequence Length [" + nodeType + "]");
 		charts.setProperty("data", getPeptidesLengthDistribution(graphDb, cypherQuery));
 		graphDb.getNodeById(Integer.valueOf(nodeID)).

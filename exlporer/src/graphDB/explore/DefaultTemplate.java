@@ -69,7 +69,7 @@ abstract public class DefaultTemplate
 	}
 	
 	
-	public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
+	public static String GraphDBString = "/home/antoine/neo4j/data/graph5.db";
 	
 	//public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph.db";
 	
@@ -162,7 +162,7 @@ abstract public class DefaultTemplate
 		String type = theNode.getType();
 		if("Peptidome".equals(type))
 		{
-			String[] testE = {"applets/tools/PeptideLength"};
+			String[] testE = {"applets/tools/PeptideLength", "applets/tools/DecoyAnalysis"};
 			return testE;
 		}
 		if("Sequence Search".equals(type))

@@ -74,7 +74,7 @@ public class DefaultNode {
 			}
 		}
 		return output;
-	}
+	}	
 
 	public String getAttributeJSON(String varName) {
 		// EDITING THE STRING

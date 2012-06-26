@@ -33,14 +33,14 @@ public void CreateJsonStore(String[] xData, String[] yData, int graphNumber, Jsp
 		    "fields: ['xax', 'yax'],"+
 			"data: [");
 		for (int i=0 ; i < xData.length ; i+=1){
-			out.println("{xax:"+xData[i]+", yax:"+yData[i]+"},");
+			out.println("{xax:'"+xData[i]+"', yax:'"+yData[i]+"'},");
 		}
 		out.println("]});");
 	}catch (IOException e) 	{
 		e.printStackTrace();
 	}
 }
-public void CreateExtJsChart(String chartName, String storeName, String title, JspWriter out) {
+public void CreateExtJsChart(String chartName, String storeName, String title, JspWriter out, String AxeY) {
 	try {
 	out.println("var "+chartName+"= Ext.create('Ext.chart.Chart', {"+
         "style: 'background:#fff',\n"+
@@ -54,7 +54,7 @@ public void CreateExtJsChart(String chartName, String storeName, String title, J
             "label: {\n"+
             "    renderer: Ext.util.Format.numberRenderer('0,0')\n"+
             "},\n"+
-            "title: 'Number of Peptides',\n"+
+            "title: '" + AxeY + "',\n"+
             "minimum: 0\n"+
         "}, {\n"+
             "type: 'Category',\n"+
@@ -109,12 +109,17 @@ try{
 		if(chartsNode.hasProperty("data") && chartsNode.hasProperty("Name") )
 		{
 			graphNumber++;
-			String value=chartsNode.getProperty("data").toString();
-			String[] xaxis = value.split("\n")[0].split(",");
-			String[] yaxis = value.split("\n")[1].split(",");
+			String value = chartsNode.getProperty("data").toString();
+			String strAxeY = "Number of Peptides";
+			if(chartsNode.hasProperty("AxeY"))
+				strAxeY = chartsNode.getProperty("AxeY").toString();
+			String[] splits = value.split("\\|");
+			String[] xaxis = splits[0].split(",");
+			String[] yaxis = splits[1].split(",");
 					
 			CreateJsonStore(xaxis, yaxis, graphNumber, out);
-			CreateExtJsChart("chart" + graphNumber, "store"+graphNumber, chartsNode.getProperty("Name").toString(), out);
+			CreateExtJsChart("chart" + graphNumber, "store"+graphNumber, chartsNode.getProperty("Name").toString(), out,
+							 strAxeY);
 			out.println("charts["+(graphNumber-1)+"] = " + "chart" + graphNumber);
 		}
 	}
