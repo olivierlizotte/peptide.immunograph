@@ -303,7 +303,7 @@ function ShowChartsForm()
 			}
 		}
 	});//*/
-}
+}	 	 
 
 function CreateViewport()
 {
@@ -328,7 +328,7 @@ function CreateViewport()
                     hideCollapseTool: false,
                     preventHeader: false,
                 	border: false,
-                    title: 'Immuno Graph',
+                    title: 'Immuno Graph :: ' + browserHistory,
                     flex: 1,
                     items: [
                         {
