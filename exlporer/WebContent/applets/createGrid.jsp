@@ -77,6 +77,21 @@ if(session.getAttribute("userNodeID") != null)
 		    groupHeaderTpl: 'Relation: {name} ({rows.length} Item{[(values.rows.length > 1 ? "s" : "")]})'
 		});//*/
 
+
+		function Json2Csv(jsonObject){
+        var array = typeof jsonObject != 'object' ? JSON.parse(jsonObject) : jsonObject;
+        var csv = '';
+        for (var i = 0; i < array.length; i++) {
+            var line = '';
+            for (var index in array[i]) {
+                line += array[i][index] + ',';
+            }
+            line.slice(0,line.Length-1); 
+            csv += line + '\r\n';
+        }
+        window.open( "data:text/csv;charset=utf-8," + escape(csv))
+    	}
+		
 		var theGrid = Ext.create('Ext.grid.Panel',
 						{
 							id : 'grid' + currentNodeType + keyName,
@@ -136,35 +151,65 @@ if(session.getAttribute("userNodeID") != null)
 											text : 'csv export',
 											handler : function() {
 												//octet-stream
-												var formatedData = "";
-												var theGrid = Ext.ComponentMgr
-														.get('grid'
-																+ currentNodeType
-																+ keyName);
-												var theStore = theGrid.store;//Ext.ComponentMgr.get('nodeStoreID'+keyName);
-												var columns = theGrid.columns;
+												Json2Csv(gridData[keyName])
+												//var formatedData = "";
+												//var theGrid = Ext.ComponentMgr
+												//		.get('grid'
+												//				+ currentNodeType
+												//				+ keyName);
+												//var theStore = theGrid.store;//Ext.ComponentMgr.get('nodeStoreID'+keyName);
+												//var columns = theGrid.columns;
 												//Title line
-												for (i = 0; i < columns.length; i++)
-													formatedData += columns[i].dataIndex
-															+ ',';
+												//for (i = 0; i < columns.length; i++)
+												//	formatedData += columns[i].dataIndex
+												//			+ ',';
 												//Items currently displayed
-												for (i = 0; i < theStore.data.items.length; i++) {
-													formatedData += '\n';
-													for (j = 0; j < columns.length; j++)
-														formatedData += theStore.data.items[i].data[columns[j].dataIndex]
-																+ ',';
-												}/*
+												//for (i = 0; i < theStore.data.items.length; i++) {
+												//	formatedData += '\n';
+												//	for (j = 0; j < columns.length; j++)
+												//		formatedData += theStore.data.items[i].data[columns[j].dataIndex]
+												//				+ ',';
+												//}/*
 																        //TODO
 																        //Set a default file name with the csv file type//*/
-												uriContent = 'data:text/csv,'
-														+ encodeURIComponent(formatedData);
-												newWindow = window
-														.open(uriContent,
-																'gridToCSV');
+												//uriContent = 'data:text/csv,'
+												//		+ encodeURIComponent(formatedData);
+												//newWindow = window
+												//		.open(uriContent,
+												//				'gridToCSV');
 												MessageTop
 														.msg('CSV EXPORT',
 																'Your file has been created successfully');
 												//alert(csvData[keyName]);				 		
+											}
+										},
+										{
+											xtype : 'button',
+											text : 'csv import',
+											handler : function() {
+												//var attributeForm=createForm();
+												var queryWin = new Ext.create(
+														'Ext.Window',
+														{
+															id : 'autoload-win',
+															title : 'Cypher Query',
+															closable : true,
+															width : 400,
+															height : 180,
+															x : 10,
+															y : 200,
+															plain : true,
+															//autoLoad: {url:'tool.jsp?name='+keyName+'&url='+document.URL, scripts:true},
+															loader : {
+																url : 'applets/tools/CsvImport/Launcher.jsp?url='
+																		+ document.URL+'&id='+currentNodeID,
+																scripts : true,
+																autoLoad : true
+															},
+															layout : 'fit',
+														//items: attributeForm,?url='+document.URL
+														});
+												queryWin.show();
 											}
 										},
 										{
