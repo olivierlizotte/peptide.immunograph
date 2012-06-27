@@ -81,14 +81,20 @@ if(session.getAttribute("userNodeID") != null)
 		function Json2Csv(jsonObject){
         var array = typeof jsonObject != 'object' ? JSON.parse(jsonObject) : jsonObject;
         var csv = '';
+        var header = '';
         for (var i = 0; i < array.length; i++) {
             var line = '';
             for (var index in array[i]) {
                 line += array[i][index] + ',';
+                // when creating the first line, get the headers
+                if (i==0){
+                	header += index + ','; 
+                }
             }
             line.slice(0,line.Length-1); 
             csv += line + '\r\n';
         }
+        csv = header + '\n' + csv
         window.open( "data:text/csv;charset=utf-8," + escape(csv))
     	}
 		
