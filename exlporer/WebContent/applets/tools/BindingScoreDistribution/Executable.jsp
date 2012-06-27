@@ -26,12 +26,12 @@ String getBindingScoreDistribution(EmbeddedGraphDatabase graphDb, long nodeID){
 	Map<String,Integer> decoy = new HashMap<String,Integer>();
 	Iterable<Relationship> allRels = currentNode.getRelationships(Direction.OUTGOING);
 	target.put("<50", 0);
-	target.put("[500,1000]", 0);
-	target.put(">1000",	0);
+	target.put("[50,500]", 0);
+	target.put(">500",	0);
 	
 	decoy.put("<50", 0);
-	decoy.put("[500,1000]", 0);
-	decoy.put(">1000",	0);
+	decoy.put("[500,500]", 0);
+	decoy.put(">500",	0);
 	for (Relationship rel : allRels){
 		Node otherNode = rel.getOtherNode(currentNode);
 		if ((otherNode.hasProperty("Sequence")) && (otherNode.hasProperty("Binding Score"))) {
@@ -42,22 +42,22 @@ String getBindingScoreDistribution(EmbeddedGraphDatabase graphDb, long nodeID){
 				if (currentScore <= 50){
 					target.put("<50", target.get("<50")+1);
 				}
-				if((currentScore >= 50) &&(currentScore <=1000)){
-					target.put("[500,1000]", target.get("[500,1000]")+1);
+				if((currentScore >= 50) &&(currentScore <=500)){
+					target.put("[50,500]", target.get("[50,500]")+1);
 				}
-				if(currentScore > 1000){
-					target.put(">1000", target.get(">1000")+1);
+				if(currentScore > 500){
+					target.put(">500", target.get(">500")+1);
 				}
 			// if decoy hit
 			}else{
 				if (currentScore <= 50){
 					decoy.put("<50", decoy.get("<50")+1);
 				}
-				if((currentScore >= 50) &&(currentScore <=1000)){
-					decoy.put("[500,1000]", decoy.get("[500,1000]")+1);
+				if((currentScore >= 50) &&(currentScore <=500)){
+					decoy.put("[500,500]", decoy.get("[500,500]")+1);
 				}
-				if(currentScore > 1000){
-					decoy.put(">1000", decoy.get(">1000")+1);
+				if(currentScore > 500){
+					decoy.put(">500", decoy.get(">500")+1);
 				}
 			}
 		}
