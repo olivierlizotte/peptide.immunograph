@@ -283,7 +283,7 @@ public class NodeHelper
 			for (Relationship relation : theNode.getRelationships())
 			{
 				Node theOtherNode = relation.getOtherNode(theNode);
-				if (theOtherNode.getId() != theNode.getId())//DefaultTemplate.keepRelation(relation.getType().name()))
+				if ((theOtherNode.getId() != theNode.getId()) && (DefaultTemplate.keepRelation(relation.getType().name())))
 				{
 					NavNode nav = result.get(getType(theOtherNode));
 					if(nav == null)

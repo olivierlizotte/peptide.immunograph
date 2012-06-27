@@ -61,8 +61,60 @@ String getPeptidesLengthDistribution(EmbeddedGraphDatabase graphDb, String cyphe
 	// 1,2,3,4,5,6,7,8,9,10 <- sizes
 	// 0,0,2,2,2,2,3,4,2,1  <- number of nodes with this value
 	return sizes+"|"+numberOfSeq;
-}
+		
 
+}
+String getPeptidesLengthDistribution(EmbeddedGraphDatabase graphDb, long nodeID){
+	String jsonString = "";
+	Node currentNode = graphDb.getNodeById(nodeID);
+	Map<Integer,Integer> target = new HashMap<Integer,Integer>();
+	Map<Integer,Integer> decoy = new HashMap<Integer,Integer>();
+	Iterable<Relationship> allRels = currentNode.getRelationships(Direction.OUTGOING);
+	for (Relationship rel : allRels){
+		Node otherNode = rel.getOtherNode(currentNode);
+		if (otherNode.hasProperty("Sequence")){
+			int currentLength = otherNode.getProperty("Sequence").toString().trim().length();
+			// if target hit
+			if(otherNode.getProperty("Decoy").toString().equals("False")){
+				if (target.containsKey(currentLength)){
+					target.put(currentLength, target.get(currentLength) + 1);
+				}else{
+					target.put(currentLength, 1);
+				}
+			// if decoy hit
+			}else{
+				if (decoy.containsKey(currentLength)){
+					decoy.put(currentLength, decoy.get(currentLength) + 1);
+				}else{
+					decoy.put(currentLength, 1);
+				}
+			}
+		}
+	}
+	// some peptides lengths are not represented by any peptide in the DB. 
+	// In order to get a proper histogram, the values for these lengths are set to 0
+	for(int i=0; i<Math.max(Collections.max(target.keySet()), Collections.max(decoy.keySet())) ; i+=1 ){
+		if (!target.containsKey(i))
+			target.put(i,0);
+		if (!decoy.containsKey(i))
+			decoy.put(i,0);
+	}
+	
+	for (int i : target.keySet()){
+		System.out.println(i+"->"+target.get(i)+":"+decoy.get(i));
+	}
+	
+	jsonString += "{"+
+		    "fields: ['size', 'target', 'decoy'],"+
+			"data: [";
+		for (int i : target.keySet()){
+			jsonString += "{size:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"'},";
+		}
+		jsonString=jsonString.substring(0, jsonString.length()-1);
+		jsonString += "]}";
+	
+	return jsonString;
+}
 %>
 <%
 // TODO get a parameter to know which type of peptide to get the distribution from: SequenceSearch, Peptidome etc.
@@ -99,11 +151,12 @@ try{
 		charts.setProperty("type", "Charts");
 		charts.setProperty("AxeY", "Number of Peptides");
 		charts.setProperty("Name", "Sequence Length [" + nodeType + "]");
-		charts.setProperty("data", getPeptidesLengthDistribution(graphDb, cypherQuery));
+		charts.setProperty("data", getPeptidesLengthDistribution(graphDb, Long.valueOf(request.getParameter("id"))));
 		graphDb.getNodeById(Integer.valueOf(nodeID)).
 				createRelationshipTo(charts, DynamicRelationshipType.withName("Tool_output"));
 		DefaultTemplate.linkToExperimentNode(graphDb, charts, "Tool_output");
 		System.out.println("just created "+charts.getId());
+	
 	}/*else{
 		Relationship toolOutput = graphDb.getNodeById(Integer.valueOf(nodeID)).
 				getSingleRelationship(DynamicRelationshipType.withName("Tool_output"), Direction.OUTGOING);
@@ -124,7 +177,7 @@ try{
 
 	tx.success();
 	tx.finish();
-	out.println(getPeptidesLengthDistribution(graphDb, cypherQuery));
+	out.println(Long.valueOf(request.getParameter("id")));
 }
 catch(Exception e)
 {
