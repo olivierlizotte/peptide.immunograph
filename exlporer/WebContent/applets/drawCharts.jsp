@@ -51,7 +51,9 @@ public void CreateExtJsChart(String chartName, String storeName, String title, J
             "    renderer: Ext.util.Format.numberRenderer('0,0')\n"+
             "},\n"+
             "title: '" + AxeY + "',\n"+
-            "minimum: 0\n"+
+            "minimum: 0\n,"+
+            "maximum: parseInt("+storeName+".max('target',false)) + parseInt("+storeName+".max('decoy',false)),\n"+
+            "adjustMaximumByMajorUnit : true \n"+
         "}, {\n"+
             "type: 'Category',\n"+
             "position: 'bottom',\n"+
