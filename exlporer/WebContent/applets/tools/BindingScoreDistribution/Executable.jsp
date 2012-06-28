@@ -30,7 +30,7 @@ String getBindingScoreDistribution(EmbeddedGraphDatabase graphDb, long nodeID){
 	target.put(">500",	0);
 	
 	decoy.put("<50", 0);
-	decoy.put("[500,500]", 0);
+	decoy.put("[50,500]", 0);
 	decoy.put(">500",	0);
 	for (Relationship rel : allRels){
 		Node otherNode = rel.getOtherNode(currentNode);
@@ -54,7 +54,7 @@ String getBindingScoreDistribution(EmbeddedGraphDatabase graphDb, long nodeID){
 					decoy.put("<50", decoy.get("<50")+1);
 				}
 				if((currentScore >= 50) &&(currentScore <=500)){
-					decoy.put("[500,500]", decoy.get("[500,500]")+1);
+					decoy.put("[50,500]", decoy.get("[50,500]")+1);
 				}
 				if(currentScore > 500){
 					decoy.put(">500", decoy.get(">500")+1);
