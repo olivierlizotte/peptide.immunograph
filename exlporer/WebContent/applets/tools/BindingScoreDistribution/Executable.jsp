@@ -18,100 +18,64 @@
 <%@ page import="java.util.Map"%>
 <%@ page import="java.util.Map.Entry"%>
 <%!
-String getPeptidesLengthDistribution(EmbeddedGraphDatabase graphDb, String cypherQuery){
-	// Map containing information about the peptides lengths. 
-	// To each size corresponds the number of peptides in this category
-	Map<Integer,Integer> lengths = new HashMap<Integer,Integer>();
-	ExecutionEngine engine = new ExecutionEngine( graphDb );
-	// VERY IMPORTANT : use the org.neo4j.cypher.javacompat.* and not the org.neo4j.cypher.*
-	// otherwise can't iterate over the ExecutionResult
-	ExecutionResult result = engine.execute( cypherQuery );
-	
-	int currentLength=0;
-	for ( Map<String, Object> row : result )
-	{
-	    for ( Entry<String, Object> column : row.entrySet() )
-	    {
-	        // get the length of the peptide
-	    	currentLength = column.getValue().toString().trim().length();
-	        
-	        // if the key is already in the map, increment the number
-	        if(lengths.containsKey(currentLength))
-	        	lengths.put(currentLength, lengths.get(currentLength) + 1);
-	        else  	// a peptide of the current length has not been found yet
-		    	lengths.put(currentLength,1);	        
-	    }
-	}
-	// some peptides lengths are not represented by any peptide in the DB. 
-	// In order to get a proper histogram, the values for these lengths are set to 0
-	for(int i=0; i<Collections.max(lengths.keySet()) ; i+=1 )
-		if (!lengths.containsKey(i))
-			lengths.put(i,0);	
-	//First line (sequence length header)
-	String sizes = "";
-	for (int length : lengths.keySet())
-		sizes += length + ",";
-	sizes = sizes.substring(0, sizes.length()-1);
-	//Number of sequence per length
-	String numberOfSeq = "";
-	for (int nb : lengths.values())
-		numberOfSeq += nb + ",";
-	numberOfSeq = numberOfSeq.substring(0, numberOfSeq.length() - 1);
-	// now return the result
-	// 1,2,3,4,5,6,7,8,9,10 <- sizes
-	// 0,0,2,2,2,2,3,4,2,1  <- number of nodes with this value
-	return sizes+"|"+numberOfSeq;
-		
 
-}
-String getPeptidesLengthDistribution(EmbeddedGraphDatabase graphDb, long nodeID){
+String getBindingScoreDistribution(EmbeddedGraphDatabase graphDb, long nodeID){
 	String jsonString = "";
 	Node currentNode = graphDb.getNodeById(nodeID);
-	Map<Integer,Integer> target = new HashMap<Integer,Integer>();
-	Map<Integer,Integer> decoy = new HashMap<Integer,Integer>();
+	Map<String,Integer> target = new HashMap<String,Integer>();
+	Map<String,Integer> decoy = new HashMap<String,Integer>();
 	Iterable<Relationship> allRels = currentNode.getRelationships(Direction.OUTGOING);
+	target.put("<50", 0);
+	target.put("[50,500]", 0);
+	target.put(">500",	0);
+	
+	decoy.put("<50", 0);
+	decoy.put("[500,500]", 0);
+	decoy.put(">500",	0);
 	for (Relationship rel : allRels){
 		Node otherNode = rel.getOtherNode(currentNode);
-		if (otherNode.hasProperty("Sequence")){
-			int currentLength = otherNode.getProperty("Sequence").toString().trim().length();
+		if ((otherNode.hasProperty("Sequence")) && (otherNode.hasProperty("Binding Score"))) {
+			int currentScore = Integer.valueOf(otherNode.getProperty("Binding Score").toString().trim());
 			// if target hit
+			System.out.println(currentScore);
 			if(otherNode.getProperty("Decoy").toString().equals("False")){
-				if (target.containsKey(currentLength)){
-					target.put(currentLength, target.get(currentLength) + 1);
-				}else{
-					target.put(currentLength, 1);
+				if (currentScore <= 50){
+					target.put("<50", target.get("<50")+1);
+				}
+				if((currentScore >= 50) &&(currentScore <=500)){
+					target.put("[50,500]", target.get("[50,500]")+1);
+				}
+				if(currentScore > 500){
+					target.put(">500", target.get(">500")+1);
 				}
 			// if decoy hit
 			}else{
-				if (decoy.containsKey(currentLength)){
-					decoy.put(currentLength, decoy.get(currentLength) + 1);
-				}else{
-					decoy.put(currentLength, 1);
+				if (currentScore <= 50){
+					decoy.put("<50", decoy.get("<50")+1);
+				}
+				if((currentScore >= 50) &&(currentScore <=500)){
+					decoy.put("[500,500]", decoy.get("[500,500]")+1);
+				}
+				if(currentScore > 500){
+					decoy.put(">500", decoy.get(">500")+1);
 				}
 			}
 		}
 	}
 	// some peptides lengths are not represented by any peptide in the DB. 
 	// In order to get a proper histogram, the values for these lengths are set to 0
-	for(int i=0; i<Math.max(Collections.max(target.keySet()), Collections.max(decoy.keySet())) ; i+=1 ){
-		if (!target.containsKey(i))
-			target.put(i,0);
-		if (!decoy.containsKey(i))
-			decoy.put(i,0);
-	}
 	
-	for (int i : target.keySet()){
-		System.out.println(i+"->"+target.get(i)+":"+decoy.get(i));
-	}
+	
+	
 	
 	jsonString += "{"+
 		    "fields: ['size', 'target', 'decoy'],"+
 			"data: [";
-		for (int i : target.keySet()){
-			jsonString += "{size:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"'},";
-		}
-		jsonString=jsonString.substring(0, jsonString.length()-1);
-		jsonString += "]}";
+	for (String i : target.keySet()){
+		jsonString += "{size:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"'},";
+	}
+	jsonString=jsonString.substring(0, jsonString.length()-1);
+	jsonString += "]}";
 	
 	return jsonString;
 }
@@ -150,8 +114,8 @@ try{
 		Node charts = graphDb.createNode();
 		charts.setProperty("type", "Charts");
 		charts.setProperty("AxeY", "Number of Peptides");
-		charts.setProperty("Name", "Sequence Length [" + nodeType + "]");
-		charts.setProperty("data", getPeptidesLengthDistribution(graphDb, Long.valueOf(request.getParameter("id"))));
+		charts.setProperty("Name", "Binding Score [" + nodeType + "]");
+		charts.setProperty("data", getBindingScoreDistribution(graphDb, Long.valueOf(request.getParameter("id"))));
 		graphDb.getNodeById(Integer.valueOf(nodeID)).
 				createRelationshipTo(charts, DynamicRelationshipType.withName("Tool_output"));
 		DefaultTemplate.linkToExperimentNode(graphDb, charts, "Tool_output");

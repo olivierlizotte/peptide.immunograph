@@ -1,0 +1,2 @@
+Binding Score Distribution :: <br>
+This tool creates a graph of the peptides's binding score from a list of nodes with a sequence attribute and a binding score value.  

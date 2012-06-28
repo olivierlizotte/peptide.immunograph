@@ -27,19 +27,15 @@ window.store1 = Ext.create('Ext.data.JsonStore', {
 			{name: 4, data1:8},]
 });
 */
-public void CreateJsonStore(String[] xData, String[] yData, int graphNumber, JspWriter out){
+public void CreateJsonStore(String jsonData, int graphNumber, JspWriter out){
 	try{
-		out.println("window.store"+graphNumber+"= Ext.create('Ext.data.JsonStore', {"+
-		    "fields: ['xax', 'yax'],"+
-			"data: [");
-		for (int i=0 ; i < xData.length ; i+=1){
-			out.println("{xax:'"+xData[i]+"', yax:'"+yData[i]+"'},");
-		}
-		out.println("]});");
+		out.println("window.store"+graphNumber+"= Ext.create('Ext.data.JsonStore', "+
+		    jsonData+");");
 	}catch (IOException e) 	{
 		e.printStackTrace();
 	}
 }
+
 public void CreateExtJsChart(String chartName, String storeName, String title, JspWriter out, String AxeY) {
 	try {
 	out.println("var "+chartName+"= Ext.create('Ext.chart.Chart', {"+
@@ -50,7 +46,7 @@ public void CreateExtJsChart(String chartName, String storeName, String title, J
         "axes: [{\n"+
             "type: 'Numeric',\n"+
             "position: 'left',\n"+
-            "fields: ['yax'],\n"+
+            "fields: ['target', 'decoy'],\n"+
             "label: {\n"+
             "    renderer: Ext.util.Format.numberRenderer('0,0')\n"+
             "},\n"+
@@ -59,30 +55,31 @@ public void CreateExtJsChart(String chartName, String storeName, String title, J
         "}, {\n"+
             "type: 'Category',\n"+
             "position: 'bottom',\n"+
-            "fields: ['xax'],\n"+
+            "fields: ['size'],\n"+
             "title: '"+title+"'\n"+
         "}],\n"+
         "series: [{\n"+
             "type: 'column',\n"+
             "axis: 'left',\n"+
             "gutter:0,\n"+
+            "stacked: true,"+
             "highlight: true,\n"+
             "tips: {\n"+
               "trackMouse: true,\n"+
               "renderer: function(storeItem, item) {\n"+
-                   "this.setTitle(storeItem.get('xax') + ': ' + storeItem.get('yax'));\n"+
+                   "this.setTitle(storeItem.get('size') + ': ' + item.value[1]);\n"+
               "}\n"+
             "},\n"+
             "label: {\n"+
               "display: 'insideEnd',\n"+
               "'text-anchor': 'middle',\n"+
-                "field: 'yax',\n"+
+                "field: 'target',\n"+
                 "renderer: Ext.util.Format.numberRenderer('0'),\n"+
                 "orientation: 'vertical',\n"+
                 "color: '#333'\n"+
             "},\n"+
-            "xField: 'xax',\n"+
-            "yField: 'yax'\n"+
+            "xField: 'size',\n"+
+            "yField: ['target', 'decoy']\n"+
         "}]\n"+
 	"});");
 	}catch	(IOException e) {
@@ -109,15 +106,13 @@ try{
 		if(chartsNode.hasProperty("data") && chartsNode.hasProperty("Name") )
 		{
 			graphNumber++;
-			String value = chartsNode.getProperty("data").toString();
+			String jsonData = chartsNode.getProperty("data").toString();
 			String strAxeY = "Number of Peptides";
 			if(chartsNode.hasProperty("AxeY"))
 				strAxeY = chartsNode.getProperty("AxeY").toString();
-			String[] splits = value.split("\\|");
-			String[] xaxis = splits[0].split(",");
-			String[] yaxis = splits[1].split(",");
+			
 					
-			CreateJsonStore(xaxis, yaxis, graphNumber, out);
+			CreateJsonStore(jsonData, graphNumber, out);
 			CreateExtJsChart("chart" + graphNumber, "store"+graphNumber, chartsNode.getProperty("Name").toString(), out,
 							 strAxeY);
 			out.println("charts["+(graphNumber-1)+"] = " + "chart" + graphNumber);

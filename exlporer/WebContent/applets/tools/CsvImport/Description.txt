@@ -1,0 +1,9 @@
+CSV import :: <br>
+This tool allows you to import a csv file. It must contain two columns. 
+<UL type="circle">
+<LI>The first one should contain a header corresponding to one present in the grid (case sensitive). 
+The values have to specifically identify one line (for example a peptide sequence).</LI>
+<LI>The second column should contain a header not present yet in the grid and the same 
+number of values as the first column.</LI>
+</UL>
+This operation will add a column in the grid.
