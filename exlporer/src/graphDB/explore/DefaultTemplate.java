@@ -162,7 +162,7 @@ abstract public class DefaultTemplate
 		String type = theNode.getType();
 		if("Peptidome".equals(type))
 		{
-			String[] testE = {"applets/tools/PeptideLength", "applets/tools/DecoyAnalysis"};
+			String[] testE = {"applets/tools/PeptideLength", "applets/tools/DecoyAnalysis", "applets/tools/BindingScoreDistribution"};
 			return testE;
 		}
 		if("Sequence Search".equals(type))
@@ -184,7 +184,7 @@ abstract public class DefaultTemplate
 		String type = theNode.getType();
 		if("Peptidome".equals(type))
 		{
-			String[] testE = {"applets/tools/SequenceAnalysis", "applets/tools/BindingScoreDistribution"};
+			String[] testE = {"applets/tools/SequenceAnalysis"};
 			return testE;
 		}
 		if("Sequence Search".equals(type))
