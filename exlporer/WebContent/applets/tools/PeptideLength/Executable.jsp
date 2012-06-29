@@ -18,53 +18,10 @@
 <%@ page import="java.util.Map"%>
 <%@ page import="java.util.Map.Entry"%>
 <%!
-String getPeptidesLengthDistribution(EmbeddedGraphDatabase graphDb, String cypherQuery){
-	// Map containing information about the peptides lengths. 
-	// To each size corresponds the number of peptides in this category
-	Map<Integer,Integer> lengths = new HashMap<Integer,Integer>();
-	ExecutionEngine engine = new ExecutionEngine( graphDb );
-	// VERY IMPORTANT : use the org.neo4j.cypher.javacompat.* and not the org.neo4j.cypher.*
-	// otherwise can't iterate over the ExecutionResult
-	ExecutionResult result = engine.execute( cypherQuery );
-	
-	int currentLength=0;
-	for ( Map<String, Object> row : result )
-	{
-	    for ( Entry<String, Object> column : row.entrySet() )
-	    {
-	        // get the length of the peptide
-	    	currentLength = column.getValue().toString().trim().length();
-	        
-	        // if the key is already in the map, increment the number
-	        if(lengths.containsKey(currentLength))
-	        	lengths.put(currentLength, lengths.get(currentLength) + 1);
-	        else  	// a peptide of the current length has not been found yet
-		    	lengths.put(currentLength,1);	        
-	    }
-	}
-	// some peptides lengths are not represented by any peptide in the DB. 
-	// In order to get a proper histogram, the values for these lengths are set to 0
-	for(int i=0; i<Collections.max(lengths.keySet()) ; i+=1 )
-		if (!lengths.containsKey(i))
-			lengths.put(i,0);	
-	//First line (sequence length header)
-	String sizes = "";
-	for (int length : lengths.keySet())
-		sizes += length + ",";
-	sizes = sizes.substring(0, sizes.length()-1);
-	//Number of sequence per length
-	String numberOfSeq = "";
-	for (int nb : lengths.values())
-		numberOfSeq += nb + ",";
-	numberOfSeq = numberOfSeq.substring(0, numberOfSeq.length() - 1);
-	// now return the result
-	// 1,2,3,4,5,6,7,8,9,10 <- sizes
-	// 0,0,2,2,2,2,3,4,2,1  <- number of nodes with this value
-	return sizes+"|"+numberOfSeq;
-		
 
-}
-String getPeptidesLengthDistribution(EmbeddedGraphDatabase graphDb, long nodeID){
+HashMap<String,String> getPeptidesLengthDistribution(EmbeddedGraphDatabase graphDb, long nodeID){
+	HashMap<String,String> info = new HashMap<String,String>(); 
+	int maxValue = 0;
 	String jsonString = "";
 	Node currentNode = graphDb.getNodeById(nodeID);
 	Map<Integer,Integer> target = new HashMap<Integer,Integer>();
@@ -93,13 +50,13 @@ String getPeptidesLengthDistribution(EmbeddedGraphDatabase graphDb, long nodeID)
 	}
 	// some peptides lengths are not represented by any peptide in the DB. 
 	// In order to get a proper histogram, the values for these lengths are set to 0
-	for(int i=0; i<Math.max(Collections.max(target.keySet()), Collections.max(decoy.keySet())) ; i+=1 ){
+	for(int i=0; i<= Math.max(Collections.max(target.keySet()), Collections.max(decoy.keySet())) ; i+=1 ){
 		if (!target.containsKey(i))
 			target.put(i,0);
 		if (!decoy.containsKey(i))
 			decoy.put(i,0);
 	}
-	
+	maxValue = Collections.max(target.keySet()) + Collections.max(decoy.keySet());
 	for (int i : target.keySet()){
 		System.out.println(i+"->"+target.get(i)+":"+decoy.get(i));
 	}
@@ -113,7 +70,9 @@ String getPeptidesLengthDistribution(EmbeddedGraphDatabase graphDb, long nodeID)
 		jsonString=jsonString.substring(0, jsonString.length()-1);
 		jsonString += "]}";
 	
-	return jsonString;
+	info.put("data",jsonString);
+	info.put("maxYaxis", String.valueOf(maxValue));
+	return info;
 }
 %>
 <%
@@ -147,11 +106,15 @@ try{
 	// if the relationship doesn't existe yet, create it
 	//if(!graphDb.getNodeById(Integer.valueOf(nodeID)).hasRelationship(DynamicRelationshipType.withName("Tool_output"), Direction.OUTGOING))
 	{		
+		HashMap<String,String> nodeInfo = getPeptidesLengthDistribution(graphDb, Long.valueOf(request.getParameter("id")));
 		Node charts = graphDb.createNode();
 		charts.setProperty("type", "Charts");
 		charts.setProperty("AxeY", "Number of Peptides");
 		charts.setProperty("Name", "Sequence Length [" + nodeType + "]");
-		charts.setProperty("data", getPeptidesLengthDistribution(graphDb, Long.valueOf(request.getParameter("id"))));
+		charts.setProperty("data", nodeInfo.get("data"));
+		charts.setProperty("maxYaxis", nodeInfo.get("maxYaxis"));
+		charts.setProperty("xfield", "'size'");
+		charts.setProperty("yfield", "['target', 'decoy']");
 		graphDb.getNodeById(Integer.valueOf(nodeID)).
 				createRelationshipTo(charts, DynamicRelationshipType.withName("Tool_output"));
 		DefaultTemplate.linkToExperimentNode(graphDb, charts, "Tool_output");
