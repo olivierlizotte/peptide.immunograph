@@ -36,7 +36,8 @@ public void CreateJsonStore(String jsonData, int graphNumber, JspWriter out){
 	}
 }
 
-public void CreateExtJsChart(String chartName, String storeName, String title, JspWriter out, String AxeY) {
+public void CreateExtJsChart(String chartName, String storeName, String title, JspWriter out, 
+		String AxeY, String xfield, String yfield, String maxYaxis) {
 	try {
 	out.println("var "+chartName+"= Ext.create('Ext.chart.Chart', {"+
         "style: 'background:#fff',\n"+
@@ -46,16 +47,18 @@ public void CreateExtJsChart(String chartName, String storeName, String title, J
         "axes: [{\n"+
             "type: 'Numeric',\n"+
             "position: 'left',\n"+
-            "fields: ['target', 'decoy'],\n"+
+            "fields: "+yfield+",\n"+
             "label: {\n"+
             "    renderer: Ext.util.Format.numberRenderer('0,0')\n"+
             "},\n"+
             "title: '" + AxeY + "',\n"+
-            "minimum: 0\n"+
+            "minimum: 0\n,"+
+            "maximum: "+maxYaxis+",\n"+
+            "adjustMaximumByMajorUnit : true \n"+
         "}, {\n"+
             "type: 'Category',\n"+
             "position: 'bottom',\n"+
-            "fields: ['size'],\n"+
+            "fields: "+xfield+",\n"+
             "title: '"+title+"'\n"+
         "}],\n"+
         "series: [{\n"+
@@ -67,19 +70,19 @@ public void CreateExtJsChart(String chartName, String storeName, String title, J
             "tips: {\n"+
               "trackMouse: true,\n"+
               "renderer: function(storeItem, item) {\n"+
-                   "this.setTitle(storeItem.get('size') + ': ' + item.value[1]);\n"+
+                   "this.setTitle(storeItem.get("+xfield+") + ': ' + item.value[1]);\n"+
               "}\n"+
             "},\n"+
             "label: {\n"+
               "display: 'insideEnd',\n"+
               "'text-anchor': 'middle',\n"+
-                "field: 'target',\n"+
+                "field: "+yfield+",\n"+
                 "renderer: Ext.util.Format.numberRenderer('0'),\n"+
                 "orientation: 'vertical',\n"+
                 "color: '#333'\n"+
             "},\n"+
-            "xField: 'size',\n"+
-            "yField: ['target', 'decoy']\n"+
+            "xField: "+xfield+",\n"+
+            "yField: "+yfield+"\n"+
         "}]\n"+
 	"});");
 	}catch	(IOException e) {
@@ -110,11 +113,15 @@ try{
 			String strAxeY = "Number of Peptides";
 			if(chartsNode.hasProperty("AxeY"))
 				strAxeY = chartsNode.getProperty("AxeY").toString();
-			
-					
+			// x axis field name in the Json data
+			String xfield = chartsNode.getProperty("xfield").toString();
+			// y axis field name in the Json data
+			String yfield = chartsNode.getProperty("yfield").toString();
+			// max value of the y axis. Needed to scale the chart
+			String maxYaxis = chartsNode.getProperty("maxYaxis").toString();
 			CreateJsonStore(jsonData, graphNumber, out);
 			CreateExtJsChart("chart" + graphNumber, "store"+graphNumber, chartsNode.getProperty("Name").toString(), out,
-							 strAxeY);
+							 strAxeY, xfield, yfield, maxYaxis);
 			out.println("charts["+(graphNumber-1)+"] = " + "chart" + graphNumber);
 		}
 	}

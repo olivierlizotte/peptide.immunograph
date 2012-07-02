@@ -19,19 +19,33 @@
 <%@ page import="java.util.Map.Entry"%>
 <%!
 
-String getBindingScoreDistribution(EmbeddedGraphDatabase graphDb, long nodeID){
+boolean isInIntervall(double x, int a, int b){
+	if ((x>=a)&&(x<b))
+		return true;
+	else
+		return false;
+}
+
+HashMap<String,String> getBindingScoreDistribution(EmbeddedGraphDatabase graphDb, long nodeID){
+	HashMap<String,String> info = new HashMap<String,String>();
 	String jsonString = "";
+	int maxValue = 0;
 	Node currentNode = graphDb.getNodeById(nodeID);
 	Map<String,Integer> target = new HashMap<String,Integer>();
 	Map<String,Integer> decoy = new HashMap<String,Integer>();
 	Iterable<Relationship> allRels = currentNode.getRelationships(Direction.OUTGOING);
 	target.put("<50", 0);
 	target.put("[50,500]", 0);
-	target.put(">500",	0);
+	target.put("[500,5000]", 0);
+	target.put("[5000,20000]", 0);
+	target.put(">20000", 0);
 	
 	decoy.put("<50", 0);
-	decoy.put("[500,500]", 0);
-	decoy.put(">500",	0);
+	decoy.put("[50,500]", 0);
+	decoy.put("[500,5000]", 0);
+	decoy.put("[5000,20000]", 0);
+	decoy.put(">20000", 0);
+
 	for (Relationship rel : allRels){
 		Node otherNode = rel.getOtherNode(currentNode);
 		if ((otherNode.hasProperty("Sequence")) && (otherNode.hasProperty("Binding Score"))) {
@@ -39,25 +53,37 @@ String getBindingScoreDistribution(EmbeddedGraphDatabase graphDb, long nodeID){
 			// if target hit
 			System.out.println(currentScore);
 			if(otherNode.getProperty("Decoy").toString().equals("False")){
-				if (currentScore <= 50){
+				if (currentScore < 50){
 					target.put("<50", target.get("<50")+1);
 				}
-				if((currentScore >= 50) &&(currentScore <=500)){
+				if(isInIntervall(currentScore, 50, 500)){
 					target.put("[50,500]", target.get("[50,500]")+1);
 				}
-				if(currentScore > 500){
-					target.put(">500", target.get(">500")+1);
+				if(isInIntervall(currentScore, 500, 5000)){
+					target.put("[500,5000]", target.get("[500,5000]")+1);
+				}
+				if(isInIntervall(currentScore, 5000, 20000)){
+					target.put("[5000,20000]", target.get("[5000,20000]")+1);
+				}
+				if(currentScore >= 20000){
+					target.put(">20000", target.get(">20000")+1);
 				}
 			// if decoy hit
 			}else{
-				if (currentScore <= 50){
+				if (currentScore < 50){
 					decoy.put("<50", decoy.get("<50")+1);
 				}
-				if((currentScore >= 50) &&(currentScore <=500)){
-					decoy.put("[500,500]", decoy.get("[500,500]")+1);
+				if(isInIntervall(currentScore, 50, 500)){
+					decoy.put("[50,500]", decoy.get("[50,500]")+1);
 				}
-				if(currentScore > 500){
-					decoy.put(">500", decoy.get(">500")+1);
+				if(isInIntervall(currentScore, 500, 5000)){
+					decoy.put("[500,5000]", decoy.get("[500,5000]")+1);
+				}
+				if(isInIntervall(currentScore, 5000, 20000)){
+					decoy.put("[5000,20000]", decoy.get("[5000,20000]")+1);
+				}
+				if(currentScore >= 20000){
+					decoy.put(">20000", decoy.get(">20000")+1);
 				}
 			}
 		}
@@ -65,11 +91,10 @@ String getBindingScoreDistribution(EmbeddedGraphDatabase graphDb, long nodeID){
 	// some peptides lengths are not represented by any peptide in the DB. 
 	// In order to get a proper histogram, the values for these lengths are set to 0
 	
-	
-	
-	
+	maxValue = Math.max(Collections.max(target.values()), Collections.max(target.values()));
+		
 	jsonString += "{"+
-		    "fields: ['size', 'target', 'decoy'],"+
+		    "fields: ['category', 'target', 'decoy'],"+
 			"data: [";
 	for (String i : target.keySet()){
 		jsonString += "{size:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"'},";
@@ -77,7 +102,9 @@ String getBindingScoreDistribution(EmbeddedGraphDatabase graphDb, long nodeID){
 	jsonString=jsonString.substring(0, jsonString.length()-1);
 	jsonString += "]}";
 	
-	return jsonString;
+	info.put("data",jsonString);
+	info.put("maxYaxis", String.valueOf(maxValue));
+	return info;
 }
 %>
 <%
@@ -111,11 +138,15 @@ try{
 	// if the relationship doesn't existe yet, create it
 	//if(!graphDb.getNodeById(Integer.valueOf(nodeID)).hasRelationship(DynamicRelationshipType.withName("Tool_output"), Direction.OUTGOING))
 	{		
+		HashMap<String,String> nodeInfo = getBindingScoreDistribution(graphDb, Long.valueOf(request.getParameter("id")));
 		Node charts = graphDb.createNode();
 		charts.setProperty("type", "Charts");
 		charts.setProperty("AxeY", "Number of Peptides");
 		charts.setProperty("Name", "Binding Score [" + nodeType + "]");
-		charts.setProperty("data", getBindingScoreDistribution(graphDb, Long.valueOf(request.getParameter("id"))));
+		charts.setProperty("data", nodeInfo.get("data"));
+		charts.setProperty("maxYaxis", nodeInfo.get("maxYaxis"));
+		charts.setProperty("xfield", "'category'");
+		charts.setProperty("yfield", "['target', 'decoy']");
 		graphDb.getNodeById(Integer.valueOf(nodeID)).
 				createRelationshipTo(charts, DynamicRelationshipType.withName("Tool_output"));
 		DefaultTemplate.linkToExperimentNode(graphDb, charts, "Tool_output");
