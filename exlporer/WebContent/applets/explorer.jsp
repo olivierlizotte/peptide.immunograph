@@ -430,7 +430,7 @@ function CreateViewport()
                                     id: 'idGraphs',                                                               
                                     border: false,
                                     preventHeader: true,
-                                    tbar:[
+                                    bbar:[
                                           {
                                               id: 'idShowChartsForm',
                                               icon: "icons/bar_chart.png",
@@ -440,8 +440,45 @@ function CreateViewport()
                                                   //navigate(btn.up("panel"), "prev");
                                               }
                                               //disabled: true
-                                          }],
-                                    bbar: [
+                                          },
+                                          {
+                                              text: 'Save Chart',
+                                              handler: function() {
+                                                  Ext.MessageBox.confirm('Confirm Download', 'Would you like to download the chart as an image?', function(choice){
+                                                      if(choice == 'yes'){
+                                                          charts[graphItemNumber-1].save({
+                                                              type: 'image/png'
+                                                          });
+                                                      }
+                                                  });
+                                              }
+                                          },
+                                          '->', // greedy spacer so that the buttons are aligned to each side
+                                          {
+                                       	   xtype:'text',
+                                       	   text:graphItemNumber+'/'+charts.length, 
+                                       	   id:'graphItemNumber'
+                                          },
+                                          '->', // greedy spacer so that the buttons are aligned to each side
+
+                                          {
+                                        	  id: 'move-prev',
+                                        	  text: 'Back',
+                                        	  handler: function(btn) {
+                                            	  navigate(btn.up("panel"), "prev");
+                                        	  },
+                                    	      disabled: true
+                                    	  },
+                                          {
+                                              id: 'move-next',
+                                              text: 'Next',
+                                              disabled: (charts.length > 1? false: true),
+                                              handler: function(btn) {
+                                                  navigate(btn.up("panel"), "next");
+                                              }
+                                          }
+                                          ],
+                                    /*bbar: [
                                            {
                                                id: 'move-prev',
                                                text: 'Back',
@@ -454,7 +491,7 @@ function CreateViewport()
                                            {
                                         	   xtype:'text',
                                         	   text:graphItemNumber+'/'+charts.length, 
-                                        	   id:'graphItemNumber',
+                                        	   id:'graphItemNumber'
                                            },
                                            '->', // greedy spacer so that the buttons are aligned to each side
                                            {
@@ -465,7 +502,7 @@ function CreateViewport()
                                                    navigate(btn.up("panel"), "next");
                                                }
                                            }
-                                       ],
+                                       ],//*/
                                     items: charts
                                 }
                             ]
@@ -491,7 +528,7 @@ function CreateViewport()
                         type: 'hbox'
                     },
                     id: 'idGrid',
-                    items: Grid				    
+                    items: Grid
                 }
             ]
         });

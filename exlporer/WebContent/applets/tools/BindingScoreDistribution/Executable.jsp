@@ -97,7 +97,7 @@ HashMap<String,String> getBindingScoreDistribution(EmbeddedGraphDatabase graphDb
 		    "fields: ['category', 'target', 'decoy'],"+
 			"data: [";
 	for (String i : target.keySet()){
-		jsonString += "{size:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"'},";
+		jsonString += "{category:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"'},";
 	}
 	jsonString=jsonString.substring(0, jsonString.length()-1);
 	jsonString += "]}";

@@ -126,6 +126,19 @@ public class NodeHelper
 			return "";
 		}
 	}
+
+	public static String getNameAndType(Node aNode) {
+		try {
+			if(aNode.hasProperty("Name"))
+				return aNode.getProperty("Name").toString() + " [" + getType(aNode) + "]";
+			else if(aNode.hasProperty("name"))
+				return aNode.getProperty("name").toString() + " [" + getType(aNode) + "]";
+			else
+				return getType(aNode);
+		} catch (Exception e) {
+			return "";
+		}
+	}
 	
 	public static String getName(Node aNode) {
 		try {
@@ -324,7 +337,7 @@ public class NodeHelper
 	private static String getNodeInfo(Node theNode, String toAdd, int size) {
 		String result = "";
 
-		result += "name:'" + getName(theNode) + "'";
+		result += "name:'" + getNameAndType(theNode) + "'";
 		
 		if (toAdd != null && !toAdd.isEmpty())
 			result += "," + toAdd;
