@@ -77,13 +77,18 @@ public void CreateExtJsChart(String chartName, String storeName, String title, J
               "display: 'insideEnd',\n"+
               "'text-anchor': 'middle',\n"+
                 "field: "+yfield+",\n"+
+                "contrast: true,\n"+
                 "renderer: Ext.util.Format.numberRenderer('0'),\n"+
                 "orientation: 'vertical',\n"+
                 "color: '#333'\n"+
             "},\n"+
             "xField: "+xfield+",\n"+
             "yField: "+yfield+"\n"+
-        "}]\n"+
+        "}],\n"+
+        "legend:{ \n"+
+        "visible: true, \n"+
+        "position: 'right', \n"+
+        "}"+
 	"});");
 	}catch	(IOException e) {
 		e.printStackTrace();
