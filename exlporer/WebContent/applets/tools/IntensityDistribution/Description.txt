@@ -1,0 +1,2 @@
+Intensity Distribution :: <br>
+This tool creates a bar chart of the peptides's normalized intensities. It separates target and decoy hits.  

@@ -165,7 +165,8 @@ abstract public class DefaultTemplate
 			String[] testE = {"applets/tools/PeptideLength", 
 							  "applets/tools/DecoyAnalysis", 
 							  "applets/tools/BindingScoreDistribution",
-							  "applets/tools/MascotScoreDistribution"};
+							  "applets/tools/MascotScoreDistribution",
+							  "applets/tools/IntensityDistribution"};
 			return testE;
 		}
 		if("Sequence Search".equals(type))
