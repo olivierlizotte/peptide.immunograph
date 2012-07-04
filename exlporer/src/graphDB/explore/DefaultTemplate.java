@@ -166,7 +166,8 @@ abstract public class DefaultTemplate
 							  "applets/tools/DecoyAnalysis", 
 							  "applets/tools/BindingScoreDistribution",
 							  "applets/tools/MascotScoreDistribution",
-							  "applets/tools/IntensityDistribution"};
+							  "applets/tools/IntensityDistribution",
+							  "applets/tools/PvalDistribution"};
 			return testE;
 		}
 		if("Sequence Search".equals(type))
