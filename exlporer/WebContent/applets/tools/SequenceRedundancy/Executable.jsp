@@ -20,46 +20,43 @@
 <%!
 
 // This function puts a value in the right interval represented by keys in target or decoy hashmap
-HashMap<String,Integer> putInApropriateKey(HashMap<String,Integer> targetOrDecoy, int value, int max){
+HashMap<String,Integer> putInApropriateKey(HashMap<String,Integer> targetOrDecoy, String value){
 	int start, end;
 	HashMap<String,Integer> res = targetOrDecoy;
-	for (String interval : res.keySet()){
-		start=Integer.valueOf(interval.split(":")[0]);
-		end=interval.split(":")[1].equals("+") ? Integer.MAX_VALUE : Integer.valueOf(interval.split(":")[1]);
-		if ((value>=start)&&(value<end)){
-			res.put(interval, res.get(interval)+1);
+	if (Integer.valueOf(value) >= 40){
+		res.put("40+", res.get("40+")+1);
+	}else{
+		for (String key : res.keySet()){
+			if (!key.equals("40+")){
+				if ((value.equals(key))){
+					res.put(key, res.get(key)+1);
+				}
+			}	
 		}
 	}
 	return res;
 }
 
-Map<String,String> getIntensityDistribution(EmbeddedGraphDatabase graphDb, 
-													long nodeID,
-													int numberOfConditions){
+Map<String,String> getSequenceRedundancyDistribution(EmbeddedGraphDatabase graphDb, 
+													long nodeID){
 	Map<String,String> info = new HashMap<String,String>();
 	List<String> keyOrder = new ArrayList<String>();
 	String jsonString = "";
 	int maxValue = 0;
-	Double intensity;
+	String nbTimeSequenced;
 	boolean isDecoy = true;
 	HashMap<String,Integer> target = new HashMap<String,Integer>();
 	HashMap<String,Integer> decoy = new HashMap<String,Integer>();
 	int start, end;
 	// initialize target and decoy hashmaps
-	target.put("0:10000", 0);
-	decoy.put("0:10000", 0);
-	keyOrder.add("0:10000");
-	for (int i=4 ; i<6 ; i++){
-		start=(int)Math.pow(10, i);
-		end=(int)Math.pow(10, i+1);
-		target.put(start+":"+end, 0);
-		decoy.put(start+":"+end, 0);
-		keyOrder.add(start+":"+end);
-		System.out.println(target.get(start+":"+end));
+	for (int i=0 ; i<40 ; i++){
+		target.put(String.valueOf(i), 0);
+		decoy.put(String.valueOf(i), 0);
+		keyOrder.add(String.valueOf(i));
 	}
-	target.put((int)Math.pow(10, 6)+":+",0);
-	decoy.put((int)Math.pow(10, 6)+":+",0);
-	keyOrder.add((int)Math.pow(10, 6)+":+");
+	target.put("40+",0);
+	decoy.put("40+",0);
+	keyOrder.add("40+");
 	
 	Node currentNode = graphDb.getNodeById(nodeID);
 	Iterable<Relationship> allRels = currentNode.getRelationships(Direction.OUTGOING);
@@ -68,18 +65,14 @@ Map<String,String> getIntensityDistribution(EmbeddedGraphDatabase graphDb,
 	Node peptideIdentification;
 	for (Relationship rel : allRels){
 		Node otherNode = rel.getOtherNode(currentNode);
-		intensity = 0.0;
+		
 		if (NodeHelper.getType(otherNode).equals("Peptide")) {
-			for(int i=1 ; i<= numberOfConditions ; i++){
-				if (Double.valueOf(otherNode.getProperty("Condition "+i).toString()) > intensity){
-					intensity= Double.valueOf(otherNode.getProperty("Condition "+i).toString());
-				}
-			}
+			nbTimeSequenced = otherNode.getProperty("Number of Time Sequenced").toString();
 			isDecoy = otherNode.getProperty("Decoy").toString().equals("True") ? true : false;
 			if (isDecoy){
-				decoy = putInApropriateKey(decoy, intensity.intValue(), (int)Math.pow(10, 6));
+				decoy = putInApropriateKey(decoy, nbTimeSequenced);
 			}else{
-				target = putInApropriateKey(target, intensity.intValue(), (int)Math.pow(10, 6));
+				target = putInApropriateKey(target, nbTimeSequenced);
 			}
 			
 		}else{
@@ -92,10 +85,10 @@ Map<String,String> getIntensityDistribution(EmbeddedGraphDatabase graphDb,
 	maxValue = Math.max(Collections.max(target.values()), Collections.max(target.values()));
 		
 	jsonString += "{"+
-		    "fields: ['intensity', 'target', 'decoy'],"+
+		    "fields: ['nbTime', 'target', 'decoy'],"+
 			"data: [";
 	for (String i : keyOrder){
-		jsonString += "{intensity:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"'},";
+		jsonString += "{nbTime:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"'},";
 	}
 	jsonString=jsonString.substring(0, jsonString.length()-1);
 	jsonString += "]}";
@@ -117,9 +110,6 @@ Map<String,String> getIntensityDistribution(EmbeddedGraphDatabase graphDb,
 
 String nodeID = request.getParameter("id").toString();
 String relationType = request.getParameter("rel").toString();
-int numberOfConditions = Integer.valueOf(request.getParameter("numConditions"));
-
-
 
 EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
 
@@ -134,15 +124,15 @@ try{
 	// if the relationship doesn't existe yet, create it
 	//if(!graphDb.getNodeById(Integer.valueOf(nodeID)).hasRelationship(DynamicRelationshipType.withName("Tool_output"), Direction.OUTGOING))
 	{		
-		Map<String,String> nodeInfo = getIntensityDistribution(graphDb, Long.valueOf(request.getParameter("id")), numberOfConditions);
+		Map<String,String> nodeInfo = getSequenceRedundancyDistribution(graphDb, Long.valueOf(request.getParameter("id")));
 		System.out.println(nodeInfo.get("data"));
 		Node charts = graphDb.createNode();
 		charts.setProperty("type", "Charts");
 		charts.setProperty("AxeY", "Number of Peptides");
-		charts.setProperty("Name", "Intensity [" + nodeType + "]");
+		charts.setProperty("Name", "Number of Time Sequenced [" + nodeType + "]");
 		charts.setProperty("data", nodeInfo.get("data"));
 		charts.setProperty("maxYaxis", nodeInfo.get("maxYaxis"));
-		charts.setProperty("xfield", "'intensity'");
+		charts.setProperty("xfield", "'nbTime'");
 		charts.setProperty("yfield", "['decoy', 'target']");
 		graphDb.getNodeById(Integer.valueOf(nodeID)).
 				createRelationshipTo(charts, DynamicRelationshipType.withName("Tool_output"));

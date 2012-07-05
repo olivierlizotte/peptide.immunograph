@@ -167,7 +167,8 @@ abstract public class DefaultTemplate
 							  "applets/tools/BindingScoreDistribution",
 							  "applets/tools/MascotScoreDistribution",
 							  "applets/tools/IntensityDistribution",
-							  "applets/tools/PvalDistribution"};
+							  "applets/tools/PvalDistribution",
+							  "applets/tools/SequenceRedundancy"};
 			return testE;
 		}
 		if("Sequence Search".equals(type))
