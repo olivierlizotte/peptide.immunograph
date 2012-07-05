@@ -1,0 +1,3 @@
+Sequence Redundancy :: <br>
+This tool creates a graph of the peptides's sequence redundancy. In x-axis, the number of times it was sequenced, 
+and y-axis the number of peptides sequenced this amount of times. It separates target and decoy hits.   

@@ -69,7 +69,7 @@ abstract public class DefaultTemplate
 	}
 	
 	
-	//public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
+	public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
 	
 	//public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph3.db";
 	

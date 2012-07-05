@@ -1,0 +1,2 @@
+MASCOT Score Distribution :: <br>
+This tool creates a bar chart of the peptides's MASCOT score. It separates target and decoy hits.  

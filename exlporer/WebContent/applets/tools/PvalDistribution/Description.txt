@@ -1,0 +1,2 @@
+P-value distribution :: <br>
+This tool creates a bar chart of the peptides's p-values. It separates target and decoy hits.  

@@ -274,6 +274,7 @@ function ShowChartsForm()
             width: 300,
 	        closable: true,
 	        resizable: true,
+	        autoScroll:true,
 	        id:'tool-win',
 //	        plain: true,
 	        title:'Tools',
