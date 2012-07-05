@@ -71,9 +71,9 @@ abstract public class DefaultTemplate
 	
 	//public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
 	
-	public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph3.db";
+	//public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph3.db";
 	
-	//public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph2.db";
+	public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph2.db";
 	
 	//Singleton pattern to force every user into a single database connexion object
 	private static EmbeddedGraphDatabase theGraph = null;
@@ -162,7 +162,13 @@ abstract public class DefaultTemplate
 		String type = theNode.getType();
 		if("Peptidome".equals(type))
 		{
-			String[] testE = {"applets/tools/PeptideLength", "applets/tools/DecoyAnalysis", "applets/tools/BindingScoreDistribution"};
+			String[] testE = {"applets/tools/PeptideLength", 
+							  "applets/tools/DecoyAnalysis", 
+							  "applets/tools/BindingScoreDistribution",
+							  "applets/tools/MascotScoreDistribution",
+							  "applets/tools/IntensityDistribution",
+							  "applets/tools/PvalDistribution",
+							  "applets/tools/SequenceRedundancy"};
 			return testE;
 		}
 		if("Sequence Search".equals(type))

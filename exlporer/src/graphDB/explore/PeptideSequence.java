@@ -1,6 +1,8 @@
 package graphDB.explore;
 
 import java.util.Arrays;
+import java.util.HashMap;
+
 import graphDB.explore.tools.Parallel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
@@ -20,13 +22,39 @@ public class PeptideSequence
 		int iPepMax = peptide.length() - 1;
 		int iPep  = iPepMax;
 		
+		int nbStar = 0;
 		while(iProt >= 0 && iPep >= 0)
 		{
-			if(protArray[iProt] == '*' || protArray[iProt] == pepArray[iPep])
+			if(protArray[iProt] == pepArray[iPep])
+			{
+				iProt--;
 				iPep--;
+				nbStar = 0;
+			}
 			else
-				iPep = iPepMax;
-			iProt--;
+			{
+				if(protArray[iProt] == '*')
+				{
+					iProt--;
+					iPep--;
+					nbStar++;
+				}
+				else
+				{
+					if(nbStar > 0)
+					{
+						iProt += nbStar - 1;
+						iPep = iPepMax;
+						nbStar = 0;
+					}
+					else
+					{
+						iProt--;
+						iPep = iPepMax;
+						nbStar = 0;
+					}
+				}
+			}
 		}
 	    return iProt;
 	}
@@ -78,10 +106,22 @@ public class PeptideSequence
 		Match(GetAllProteins(), peptides);
 	}
 	
+	private static HashMap<Node, String> GetPeptideSequenceMap(Node[] peptides)
+	{
+		HashMap<Node, String> peptideMap = new HashMap<Node, String>();
+		for(Node peptide : peptides)
+		{
+			peptideMap.put(peptide, peptide.getProperty("Sequence").toString());
+		}
+		return peptideMap;
+	}
+	
 	public static void Match(Node[] proteins, final Node[] peptides)
 	{
+		//Create a hash map of peptide sequences (for faster access)
+		final HashMap<Node, String> peptideMap = GetPeptideSequenceMap(peptides);
 		final RelationshipType relType = DynamicRelationshipType.withName( "Found In" );
-		//final int nbProteins = 0;
+		
 
 	    Parallel.ForEach(Arrays.asList(proteins), new Parallel.LoopBody <Node>()
 	    {
@@ -89,36 +129,33 @@ public class PeptideSequence
 	        {
 				String protSeq = proteinNode.getProperty("Sequence").toString();
 				
+				HashMap<Long, Relationship> relationMap = new HashMap<Long, Relationship>();
+				for(Relationship otherRelation : proteinNode.getRelationships(relType))
+					relationMap.put(otherRelation.getOtherNode(proteinNode).getId(), otherRelation);
+				
 				for(Node peptide : peptides)
 				{
-					int nbMatch = 0;
-					String pepSeq = peptide.getProperty("Sequence").toString();
-
 					//TODO Find why not all peptides are matched to a protein
-					if("KLFLVNHSQN".equals(pepSeq) && proteinNode.getProperty("Unique ID").equals("Ref9_1412"))
-						nbMatch = 0;
-						
-					int indexPos = IsSimpleMatch(protSeq, pepSeq);
-					if(indexPos >= 0)
+//					if("KLFLVNHSQN".equals(pepSeq) && proteinNode.getProperty("Unique ID").equals("Ref9_1412"))
+//					{
+
+					int indexPos = IsSimpleMatch(protSeq, peptideMap.get(peptide));
+					if(indexPos >= 0 && !relationMap.containsKey(peptide.getId()))
 					{
-						boolean add = true;
-						if(proteinNode.hasRelationship(relType))
-						{
-							for(Relationship otherRelation : proteinNode.getRelationships(relType))
-							{
-								if(otherRelation.getOtherNode(proteinNode).getId() == peptide.getId())
-									add = false;
-								nbMatch++;
-							}
-						}
-						if(add)
-						{										
-							Relationship relation = peptide.createRelationshipTo(proteinNode, relType);
-							relation.setProperty("Position", indexPos);
-							nbMatch++;
-							peptide.setProperty("Number of Protein Match", nbMatch);
-						}
+						//int indexPos = IsSimpleMatch(protSeq, peptideMap.get(peptide));
+						//if(indexPos >= 0)
+						//{
+//							if(relationMap.containsKey(peptide.getId()))
+//							{										
+								Relationship relation = peptide.createRelationshipTo(proteinNode, relType);
+								relation.setProperty("Position", indexPos);
+								relationMap.put(peptide.getId(), relation);
+								//peptide.setProperty("Number of Protein Match", relationMap.size());
+//							}
+						//}
 					}
+//					else
+//						peptide.setProperty("Number of Protein Match", relationMap.size());
 				}
 				//nbProteins++;        
 	        }

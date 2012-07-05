@@ -330,7 +330,7 @@ public class NodeHelper
 			result += "Node ID :" + theNode.getId() + "<br>";
 			for (String key : theNode.getPropertyKeys())
 				if(DefaultTemplate.keepAttribute(key))
-					result += key + ":\"" + DefaultTemplate.Sanitize(theNode.getProperty(key).toString()) + "\"<br>";//*/				
+					result += key + ":\"" + DefaultTemplate.Sanitize(theNode.getProperty(key).toString()).replace('\'', '"') + "\"<br>";//*/				
 		}
 		return result;
 	}
