@@ -337,7 +337,10 @@ public class NodeHelper
 	private static String getNodeInfo(Node theNode, String toAdd, int size) {
 		String result = "";
 
-		result += "name:'" + getNameAndType(theNode) + "'";
+		if(size > 1)
+			result += "name:'" + getType(theNode) + "'";
+		else
+			result += "name:'" + getNameAndType(theNode) + "'";
 		
 		if (toAdd != null && !toAdd.isEmpty())
 			result += "," + toAdd;
