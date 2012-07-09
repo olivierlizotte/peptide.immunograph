@@ -16,14 +16,19 @@
 <%@ page import="graphDB.explore.*"%>
 
 <%
+String nodeID = "-1";
 String key = request.getParameter("key");
 if(session.getAttribute("userNodeID") != null)
 {	
 	if(session.getAttribute("currentNode") != null)
-		((DefaultNode)session.getAttribute("currentNode")).printGridDataJSON(out, key);
+	{
+		DefaultNode aNode = ((DefaultNode)session.getAttribute("currentNode"));
+		nodeID = Long.toString(aNode.getId());
+		aNode.printGridDataJSON(out, key);
+	}
 	else
 	{
-		String nodeID = session.getAttribute("userNodeID").toString();
+		nodeID = session.getAttribute("userNodeID").toString();
 		if (request.getParameter("id") != null)
 			nodeID = request.getParameter("id");
 	//	else
@@ -59,18 +64,34 @@ if(session.getAttribute("userNodeID") != null)
 			storeId : 'nodeStoreID' + keyName,
 			model : 'nodeModel' + keyName,
 			//TODO Fix sorting problems on infinite scroll grids
-			//sorters : gridSorters[keyName],
+			sorters : gridSorters[keyName],
 			//New
-			pageSize : gridData[keyName].length,//50000,
-			buffered : true,
-			purgePageCount : 0,
-			proxy : {
-				type : 'memory'
+			pageSize : 100,//50000,
+			remoteSort: true,
+			proxy: {
+				type: 'rest',
+				url : 'GetList.jsp',
+				extraParams : { 
+					id : <%= nodeID %>,
+					type : keyName
+					},
+				reader: {
+					type: 'json',
+					root: 'root',
+					totalProperty: 'total'
+				}
 			},
-			//     autoLoad: true,
+			//Old
+			//pageSize : gridData[keyName].length,//50000,
+			buffered : true,
+			//purgePageCount : 0,
+			//proxy : {
+			//	type : 'memory'
+			//},
+			////     autoLoad: true,			
+			//groupField: 'Relation',
 			//EndNew
-			        groupField: 'Relation',
-			data : gridData[keyName]
+			//data : gridData[keyName]
 		});
 		
 		var groupingFeature = Ext.create('Ext.grid.feature.Grouping',{
@@ -249,7 +270,7 @@ if(session.getAttribute("userNodeID") != null)
 										} ]
 							}
 						});
-		nodeStore.guaranteeRange(0, 49);
+		nodeStore.guaranteeRange(0, 99);//49);
 		//nodeStore.load(); 
 		// nodeStore.loadPage(1);
 		return theGrid;

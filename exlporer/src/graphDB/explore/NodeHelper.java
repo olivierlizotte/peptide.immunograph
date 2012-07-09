@@ -346,14 +346,17 @@ public class NodeHelper
 			result += "Node ID :" + theNode.getId() + "<br>";
 			for (String key : theNode.getPropertyKeys())
 				if(DefaultTemplate.keepAttribute(key))
-					result += key + ":\"" + DefaultTemplate.Sanitize(theNode.getProperty(key).toString()) + "\"<br>";//*/				
+					result += key + ":\"" + DefaultTemplate.Sanitize(theNode.getProperty(key).toString()).replace('\'', '"') + "\"<br>";//*/				
 		}
 		return result;
 	}
 	private static String getNodeInfo(Node theNode, String toAdd, int size) {
 		String result = "";
 
-		result += "name:'" + getNameAndType(theNode) + "'";
+		if(size > 1)
+			result += "name:'" + getType(theNode) + "'";
+		else
+			result += "name:'" + getNameAndType(theNode) + "'";
 		
 		if (toAdd != null && !toAdd.isEmpty())
 			result += "," + toAdd;

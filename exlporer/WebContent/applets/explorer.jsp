@@ -178,11 +178,15 @@ function AddComment(field, event)
 	var texte = field.getValue();
 	if(!(texte === ""))
 	{
-		texte = replaceAll(texte,"\f", "<br/>");
-		texte = replaceAll(texte,"\r", "<br/>");
-		texte = replaceAll(texte,"\n", "<br/>");
-		texte = replaceAll(texte,"\"", "&#34;");
-		texte = replaceAll(texte,"/\\/", "&#92;");
+		texte = replaceAll(texte,"\f",   "<br/>");
+		texte = replaceAll(texte,"\r",   "<br/>");
+		texte = replaceAll(texte,"\n",   "<br/>");
+		texte = replaceAll(texte,"&",    "&amp;");
+		texte = replaceAll(texte,"\"",   "&quot;");
+		texte = replaceAll(texte,"/\\/", "&brvbar;");
+		texte = replaceAll(texte,"'",    "&apos;")
+		texte = replaceAll(texte,"<",    "&lt;")
+		texte = replaceAll(texte,">",    "&gt;")
  		
 		$.post(	"addComment.jsp",
 				{"id":currentNodeID,"user":<%=session.getAttribute("userNodeID")%>, "comment": texte}, 
