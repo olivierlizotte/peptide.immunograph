@@ -1,0 +1,3 @@
+Easy query :: <br>
+This tool allows you to make a request to the database easily. 
+Just fill a form and the query will be built automatically.

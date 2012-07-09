@@ -202,7 +202,31 @@ function AddAttribute(btn, text)
 	MessageTop.msg('Button Click', 'You clicked the {0} button and entered the text "{1}".', btn, text);
 };
 
-
+function showTools(){
+var toolWin = new Ext.create(
+		'Ext.Window',
+		{
+			id : 'autoload-win',
+			title : currentNodeType
+					+ ' Tools',
+			closable : true,
+			autoScroll:true,
+			width : 400,
+			height : 200,
+			x : 10,
+			y : 200,
+			plain : true,
+			loader : {
+				url : "tools.jsp?name=seq&id="+currentNodeID,
+				scripts : true,
+				autoLoad : true,
+				renderer : 'html'
+			},
+			layout : 'fit',
+		//items: attributeForm,
+		});
+toolWin.show();
+}
 var attribPanel;
 
 function CreateAttributes(attribs)
@@ -258,6 +282,13 @@ function CreateAttributes(attribs)
            		      			MessageTop.msg("Success!", "Attributes saved");
            		     		}
            		    	});
+		   	    }
+		   	},
+		   	{	   		
+		   		text   : '<img src="icons/tool.png"/> tools',
+		   	    handler: function() 
+		   	    {
+		   	    	showTools();
 		   	    }
 		   	}],
 	        source: attribs
