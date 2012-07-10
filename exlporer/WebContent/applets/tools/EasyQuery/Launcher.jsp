@@ -27,8 +27,8 @@
 	
 <script type="text/javascript">
 var properties=new Array();
-var nbFilters = 1;
-var maxFilters = 3;
+var NB_FILTERS = 1;
+var MAX_FILTERS = 5;
 <%
 long currentID = Long.valueOf(request.getParameter("id"));
 EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
@@ -51,43 +51,79 @@ for (String nodeType : typesAndPropertiesRelated.keySet()){
 
 function changeProperties(){
 	nodeType = document.getElementById("nodeType").value;
-	for(var i=1 ; i<=maxFilters ; i+=1){
+	for(var i=1 ; i<=NB_FILTERS ; i+=1){
 		document.getElementById(('nodeProperty'+i)).innerHTML=properties[nodeType];
 	}
 	//document.getElementById("nodeProperty1").innerHTML=properties[nodeType];
 }
 
-
+function writeHTMLFilter(){
+	
+	document.getElementById("additional-filters").innerHTML += ''+
+	'<div id="filter'+NB_FILTERS+'" >'+
+	'<select id="andor'+(NB_FILTERS-1)+'">'+
+	'<option value="and"> and </option>'+
+	'<option value="or"> or </option>'+
+	'</select><br>'+
+	'<fieldset style="border-color:black">'+
+	'<legend>filter '+NB_FILTERS+'</legend>'+
+	'<select id="nodeProperty'+NB_FILTERS+'" >'+
+	'</select>'+
+	'<select id="comparator'+NB_FILTERS+'">'+
+	'<option value="="> = </option>'+
+	'<option value="<"> < </option>'+
+	'<option value=">"> > </option>'+
+	'</select>	'+
+	'<input type="text" id="value'+NB_FILTERS+'" value="a value" size=2/>'+
+	'</fieldset>'+
+	'</div>';
+	changeProperties();
+}
 
 function Launch()
 {
+	var postData = {"id":<%=request.getParameter("id") %>,
+			"rel":<%= request.getParameter("rel")%>,
+			"NB_FILTERS":NB_FILTERS,
+			"nodeType": document.getElementById("nodeType").value,
+			"nodeProperty1": document.getElementById("nodeProperty1").value,
+			"comparator1": document.getElementById("comparator1").value,
+			"value1" : document.getElementById("value1").value
+			};
+	for(var i=2 ; i<= NB_FILTERS ; i+=1){
+		postData[('andor'+(i-1))] = document.getElementById(('andor'+(i-1))).value;
+		postData[('nodeProperty'+i)] = document.getElementById(('nodeProperty'+i)).value;
+		postData[('comparator'+i)] = document.getElementById(('comparator'+i)).value;
+		postData[('value'+i)] = document.getElementById(('value'+i)).value;
+	}
+	
 	document.getElementById("wait").innerHTML="<img src=../../../icons/waiting.gif width=\"150\" height=\"20\" />";
-		$.post(	"Executable.jsp",
-				{"query":document.getElementById("textQuery").value, 
-				"id":<%=request.getParameter("id") %>,
-				"rel":<%= request.getParameter("rel")%>
-				},
+		$.post(	"Executable.jsp", 
+				postData,
 				function(results)
 				{		
-					MessageTop.msg("Query executed successfuly!", "");
-			 		
-			 		//document.getElementById("query-result").innerHTML = "</br><b>Result</b></br>"+results+"</br>";
+					//MessageTop.msg("Query executed successfuly!", "");
+			 		window.parent.location.href='http://localhost:8080/exlporer/index.jsp?id='+results;
 				});
 		document.getElementById("wait").innerHTML="";
 }
 
 function addFilter(){
-	if (nbFilters < maxFilters){
+	if (NB_FILTERS < MAX_FILTERS){
 		if (document.getElementById('add-filter').disabled){
 			document.getElementById('add-filter').disabled = false;
 		}
 		if(document.getElementById('remove-filter').disabled){
 			document.getElementById('remove-filter').disabled = false;
 		}
-		nbFilters+=1;
-		document.getElementById('filter'+nbFilters).style.display="block";
-		document.getElementById('error-message').innerHTML = nbFilters;
-		if(nbFilters == maxFilters){
+		NB_FILTERS+=1;
+		if (document.getElementById('filter'+NB_FILTERS) != null){
+			document.getElementById('filter'+NB_FILTERS).style.display="block";
+		}else{
+			writeHTMLFilter();
+		}
+		document.getElementById('error-message').innerHTML = NB_FILTERS;
+		if(NB_FILTERS == MAX_FILTERS){
 			document.getElementById('add-filter').disabled = true;
 		}
 	}else{
@@ -95,17 +131,17 @@ function addFilter(){
 	}
 }
 function removeFilter(){
-	if (nbFilters > 1){
+	if (NB_FILTERS > 1){
 		if(document.getElementById('remove-filter').disabled){
 			document.getElementById('remove-filter').disabled = false;
 		}
 		if (document.getElementById('add-filter').disabled){
 			document.getElementById('add-filter').disabled = false;
 		}
-		document.getElementById('filter'+nbFilters).style.display="none";
-		nbFilters-=1;
-		document.getElementById('error-message').innerHTML = nbFilters;
-		if(nbFilters == 1){
+		document.getElementById('filter'+NB_FILTERS).style.display="none";
+		NB_FILTERS-=1;
+		document.getElementById('error-message').innerHTML = NB_FILTERS;
+		if(NB_FILTERS == 1){
 			document.getElementById('remove-filter').disabled = true;
 		}
 	}else{
@@ -137,43 +173,11 @@ function removeFilter(){
 		<option value="<"> < </option>
 		<option value=">"> > </option>
 		</select>	
-		<input type="text" id="value1" size=2/>
+		<input type="text" id="value1" value="a value" size=2/>
 		</fieldset>
 	</div>
 	<br>
-	<div id="filter2" style="display:none">
-		<select id="andor1">
-		<option value="and"> and </option>
-		<option value="or"> or </option>
-		</select><br>
-		<fieldset style="border-color:black">
-		<legend>filter 2</legend>
-		<select id="nodeProperty2" >
-		</select>
-		<select id="comparator2">
-		<option value="="> = </option>
-		<option value="<"> < </option>
-		<option value=">"> > </option>
-		</select>	
-		<input type="text" id="value2" size=2/>
-		</fieldset>
-	</div>
-	<div id="filter3" style="display:none">
-		<select id="andor2">
-		<option value="and"> and </option>
-		<option value="or"> or </option>
-		</select><br>
-		<fieldset style="border-color:black">
-		<legend>filter 3</legend>
-		<select id="nodeProperty3" >
-		</select>
-		<select id="comparator3">
-		<option value="="> = </option>
-		<option value="<"> < </option>
-		<option value=">"> > </option>
-		</select>	
-		<input type="text" id="value3" size=2/>
-		</fieldset>
+	<div id="additional-filters">
 	</div>
 	<button onclick="Launch()">Launch!</button>
 	<br>
