@@ -1,11 +1,11 @@
 package graphDB.explore;
 
+import graphDB.explore.tools.AlphanumComparator;
+
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.jsp.JspWriter;
 
@@ -46,21 +46,26 @@ public class Grid {
 				}
 			}
 			
-	        Collections.sort( nodes, new Comparator<Pair<Node, Relationship>>()
+			final AlphanumComparator alNum = new AlphanumComparator();
+	        Collections.sort( nodes, 
+	        		new Comparator<Pair<Node, Relationship>>()
 	                {
 	                    public int compare( Pair<Node, Relationship> n1, Pair<Node, Relationship> n2 )
 	                    {
+	                    	
 	                    	Node a = n1.first();
 	                    	Node b = n2.first();
 	                    	if(!a.hasProperty(property) || !b.hasProperty(property))
 	                    		return 0;
 	                    	else
+	                    	{	                    		
 	                    		if(dir)
-	                    			return ((String)n1.first().getProperty(property)).compareTo((String)n2.first().getProperty(property));
+	                    			return alNum.compare((String)n1.first().getProperty(property), (String)n2.first().getProperty(property));
 	                    		else
-	                    			return -((String)n1.first().getProperty(property)).compareTo((String)n2.first().getProperty(property));
+	                    			return -alNum.compare((String)n1.first().getProperty(property), (String)n2.first().getProperty(property));
+	                    	}
 	                    }
-	                } );
+	                } );//*/
 
 	        out.println("{root:[");
 			long nbElem = 0;
