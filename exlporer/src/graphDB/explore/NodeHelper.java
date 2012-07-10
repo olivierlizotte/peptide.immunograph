@@ -47,6 +47,7 @@ public class NodeHelper
 		}
 		return theProperties;
 	}
+	
 
 	public static HashMap<String, HashMap<String, String>> computeListOfAttributes(	Node theNode) 
     {

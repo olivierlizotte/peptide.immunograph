@@ -77,6 +77,7 @@ abstract public class DefaultTemplate
 	
 	//Singleton pattern to force every user into a single database connexion object
 	private static EmbeddedGraphDatabase theGraph = null;
+	
 	public static EmbeddedGraphDatabase graphDb()
 	{
 		if(theGraph == null)

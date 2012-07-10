@@ -56,7 +56,7 @@ HashMap<String,String> getPeptidesLengthDistribution(EmbeddedGraphDatabase graph
 		if (!decoy.containsKey(i))
 			decoy.put(i,0);
 	}
-	maxValue = Collections.max(target.keySet()) + Collections.max(decoy.keySet());
+	maxValue = Collections.max(target.values()) + Collections.max(decoy.values());
 	for (int i : target.keySet()){
 		System.out.println(i+"->"+target.get(i)+":"+decoy.get(i));
 	}
@@ -114,7 +114,7 @@ try{
 		charts.setProperty("data", nodeInfo.get("data"));
 		charts.setProperty("maxYaxis", nodeInfo.get("maxYaxis"));
 		charts.setProperty("xfield", "'size'");
-		charts.setProperty("yfield", "['target', 'decoy']");
+		charts.setProperty("yfield", "['decoy', 'target']");
 		graphDb.getNodeById(Integer.valueOf(nodeID)).
 				createRelationshipTo(charts, DynamicRelationshipType.withName("Tool_output"));
 		DefaultTemplate.linkToExperimentNode(graphDb, charts, "Tool_output");

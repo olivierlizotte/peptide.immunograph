@@ -16,6 +16,7 @@
 <%@ page import="graphDB.explore.*"%>
 
 <%
+
 //String nodeID = request.getParameter("id");
 //String key = request.getParameter("key");
 //if(session.getAttribute("userNodeID") != null)
