@@ -149,10 +149,16 @@ public class XmlToDb extends DefaultHandler
 					if(line != null && !line.isEmpty())
 					{
 						String[] Info = line.split("=(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-						if(Info.length > 1)
-							currentNode.setProperty(cleanText(Info[0]), cleanText(Info[1]));
+						if(Info.length > 1){
+							if(NodeHelper.isNumber(cleanText(Info[1]))){
+								currentNode.setProperty(cleanText(Info[0]), Double.valueOf(cleanText(Info[1])));
+							}else{
+								currentNode.setProperty(cleanText(Info[0]), cleanText(Info[1]));
+							}
+						}	
 					}
 				}
+				
 
 				if(currentNodeIndex != null)
 				{
