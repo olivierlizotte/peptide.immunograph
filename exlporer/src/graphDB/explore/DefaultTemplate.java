@@ -190,7 +190,8 @@ abstract public class DefaultTemplate
 		String type = theNode.getType();
 		if("Peptidome".equals(type))
 		{
-			String[] testE = {"applets/tools/SequenceAnalysis"};
+			String[] testE = {"applets/tools/SequenceAnalysis",
+							  "applets/tools/EasyQuery"};
 			return testE;
 		}
 		if("Sequence Search".equals(type))
