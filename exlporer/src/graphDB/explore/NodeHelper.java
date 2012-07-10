@@ -317,6 +317,20 @@ public class NodeHelper
 		return 0;
 	}
 	
+	public static HashMap<String, Iterable<String>> getRelatedNodeTypesAndProperties(Node n){
+		HashMap<String,Iterable<String>> TypesAndAttributesRelated = new HashMap<String,Iterable<String>>();
+		String otherNodeType;
+		for (Relationship r : n.getRelationships(Direction.OUTGOING)){
+			if(DefaultTemplate.keepRelation(r.getType().toString())){
+				otherNodeType = getType(r.getOtherNode(n));
+				if (!TypesAndAttributesRelated.containsKey(otherNodeType)){
+					TypesAndAttributesRelated.put(otherNodeType, r.getOtherNode(n).getPropertyKeys());
+				}
+			}
+		}
+		return TypesAndAttributesRelated;
+	}
+	
 	private static HashMap<String, NavNode> getNavigationNodes(Node theNode, int depth, HashMap<String, NavNode> result, int index) throws IOException
 	{	
 		if(depth > 0)
@@ -347,6 +361,8 @@ public class NodeHelper
 		}
 		return result;
 	}
+	
+	
 	
 	private static String getInfo(Node theNode, int size)	
 	{

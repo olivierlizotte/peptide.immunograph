@@ -144,34 +144,34 @@
 							tbar : {
 								height : '25px',
 								items : [
-										{
-											xtype : 'button',
-											text : keyName + ' tools',
-											handler : function() {
-												var toolWin = new Ext.create(
-														'Ext.Window',
-														{
-															id : 'autoload-win',
-															title : keyName
-																	+ ' Tools',
-															closable : true,
-															width : 400,
-															height : 200,
-															x : 10,
-															y : 200,
-															plain : true,
-															loader : {
-																url : "tools.jsp?name=seq&id="+currentNodeID,
-																scripts : true,
-																autoLoad : true,
-																renderer : 'html'
-															},
-															layout : 'fit',
-														//items: attributeForm,
-														});
-												toolWin.show();
-											}
-										},
+<!-- 										{ -->
+<!-- 											xtype : 'button', -->
+<!-- 											text : keyName + ' tools', -->
+<!-- 											handler : function() { -->
+<!-- 												var toolWin = new Ext.create( -->
+<!-- 														'Ext.Window', -->
+<!-- 														{ -->
+<!-- 															id : 'autoload-win', -->
+<!-- 															title : keyName -->
+<!-- 																	+ ' Tools', -->
+<!-- 															closable : true, -->
+<!-- 															width : 400, -->
+<!-- 															height : 200, -->
+<!-- 															x : 10, -->
+<!-- 															y : 200, -->
+<!-- 															plain : true, -->
+<!-- 															loader : { -->
+<!-- 																url : "tools.jsp?name=seq&id="+currentNodeID, -->
+<!-- 																scripts : true, -->
+<!-- 																autoLoad : true, -->
+<!-- 																renderer : 'html' -->
+<!-- 															}, -->
+<!-- 															layout : 'fit', -->
+<!-- 														//items: attributeForm, -->
+<!-- 														}); -->
+<!-- 												toolWin.show(); -->
+<!-- 											} -->
+<!-- 										}, -->
 										{
 											xtype : 'button',
 											text : 'csv export',
