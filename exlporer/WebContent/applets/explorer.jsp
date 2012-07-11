@@ -23,7 +23,6 @@
 
 </head>
 
-
 <script type="text/javascript">
 
 var graphItemNumber=0;

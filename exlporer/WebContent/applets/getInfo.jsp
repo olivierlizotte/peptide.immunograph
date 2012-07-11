@@ -72,6 +72,7 @@ if(session.getAttribute("userNodeID") != null)
 		out.println("var currentNodeType=\""+theNode.getType()+"\";\n");
 		out.println("var browserHistory=\"" + strHistory + "\";\n");
 		out.println(theNode.getAttributeJSON("myAttributeObject"));
+		theNode.printGridDataJSON(out);
 		
 		out.println(theNode.getCommentsVariable("myCommentData"));	
 		

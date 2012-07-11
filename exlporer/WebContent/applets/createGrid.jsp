@@ -16,10 +16,12 @@
 <%@ page import="graphDB.explore.*"%>
 
 <%
-String nodeID = "-1";
-String key = request.getParameter("key");
-if(session.getAttribute("userNodeID") != null)
-{	
+
+//String nodeID = request.getParameter("id");
+//String key = request.getParameter("key");
+//if(session.getAttribute("userNodeID") != null)
+//{	
+	/*
 	if(session.getAttribute("currentNode") != null)
 	{
 		DefaultNode aNode = ((DefaultNode)session.getAttribute("currentNode"));
@@ -46,12 +48,10 @@ if(session.getAttribute("userNodeID") != null)
 		{
 			//graphDb.shutdown();
 		}
-	}
-}
+	}//*/
+//}
 %>
-			
-	var key = <%= key %>;
-	
+				
 	function CreateGrid(keyName)//myListFields, myListColumns, myListSorters, myListData)
 	{
 		// wrapped in closure to prevent global vars.
@@ -72,7 +72,7 @@ if(session.getAttribute("userNodeID") != null)
 				type: 'rest',
 				url : 'GetList.jsp',
 				extraParams : { 
-					id : <%= nodeID %>,
+					id : currentNodeID,
 					type : keyName
 					},
 				reader: {
@@ -270,9 +270,7 @@ if(session.getAttribute("userNodeID") != null)
 										} ]
 							}
 						});
-		nodeStore.guaranteeRange(0, 99);//49);
-		//nodeStore.load(); 
-		// nodeStore.loadPage(1);
+		nodeStore.guaranteeRange(0, 99);
 		return theGrid;
 
 	}
@@ -339,24 +337,19 @@ if(session.getAttribute("userNodeID") != null)
 		var keys = [];
 		var itemsTab = [];
 
-		if(key)
-			Grid = CreateGrid(key).renderTo = 'list-container';
-		else
-		{
-			for ( var keyA in gridFields)
-				itemsTab.push(CreateGrid(keyA));
+		for ( var keyA in gridFields)
+			itemsTab.push(CreateGrid(keyA));
 
-			Grid = Ext.createWidget('tabpanel', {
-			    id : 'tabPanelGrid',
-				activeTab : 0,
-                flex: 1,
-                height : 400,
-                defaults: {
-                    layout: 'fit'
-                },
-				items : itemsTab
-			});
-		}
+		Grid = Ext.createWidget('tabpanel', {
+		    id : 'tabPanelGrid',
+			activeTab : 0,
+               flex: 1,
+               height : 400,
+               defaults: {
+                   layout: 'fit'
+               },
+			items : itemsTab
+		});
 	});
 
 

@@ -1,7 +1,6 @@
 package graphDB.explore;
 import java.io.FileReader;
 import graphDB.explore.DefaultTemplate;
-
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.HashMap;
@@ -158,21 +157,15 @@ public class XmlToDb extends DefaultHandler
 									!cleanText(Info[1]).equals("Infinity")
 									){
 								double d = Double.valueOf(cleanText(Info[1]));  
-								System.out.println(line);
-								System.out.println(d);
 								NumberFormat formatter = new DecimalFormat("#.########");  
 								String f = formatter.format(d);
-								System.out.println(f);
 								currentNode.setProperty(cleanText(Info[0]), Double.valueOf(f));
-								
-								System.out.println("######");
 							}else{
 								currentNode.setProperty(cleanText(Info[0]), cleanText(Info[1]));
 							}
 						}	
 					}
 				}
-				
 
 				if(currentNodeIndex != null)
 				{

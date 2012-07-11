@@ -60,7 +60,36 @@ public class NodeHelper
 		}
 		return theProperties;
 	}
+	
 
+	public static HashMap<String, HashMap<String, String>> computeListOfAttributes(	Node theNode) 
+    {
+		HashMap<String, HashMap<String, String>> listOfAttributes = new HashMap<String, HashMap<String, String>>();
+		
+		for (Relationship rel : theNode.getRelationships()) 
+		{		
+			if (DefaultTemplate.keepRelation(rel.getType().name())) 
+			{
+				Node n = rel.getOtherNode(theNode);
+				if(!listOfAttributes.containsKey(NodeHelper.getType(n)))
+					listOfAttributes.put(NodeHelper.getType(n), new HashMap<String, String>());
+				
+				HashMap<String, String> attributes = listOfAttributes.get(NodeHelper.getType(n));
+				
+				// writing the relation properties
+				for (String k : rel.getPropertyKeys())
+					if (DefaultTemplate.keepAttribute(k))
+						attributes.put(k, k);
+
+				// writing the node properties
+				for (String k : n.getPropertyKeys())
+					if (DefaultTemplate.keepAttribute(k))
+						attributes.put(k, k);
+			}
+		}
+		return listOfAttributes;
+	}
+	
 	public static HashMap<String, HashMap<String, String>> computeListOfAttributes(
 			HashMap<RelationshipType, String> relationsMap, Direction dir,
 			Node theNode) 
