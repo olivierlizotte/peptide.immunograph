@@ -58,11 +58,19 @@ public class Grid {
 	                    	if(!a.hasProperty(property) || !b.hasProperty(property))
 	                    		return 0;
 	                    	else
-	                    	{	                    		
-	                    		if(dir)
-	                    			return alNum.compare((String)n1.first().getProperty(property), (String)n2.first().getProperty(property));
+	                    	{	
+	                    		Object r1 = n1.first().getProperty(property);
+	                    		Object r2 = n2.first().getProperty(property);
+	                    		if(r1 instanceof Number && r2 instanceof Number)
+		                    		if(dir)
+		                    			return alNum.compare((Number)n1.first().getProperty(property), (Number)n2.first().getProperty(property));
+		                    		else
+		                    			return -alNum.compare((Number)n1.first().getProperty(property), (Number)n2.first().getProperty(property));
 	                    		else
-	                    			return -alNum.compare((String)n1.first().getProperty(property), (String)n2.first().getProperty(property));
+	                    			if(dir)
+		                    			return alNum.compare((String)n1.first().getProperty(property), (String)n2.first().getProperty(property));
+		                    		else
+		                    			return -alNum.compare((String)n1.first().getProperty(property), (String)n2.first().getProperty(property));
 	                    	}
 	                    }
 	                } );//*/
