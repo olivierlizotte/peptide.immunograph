@@ -16,62 +16,32 @@
 <%@ page import="java.util.*"%>
 <%@ page import="java.io.*"%>
 
+<%@page import="org.apache.tomcat.util.http.*"%>
+<%@page import="org.apache.commons.fileupload.servlet.*" %>
+<%@page import="org.apache.commons.fileupload.util.*" %>
+<%@page import="org.apache.commons.fileupload.*" %>
+<%@page import="org.apache.commons.fileupload.disk.*" %>
+<%@page import="org.apache.commons.io.*" %>
+
 <%
 
-final String TMP_DIR_PATH ="/home/antoine/workspace/tmpDir/";
 
 
-boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-//Create a factory for disk-based file items
-FileItemFactory factory = new DiskFileItemFactory();
-
-//Create a new file upload handler
-ServletFileUpload upload = new ServletFileUpload(factory);
-List items = upload.parseRequest(request);
-
-Iterator<FileItem> iter = items.iterator();
-while (iter.hasNext()) {
-    FileItem item = (FileItem) iter.next();
-
-    if (!item.isFormField()) {
-    	String fieldName = item.getFieldName();
-	    String fileName = item.getName();
-	    String contentType = item.getContentType();
-	    boolean isInMemory = item.isInMemory();
-	    long sizeInBytes = item.getSize();
-	    out.print("JSP is dealing with "+fileName+"<br>");
-		
-	    //File dirs = new File(TMP_DIR_PATH);
-		
-		//the script has to write the directory tmpDir int which we write the file, otherwise error!
-		//if (!dirs.isDirectory()){dirs.mkdirs();}
-		out.print("JSP is dealing with "+fileName+"<br>");
-		File uploadedFile = new File(fileName);
-	    item.write(uploadedFile);
-
-	    //Reading the file and creating the database
- 		XMLReader xr = XMLReaderFactory.createXMLReader();
- 		XmlToDb handler = new XmlToDb();
- 		xr.setContentHandler(handler);
- 		xr.setErrorHandler(handler);
- 		
- 		FileReader f = new FileReader(fileName);
- 		xr.parse(new InputSource(f));
- 		uploadedFile.delete();
- 		out.print("Database successfully created");
-    }
+String nodeID = request.getParameter("id").toString();
+String relationType = request.getParameter("rel").toString();
+String csvContent = request.getParameter("fileContent").toString();
+csvContent = csvContent.trim();
+String[] lines = csvContent.split("\n");
+for (String l : lines){
+	System.out.println("#"+l+"#"+" ["+l.split(",")[0]+","+l.split(",")[1]+"]");
 }
 
 
 
+//EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
 
+//HashMap<String,Node> nodesToUpdate = new HashMap<String,Node>();
 
-
-// String nodeID = request.getParameter("id").toString();
-// String relationType = request.getParameter("rel").toString();
-
-// String cypherQuery = request.getParameter("query");
-// EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
 
 // String csvFilePath = "/home/antoine/workspace/test.csv";
 // File f = new File(csvFilePath);

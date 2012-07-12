@@ -195,7 +195,9 @@ abstract public class DefaultTemplate
 		}
 		if("Sequence Search".equals(type))
 		{
-			String[] testE = {"applets/tools/SequenceAnalysis"};
+			String[] testE = {"applets/tools/SequenceAnalysis",
+							  "applets/tools/EasyQuery",
+							  "applets/tools/CsvImport"};
 			return testE;
 		}
 		if("Temporary Node".equals(type))

@@ -215,14 +215,16 @@
 											text : 'csv import',
 											handler : function() {
 												//var attributeForm=createForm();
-												var queryWin = new Ext.create(
+												var csvWin = new Ext.create(
 														'Ext.Window',
 														{
 															id : 'autoload-win',
-															title : 'Cypher Query',
+															title : 'CSV file import',
 															closable : true,
 															width : 400,
-															height : 180,
+															autoScroll:true,
+															width : 400,
+															height : 200,
 															x : 10,
 															y : 200,
 															plain : true,
@@ -231,12 +233,13 @@
 																url : 'applets/tools/CsvImport/Launcher.jsp?url='
 																		+ document.URL+'&id='+currentNodeID,
 																scripts : true,
-																autoLoad : true
+																autoLoad : true,
+																renderer : 'html'
 															},
 															layout : 'fit',
 														//items: attributeForm,?url='+document.URL
 														});
-												queryWin.show();
+												csvWin.show();
 											}
 										},
 										{

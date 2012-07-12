@@ -144,13 +144,17 @@ try
 	// create a new temp node linked to the resluts
 	Transaction tx = graphDb.beginTx();
 	Node tempNode = graphDb.createNode();
-	tempNode.setProperty("type", "Temporary Node");
+	tempNode.setProperty("type", "easyQuery_output");
 	tempNode.setProperty("query", query);
 	tempNode.setProperty("created from", graphDb.getNodeById(Long.valueOf(nodeID)).getProperty("type"));
 	tempNode.setProperty("created from id", graphDb.getNodeById(Long.valueOf(nodeID)).getId());
 	tempNode.setProperty("creation date", dateFormat.format(date));
 	Long tempNodeID = tempNode.getId();
 	createLinkerNodeFromIds(graphDb, tempNode, getQueryResultAsNodeIds(graphDb, query));
+	
+	//Link to node it was created from
+	tempNode.createRelationshipTo(graphDb.getNodeById(Long.valueOf(nodeID)),
+								  DynamicRelationshipType.withName("FilterStep"));
 	// add the new node to the index of temp nodes
 	Index<Node> index = DefaultTemplate.graphDb().index().forNodes("tempNodes");
 	
