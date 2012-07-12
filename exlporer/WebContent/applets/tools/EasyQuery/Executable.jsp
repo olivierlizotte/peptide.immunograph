@@ -152,8 +152,15 @@ try
 	Long tempNodeID = tempNode.getId();
 	createLinkerNodeFromIds(graphDb, tempNode, getQueryResultAsNodeIds(graphDb, query));
 	
+	// to know which step of the pipeline it is
+	if(graphDb.getNodeById(Long.valueOf(nodeID)).hasProperty("step")){
+		tempNode.setProperty("step", Integer.valueOf(graphDb.getNodeById(Long.valueOf(nodeID)).getProperty("step").toString())+1);
+	}else{
+		tempNode.setProperty("step",1);
+	}
+	
 	//Link to node it was created from
-	tempNode.createRelationshipTo(graphDb.getNodeById(Long.valueOf(nodeID)),
+	graphDb.getNodeById(Long.valueOf(nodeID)).createRelationshipTo(tempNode,
 								  DynamicRelationshipType.withName("FilterStep"));
 	// add the new node to the index of temp nodes
 	Index<Node> index = DefaultTemplate.graphDb().index().forNodes("tempNodes");

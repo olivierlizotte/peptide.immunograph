@@ -1,0 +1,4 @@
+Save pipeline:: <br>
+This tool allows you to save several filter steps as a pipeline for data analysis. 
+It will be accessible from the user page. In order to use it again you will have to
+enter a node ID to start the several requests from. 

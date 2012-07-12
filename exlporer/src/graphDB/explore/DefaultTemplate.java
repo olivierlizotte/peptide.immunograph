@@ -104,7 +104,8 @@ abstract public class DefaultTemplate
 				"StringID".equals(theAttributeName) ||
 				"passwd".equals(theAttributeName) ||
 				"created from id".equals(theAttributeName) ||
-				"Peptidome_peptideLength".equals(theAttributeName))
+				"Peptidome_peptideLength".equals(theAttributeName)||
+				"queries".equals(theAttributeName))
 			return false;
 		return true;
 	}
@@ -196,13 +197,19 @@ abstract public class DefaultTemplate
 		if("Sequence Search".equals(type))
 		{
 			String[] testE = {"applets/tools/SequenceAnalysis",
-							  "applets/tools/EasyQuery",
-							  "applets/tools/CsvImport"};
+							  "applets/tools/EasyQuery"};
 			return testE;
 		}
 		if("Temporary Node".equals(type))
 		{
 			String[] testE = {"applets/tools/DeleteNode"};
+			return testE;
+		}
+		
+		if("easyQuery_output".equals(type))
+		{
+			String[] testE = {"applets/tools/SavePipeLine",
+							  "applets/tools/EasyQuery"};
 			return testE;
 		}
 		return new String[0];
