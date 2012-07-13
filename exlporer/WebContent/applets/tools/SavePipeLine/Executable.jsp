@@ -42,6 +42,7 @@ try{
 	parsingNode = graphDb.getNodeById(Long.valueOf(nodeID));
 	ArrayList<String> queries = new ArrayList<String>();
 	// create the node storing the pipeline information
+	Index<Node> index = DefaultTemplate.graphDb().index().forNodes("tempNodes");
 	Node pipeLineNode = graphDb.createNode(); 
 	pipeLineNode.setProperty("type", "Pipeline");
 	pipeLineNode.setProperty("Name", pipelineName);
@@ -53,6 +54,8 @@ try{
 		Relationship oldRelation = parsingNode.getSingleRelationship(DynamicRelationshipType.withName("FilterStep"), Direction.INCOMING);
 		pipeLineNode.createRelationshipTo(parsingNode, 
 									DynamicRelationshipType.withName("FilterStep"));
+		// remove the node from index so that it is not deleted when tomcat restarts
+		index.remove(parsingNode);
 		parsingNode = oldRelation.getStartNode();
 		oldRelation.delete();
 	}
@@ -61,7 +64,6 @@ try{
 	Node userNode = graphDb.getNodeById(Long.valueOf(session.getAttribute("userNodeID").toString()));
 	userNode.createRelationshipTo(pipeLineNode, DynamicRelationshipType.withName("DataAnalysis"));
 	long userNodeID = userNode.getId();
-	
 	tx.success();
 	tx.finish();
 	out.print(userNodeID);

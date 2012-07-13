@@ -22,36 +22,6 @@
 <%!
 
 
-// String getQueryResult(EmbeddedGraphDatabase graphDb, String cypherQuery){
-// 	ExecutionEngine engine = new ExecutionEngine( graphDb );
-// 	// VERY IMPORTANT : use the org.neo4j.cypher.javacompat.* and not the org.neo4j.cypher.*
-// 	// otherwise can't iterate over the ExecutionResult
-// 	ExecutionResult result = engine.execute( cypherQuery );
-// 	String rows="";
-// 	for ( Map<String, Object> row : result ){
-// 	    for ( Entry<String, Object> column : row.entrySet() ){
-// 	        rows += column.getKey() + ": " + column.getValue() + ";";
-// 	    }
-// 	    rows += "</br>";
-// 	}
-// 	return rows;
-// }
-
-
-// String getQueryResultForJs(EmbeddedGraphDatabase graphDb, String cypherQuery){
-// 	ExecutionEngine engine = new ExecutionEngine( graphDb );
-// 	// VERY IMPORTANT : use the org.neo4j.cypher.javacompat.* and not the org.neo4j.cypher.*
-// 	// otherwise can't iterate over the ExecutionResult
-// 	ExecutionResult result = engine.execute( cypherQuery );
-// 	String rows="";
-// 	for ( Map<String, Object> row : result ){
-// 	    for ( Entry<String, Object> column : row.entrySet() ){
-// 	        rows += column.getKey() + "," + column.getValue() + "|";
-// 	    }
-// 	    //rows += ";";
-// 	}
-// 	return rows;
-// }
 
 List<Long> getQueryResultAsNodeIds(EmbeddedGraphDatabase graphDb, String cypherQuery){
 	ExecutionEngine engine = new ExecutionEngine( graphDb );
@@ -159,6 +129,9 @@ try
 		tempNode.setProperty("step",1);
 	}
 	
+	// calculate de percentage of decoy peptides removed
+	
+
 	//Link to node it was created from
 	graphDb.getNodeById(Long.valueOf(nodeID)).createRelationshipTo(tempNode,
 								  DynamicRelationshipType.withName("FilterStep"));
