@@ -36,8 +36,7 @@
 		document.getElementById("wait").innerHTML="<img src=../../../icons/waiting.gif width=\"150\" height=\"20\" /><br><img src=../../../icons/waitingGrandMa.png width=\"150\" height=\"150\" />";
 		$.post(	"Executable.jsp",
 					{"id":<%=request.getParameter("id") %>,
-					"pipelineName":document.getElementById("pipelineName").value,
-					"description":document.getElementById("description").value
+					"startNodeID":document.getElementById("startNodeID").value,
 					},
 					function(results)
 					{
@@ -51,9 +50,8 @@
 	<jsp:include page="Description.txt"/>
 	<br>
 	<br>
-	name of the pipeline: <br>
-	<input type="text" name="pipelineName" id="pipelineName" value=""/> <br>
-	<textarea rows="6" cols="40" id="description">enter a little description here</textarea>
+	please enter a node ID to start the pipeline from (it is written at the end of the address bar of your browser): <br>
+	<input type="text" name="startNodeID" id="startNodeID" value=""/> <br>
 	<button onclick="Launch()">Launch!</button>
 	<br>
 	<div id="wait"></div>

@@ -46,7 +46,7 @@ abstract public class DefaultTemplate
 	        		graphDb.shutdown();
 			}
 		} );
-	}	
+	}
 	
 	public static void removeAllTempElements(GraphDatabaseService graphDb )
 	{
