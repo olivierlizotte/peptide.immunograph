@@ -52,18 +52,34 @@ public class Grid {
 	                {
 	                    public int compare( Pair<Node, Relationship> n1, Pair<Node, Relationship> n2 )
 	                    {
+	                    	int result = 0;
+	                    	Object r1 = null;
+	                    	Object r2 = null;	                    	
 	                    	
-	                    	Node a = n1.first();
-	                    	Node b = n2.first();
-	                    	if(!a.hasProperty(property) || !b.hasProperty(property))
-	                    		return 0;
-	                    	else
-	                    	{	                    		
-	                    		if(dir)
-	                    			return alNum.compare((String)n1.first().getProperty(property), (String)n2.first().getProperty(property));
-	                    		else
-	                    			return -alNum.compare((String)n1.first().getProperty(property), (String)n2.first().getProperty(property));
+	                    	if(n1.first().hasProperty(property))
+	                    		r1 = n1.first().getProperty(property);
+	                    	else if (n1.other().hasProperty(property))
+	                    		r1 = n1.other().getProperty(property);
+	                    	
+	                    	if(r1 != null)
+	                    	{
+	                    		if(n2.first().hasProperty(property))
+	                    			r2 = n2.first().getProperty(property);
+	                    		else if (n2.other().hasProperty(property))
+	                    			r2 = n2.other().getProperty(property);
+	                    		
+	                    		if(r2 != null)
+	                    		{
+		                    		if(r1 instanceof Number && r2 instanceof Number)
+		                    			result = alNum.compare((Number)r1, (Number)r2);
+		                    		else if(r1 instanceof String && r2 instanceof String)
+		                    			result = alNum.compare((String)r1, (String)r2);
+	                    		}
 	                    	}
+	                    	if(dir)
+	                    		return result;
+	                    	else
+	                    		return -result;
 	                    }
 	                } );//*/
 

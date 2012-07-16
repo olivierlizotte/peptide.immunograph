@@ -21,7 +21,20 @@ public class NodeHelper
 	public static boolean isNumber(String string) {
 		return doublePattern.matcher(string).matches();
 	}
+	
+	public static boolean isNumeric(String string) {
+		Scanner scanner = new Scanner(string);
+		if (scanner.hasNextInt())
+		    return true;
+		else if (scanner.hasNextDouble())
+			return true;
+		else
+		    return false;
+	}
 
+
+
+	
 	public static String doubleFormat(String s) {
 		String[] tmp = s.split("\\.");
 		if (tmp.length > 1 && tmp[1].length() > numberOfDigits) {

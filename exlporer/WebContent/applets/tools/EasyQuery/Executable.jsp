@@ -22,36 +22,6 @@
 <%!
 
 
-// String getQueryResult(EmbeddedGraphDatabase graphDb, String cypherQuery){
-// 	ExecutionEngine engine = new ExecutionEngine( graphDb );
-// 	// VERY IMPORTANT : use the org.neo4j.cypher.javacompat.* and not the org.neo4j.cypher.*
-// 	// otherwise can't iterate over the ExecutionResult
-// 	ExecutionResult result = engine.execute( cypherQuery );
-// 	String rows="";
-// 	for ( Map<String, Object> row : result ){
-// 	    for ( Entry<String, Object> column : row.entrySet() ){
-// 	        rows += column.getKey() + ": " + column.getValue() + ";";
-// 	    }
-// 	    rows += "</br>";
-// 	}
-// 	return rows;
-// }
-
-
-// String getQueryResultForJs(EmbeddedGraphDatabase graphDb, String cypherQuery){
-// 	ExecutionEngine engine = new ExecutionEngine( graphDb );
-// 	// VERY IMPORTANT : use the org.neo4j.cypher.javacompat.* and not the org.neo4j.cypher.*
-// 	// otherwise can't iterate over the ExecutionResult
-// 	ExecutionResult result = engine.execute( cypherQuery );
-// 	String rows="";
-// 	for ( Map<String, Object> row : result ){
-// 	    for ( Entry<String, Object> column : row.entrySet() ){
-// 	        rows += column.getKey() + "," + column.getValue() + "|";
-// 	    }
-// 	    //rows += ";";
-// 	}
-// 	return rows;
-// }
 
 List<Long> getQueryResultAsNodeIds(EmbeddedGraphDatabase graphDb, String cypherQuery){
 	ExecutionEngine engine = new ExecutionEngine( graphDb );
@@ -144,13 +114,27 @@ try
 	// create a new temp node linked to the resluts
 	Transaction tx = graphDb.beginTx();
 	Node tempNode = graphDb.createNode();
-	tempNode.setProperty("type", "Temporary Node");
+	tempNode.setProperty("type", "easyQuery_output");
 	tempNode.setProperty("query", query);
 	tempNode.setProperty("created from", graphDb.getNodeById(Long.valueOf(nodeID)).getProperty("type"));
 	tempNode.setProperty("created from id", graphDb.getNodeById(Long.valueOf(nodeID)).getId());
 	tempNode.setProperty("creation date", dateFormat.format(date));
 	Long tempNodeID = tempNode.getId();
 	createLinkerNodeFromIds(graphDb, tempNode, getQueryResultAsNodeIds(graphDb, query));
+	
+	// to know which step of the pipeline it is
+	if(graphDb.getNodeById(Long.valueOf(nodeID)).hasProperty("step")){
+		tempNode.setProperty("step", Integer.valueOf(graphDb.getNodeById(Long.valueOf(nodeID)).getProperty("step").toString())+1);
+	}else{
+		tempNode.setProperty("step",1);
+	}
+	
+	// calculate de percentage of decoy peptides removed
+	
+
+	//Link to node it was created from
+	graphDb.getNodeById(Long.valueOf(nodeID)).createRelationshipTo(tempNode,
+								  DynamicRelationshipType.withName("FilterStep"));
 	// add the new node to the index of temp nodes
 	Index<Node> index = DefaultTemplate.graphDb().index().forNodes("tempNodes");
 	

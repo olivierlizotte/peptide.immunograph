@@ -1,6 +1,8 @@
 package graphDB.explore;
 import java.io.FileReader;
 import graphDB.explore.DefaultTemplate;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.HashMap;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -149,8 +151,19 @@ public class XmlToDb extends DefaultHandler
 					if(line != null && !line.isEmpty())
 					{
 						String[] Info = line.split("=(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-						if(Info.length > 1)
-							currentNode.setProperty(cleanText(Info[0]), cleanText(Info[1]));
+						if(Info.length > 1){
+							if(NodeHelper.isNumeric(cleanText(Info[1])) && 
+									!cleanText(Info[1]).equals("NaN") &&
+									!cleanText(Info[1]).equals("Infinity")
+									){
+								double d = Double.valueOf(cleanText(Info[1]));  
+								NumberFormat formatter = new DecimalFormat("#.########");  
+								String f = formatter.format(d);
+								currentNode.setProperty(cleanText(Info[0]), Double.valueOf(f));
+							}else{
+								currentNode.setProperty(cleanText(Info[0]), cleanText(Info[1]));
+							}
+						}	
 					}
 				}
 

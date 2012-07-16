@@ -1,0 +1,3 @@
+Execute pipeline:: <br>
+This tool allows you to use a saved pipeline. It will execute the queries in the same order. 
+After each query, a node will be created, in order to analyze each step of the pipeline. 

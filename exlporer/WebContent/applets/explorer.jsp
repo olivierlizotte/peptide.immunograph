@@ -70,6 +70,24 @@ function columnDesc(val) {
         return val;
 }  
 
+function showHelp (){
+	var plotWin = Ext.create('Ext.Window', {
+	    title: 'Database structure',
+	    width: 400,
+	    height: 600,
+	    x: 10,
+	    y: 200,
+	    plain: true,
+	    headerPosition: 'top',
+	    layout: 'fit',
+	    items: {
+	        xtype: 'image',
+	        src: "icons/network.png"
+	    }
+	});
+	plotWin.show();
+}
+
 var navigate = function(panel, direction){
     // This routine could contain business logic required to manage the navigation steps.
     // It would call setActiveItem as needed, manage navigation button state, handle any
@@ -374,7 +392,9 @@ function CreateViewport()
                             collapseDirection: 'left',
                             collapsible: true,
                         	border: false,
-                            title: 'Navigation',
+                            title: 'Navigation  ' + 
+                            '<button type="button" style="background:none;border:none" onclick="showHelp()">'+
+                            '<img src="icons/help.png"></button>',
                             floatable: false,
                             margins: '0 0 0 0',
                             flex: 0.4,
