@@ -46,7 +46,7 @@ abstract public class DefaultTemplate
 	        		graphDb.shutdown();
 			}
 		} );
-	}	
+	}
 	
 	public static void removeAllTempElements(GraphDatabaseService graphDb )
 	{
@@ -69,8 +69,8 @@ abstract public class DefaultTemplate
 	}
 	
 	
-	public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
-	//public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph3.db";
+	//public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
+	public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph3.db";
 	
 	//public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph2.db";
 	
@@ -104,7 +104,8 @@ abstract public class DefaultTemplate
 				"StringID".equals(theAttributeName) ||
 				"passwd".equals(theAttributeName) ||
 				"created from id".equals(theAttributeName) ||
-				"Peptidome_peptideLength".equals(theAttributeName))
+				"Peptidome_peptideLength".equals(theAttributeName)||
+				"queries".equals(theAttributeName))
 			return false;
 		return true;
 	}
@@ -195,12 +196,20 @@ abstract public class DefaultTemplate
 		}
 		if("Sequence Search".equals(type))
 		{
-			String[] testE = {"applets/tools/SequenceAnalysis"};
+			String[] testE = {"applets/tools/SequenceAnalysis",
+							  "applets/tools/EasyQuery"};
 			return testE;
 		}
 		if("Temporary Node".equals(type))
 		{
 			String[] testE = {"applets/tools/DeleteNode"};
+			return testE;
+		}
+		
+		if("easyQuery_output".equals(type))
+		{
+			String[] testE = {"applets/tools/SavePipeLine",
+							  "applets/tools/EasyQuery"};
 			return testE;
 		}
 		return new String[0];
