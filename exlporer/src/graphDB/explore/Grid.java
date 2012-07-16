@@ -70,8 +70,8 @@ public class Grid {
 	                    		
 	                    		if(r2 != null)
 	                    		{
-		                    		if(r1 instanceof Number && r2 instanceof Number)
-		                    			result = alNum.compare((Number)r1, (Number)r2);
+		                    		if(r1 instanceof Number && r2 instanceof Number)		                    			
+		                    			result = Double.compare((Double)r1, (Double) r2);
 		                    		else if(r1 instanceof String && r2 instanceof String)
 		                    			result = alNum.compare((String)r1, (String)r2);
 	                    		}
