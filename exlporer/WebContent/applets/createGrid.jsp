@@ -93,7 +93,7 @@
 			//EndNew
 			//data : gridData[keyName]
 		});
-		
+		/*
 		var groupingFeature = Ext.create('Ext.grid.feature.Grouping',{
 		    groupHeaderTpl: 'Relation: {name} ({rows.length} Item{[(values.rows.length > 1 ? "s" : "")]})'
 		});//*/
@@ -131,7 +131,7 @@
 							iconCls : 'icon-grid',
 							store : nodeStore,
 							title : gridName[keyName],
-							features: [groupingFeature],
+							//features: [groupingFeature],
 							columns : gridColumns[keyName],
 
 							loadMask : true,

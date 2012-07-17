@@ -1,10 +1,14 @@
 package graphDB.explore;
 
+import graphDB.explore.tools.AlphanumComparator;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-
-
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -70,9 +74,9 @@ abstract public class DefaultTemplate
 	
 	
 	//public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
-	public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph3.db";
+	//public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph3.db";
 	
-	//public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph2.db";
+	public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph2.db";
 	
 	//Singleton pattern to force every user into a single database connexion object
 	private static EmbeddedGraphDatabase theGraph = null;
@@ -133,6 +137,26 @@ abstract public class DefaultTemplate
 				)
 			return false;
 		return true;
+	}
+
+	/** This function returns an ordered list of String based on a given key set
+	 * @param keySet the key set of a hashmap, used to create the ordered attribute list
+	 * @return the list of attributes, ordered
+	 */
+	public static List<String> sortAttributes(Set<String> keySet)
+	{
+		final AlphanumComparator alNum = new AlphanumComparator();
+		List<String> results = new ArrayList<String>();
+		results.addAll(keySet);
+		Collections.sort(results, 
+        		new Comparator<String>()
+                {
+                    public int compare( String n1, String n2 )
+                    {
+                    	return alNum.compare((String)n1, (String)n2);
+                    }
+                } );//*/
+		return results;
 	}
 /*
 	public static void registerShutdownHook( final GraphDatabaseService graphDb )
