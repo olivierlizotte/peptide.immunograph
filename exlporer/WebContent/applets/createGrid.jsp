@@ -176,7 +176,7 @@
 <!-- 										}, -->
 										{
 											xtype : 'button',
-											text : '<table><tr><td align="center"><img src="icons/export.png" height="15px"></td>'+
+											text : '<table><tr><td align="center"><img src="icons/export.png" height="15px" width="20px"></td>'+
 													'<td align="center">  csv export</td></tr></table>',
 											handler : function() {
 												var csvExpWin = new Ext.create(
@@ -240,7 +240,7 @@
 										},
 										{
 											xtype : 'button',
-											text : '<table><tr><td align="center"><img src="icons/import.png" height="15px"></td>'+
+											text : '<table><tr><td align="center"><img src="icons/import.png" height="15px" width="20px"></td>'+
 													'<td align="center">  csv import</td></tr></table>',
 											handler : function() {
 												//var attributeForm=createForm();
@@ -273,7 +273,8 @@
 										},
 										{
 											xtype : 'button',
-											text : 'Expert mode',
+											text : '<table><tr><td align="center"><img src="icons/expert.png" height="15px" width="20px"></td>'+
+													'<td align="center">&nbsp Expert mode</td></tr></table>',
 											handler : function() {
 												//var attributeForm=createForm();
 												var queryWin = new Ext.create(

@@ -282,14 +282,16 @@ function CreateAttributes(attribs)
 	                ],//*/
 		   	bbar: [
 		   	{	   		
-		   		text   : "Add attribute",
+		   		text   : '<table><tr><td align="center"><img src="icons/plus.png" height="20px"></td>'+
+				'<td align="center">&nbsp Add attribute </td></tr></table>',
 		   	    handler: function() 
 		   	    {
 		   	    	Ext.MessageBox.prompt('New Attribute', 'Please enter the name for the new attribute:', AddAttribute);
 		   	    }
 		   	},
 		   	{	   		
-		   		text   : "Save",
+		   		text   : '<table><tr><td align="center"><img src="icons/save.png" height="20px"></td>'+
+				'<td align="center">&nbsp Save </td></tr></table>',
 		   	    handler: function() 
 		   	    {
 		   	    	Ext.Ajax.request({
