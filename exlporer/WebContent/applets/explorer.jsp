@@ -306,7 +306,7 @@ function CreateAttributes(attribs)
 		   	    }
 		   	},
 		   	{	   		
-		   		text   : '<table><tr align="middle"><td align="center"><img src="icons/tool.png" height="20px"></td>'+
+		   		text   : '<table><tr><td align="center"><img src="icons/tool.png" height="20px"></td>'+
 				'<td align="center">&nbsp Tools</td></tr></table>',
 		   	    handler: function() 
 		   	    {
@@ -490,7 +490,7 @@ function CreateViewport()
                                           {
                                               id: 'idShowChartsForm',
                                               //icon: "icons/bar_chart.png",
-                                              text: '<table><tr align="middle"><td align="center"><img src="icons/bar_chart.png" height="20px"></td>'+
+                                              text: '<table><tr><td align="center"><img src="icons/bar_chart.png" height="20px"></td>'+
 												'<td align="center">&nbsp Charts</td></tr></table>',
                                               handler: function(btn) {
                                             	  ShowChartsForm();                                              

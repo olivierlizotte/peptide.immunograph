@@ -210,7 +210,18 @@ abstract public class DefaultTemplate
 		if("easyQuery_output".equals(type))
 		{
 			String[] testE = {"applets/tools/SavePipeLine",
-							  "applets/tools/EasyQuery"};
+							  "applets/tools/EasyQuery",
+							  "applets/tools/DeleteNode"};
+			return testE;
+		}
+		if("ExpertMode_output".equals(type))
+		{
+			String[] testE = {"applets/tools/DeleteNode"};
+			return testE;
+		}
+		if("Pipeline".equals(type))
+		{
+			String[] testE = {"applets/tools/DeleteNode"};
 			return testE;
 		}
 		return new String[0];

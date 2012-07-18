@@ -1,3 +1,4 @@
+<%@page import="org.neo4j.graphdb.DynamicRelationshipType"%>
 <%@page import="scala.util.parsing.json.JSONFormat"%>
 <%@ page import="graphDB.explore.*" %>
 <%@ page import =" org.neo4j.cypher.javacompat.ExecutionEngine" %>
@@ -22,6 +23,7 @@
 
 String nodeID = request.getParameter("id").toString();
 String csvContent = request.getParameter("fileContent").toString();
+String isBindingScore = request.getParameter("isBindingScore").toString();
 csvContent = csvContent.trim();
 String[] csvLines = csvContent.split("\n");
 System.out.println(csvContent);
@@ -43,7 +45,7 @@ for (int i=1 ; i<csvLines[0].split(",").length ; i+=1){
 	System.out.println(attributeNameToUpdate.get(i-1));
 }
 
-Iterable<Relationship> allRels = currentNode.getRelationships(Direction.OUTGOING);
+Iterable<Relationship> allRels = currentNode.getRelationships(Direction.OUTGOING, DynamicRelationshipType.withName("Listed"));
 for (Relationship rel : allRels){
 	Node otherNode = rel.getOtherNode(currentNode);
 	if (otherNode.hasProperty(attributeNameToIdentify)){
@@ -58,6 +60,7 @@ for (Relationship rel : allRels){
 System.out.println("created hashmap");
 try
 {
+	
 	String identifier;
 	Node tmpNode;
 	Transaction tx = graphDb.beginTx();
@@ -65,9 +68,13 @@ try
 		identifier = csvLines[l].split(",")[0];
 		System.out.print(identifier);
 		tmpNode = nodesToUpdate.get(identifier);
+		if (("true".equals(isBindingScore)) && 
+			(NodeHelper.getType(graphDb.getNodeById(Long.valueOf(nodeID))).equals("Peptidome"))){
+			tmpNode = tmpNode.getSingleRelationship(DynamicRelationshipType.withName("Sequence"), Direction.OUTGOING).
+					getEndNode();
+		}
 		for (int i=1 ; i<csvLines[l].split(",").length ; i+=1){
 			tmpNode.setProperty(attributeNameToUpdate.get(i-1) , csvLines[l].split(",")[i].trim());
-			System.out.println(attributeNameToUpdate.get(i-1) +" "+ csvLines[l].split(",")[i].trim());
 		}
 	}
 	tx.success();
