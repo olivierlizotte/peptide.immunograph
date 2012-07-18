@@ -31,7 +31,6 @@ if(session.getAttribute("user") != null)
 	int iStart        = Integer.parseInt(request.getParameter("start"));
 	int iLimit	      = Integer.parseInt(request.getParameter("limit"));
 	int iPage		  = Integer.parseInt(request.getParameter("page"));
-
 	Grid.GetList(out, iStart, iLimit, sort, nodeId, nodeType);
 //		out.println("OK!");
 //	else

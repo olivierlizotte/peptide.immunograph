@@ -100,6 +100,7 @@
 
 
 		function Json2Csv(jsonObject){
+		alert(jsonObject);
         var array = typeof jsonObject != 'object' ? JSON.parse(jsonObject) : jsonObject;
         var csv = '';
         var header = '';
@@ -175,10 +176,37 @@
 <!-- 										}, -->
 										{
 											xtype : 'button',
-											text : 'csv export',
+											text : '<table><tr align="middle"><td align="center"><img src="icons/export.png" height="15px"></td>'+
+													'<td align="center">  csv export</td></tr></table>',
 											handler : function() {
+												var csvExpWin = new Ext.create(
+														'Ext.Window',
+														{
+															id : 'autoload-win',
+															title : 'CSV file export',
+															closable : true,
+															width : 400,
+															autoScroll:true,
+															width : 400,
+															height : 200,
+															x : 10,
+															y : 200,
+															plain : true,
+															//autoLoad: {url:'tool.jsp?name='+keyName+'&url='+document.URL, scripts:true},
+															loader : {
+																url : 'applets/tools/CsvExport/Launcher.jsp?url='
+																		+ document.URL+'&id='+currentNodeID,
+																scripts : true,
+																autoLoad : true,
+																renderer : 'html'
+															},
+															layout : 'fit',
+														//items: attributeForm,?url='+document.URL
+														});
+												csvExpWin.show();
+												
 												//octet-stream
-												Json2Csv(gridData[keyName])
+												//Json2Csv(dataObject)
 												//var formatedData = "";
 												//var theGrid = Ext.ComponentMgr
 												//		.get('grid'
@@ -212,7 +240,8 @@
 										},
 										{
 											xtype : 'button',
-											text : 'csv import',
+											text : '<table><tr align="middle"><td align="center"><img src="icons/import.png" height="15px"></td>'+
+													'<td align="center">  csv import</td></tr></table>',
 											handler : function() {
 												//var attributeForm=createForm();
 												var csvWin = new Ext.create(

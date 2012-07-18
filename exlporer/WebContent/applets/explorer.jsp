@@ -74,7 +74,7 @@ function showHelp (){
 	var plotWin = Ext.create('Ext.Window', {
 	    title: 'Database structure',
 	    width: 400,
-	    height: 600,
+	    height: 650,
 	    x: 10,
 	    y: 200,
 	    plain: true,
@@ -306,7 +306,8 @@ function CreateAttributes(attribs)
 		   	    }
 		   	},
 		   	{	   		
-		   		text   : '<img src="icons/tool.png"/> tools',
+		   		text   : '<table><tr align="middle"><td align="center"><img src="icons/tool.png" height="20px"></td>'+
+				'<td align="center">&nbsp Tools</td></tr></table>',
 		   	    handler: function() 
 		   	    {
 		   	    	showTools();
@@ -479,7 +480,7 @@ function CreateViewport()
                                     layout: 'card',
                                     collapseDirection: 'bottom',
                                     collapsible: true,
-                                    //title: '<button type="button" style="padding:0px,margin:0px,height:10px,border-radius:40px;font-size:small;font-weight:bold;color:#2B498B;background:#B9D0EE;" onClick="ShowChartsForm()"> <img src="icons/bar_chart.png"/> Charts </button>',
+                                    //title: '<button type="button" style="padding:0px,margin:0px,height:10px,border-radius:40px;font-size:small;font-weight:bold;color:#2B498B;background:#B9D0EE;" onClick="ShowChartsForm()"> <img src="icons/bar_chart.png" height="20px"/> Charts </button>',
                                     margins: '0 0 0 0',
                                     flex: 1,
                                     id: 'idGraphs',                                                               
@@ -488,8 +489,9 @@ function CreateViewport()
                                     bbar:[
                                           {
                                               id: 'idShowChartsForm',
-                                              icon: "icons/bar_chart.png",
-                                              text: 'Charts',
+                                              //icon: "icons/bar_chart.png",
+                                              text: '<table><tr align="middle"><td align="center"><img src="icons/bar_chart.png" height="20px"></td>'+
+												'<td align="center">&nbsp Charts</td></tr></table>',
                                               handler: function(btn) {
                                             	  ShowChartsForm();                                              
                                                   //navigate(btn.up("panel"), "prev");

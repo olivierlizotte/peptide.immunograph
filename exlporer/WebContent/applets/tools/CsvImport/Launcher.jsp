@@ -14,13 +14,12 @@ function Launch()
 	    //alert(contents);
 	    $.post("applets/tools/CsvImport/Executable.jsp",
 			{"id":<%=request.getParameter("id") %>,
-			"rel":<%= request.getParameter("rel")%>,
 			"fileContent": contents,
 			},
 			function(results)
 			{		
 				alert(results);
-				//window.parent.location.href='http://localhost:8080/exlporer/index.jsp?id='+results;
+				window.parent.location.reload();
 			});
       }
       reader.readAsText(csvFile);
@@ -69,9 +68,7 @@ function Launch()
 		<button onclick="Launch()">Launch!</button>
 		<!-- <button type="submit">Create the Database!</button> -->
 	</div>
-	<input type="hidden" name="id" value="<%=request.getParameter("id")%>" />
-	<input type="hidden" name="rel"	value="<%= request.getParameter("rel")%>" />
-	</fieldset>
+		</fieldset>
 	
 	<div id="messages">
 	<p>Status Messages</p>
