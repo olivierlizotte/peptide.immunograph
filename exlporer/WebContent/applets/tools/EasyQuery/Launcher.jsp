@@ -103,7 +103,7 @@ function Launch()
 				function(results)
 				{		
 					//MessageTop.msg("Query executed successfuly!", "");
-			 		window.parent.location.href='http://localhost:8080/exlporer/index.jsp?id='+results;
+			 		window.parent.location.href='../../../index.jsp?id='+results;
 				});
 		document.getElementById("wait").innerHTML="";
 }

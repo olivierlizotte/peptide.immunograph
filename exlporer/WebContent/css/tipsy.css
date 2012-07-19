@@ -65,3 +65,43 @@
   stroke: none;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
+
+.icon-plus{
+  background-image: url(../icons/plus.png) ;
+  background-size: 100%;
+}
+
+.icon-save{
+  background-image: url(../icons/save.png);
+  background-size: 100%;
+}
+
+.icon-tools{
+  background-image: url(../icons/tool.png);
+  background-size: 100%;
+}
+
+.icon-help{
+  background-image: url(../icons/help.png);
+  background-size: 100%;
+}
+
+.icon-barchart{
+  background-image: url(../icons/bar_chart.png);
+  background-size: 100%;
+}
+
+.icon-csvExport{
+  background-image: url(../icons/export.png);
+  background-size: 100%;
+}
+
+.icon-csvImport{
+  background-image: url(../icons/import.png);
+  background-size: 100%;
+}
+
+.icon-expert{
+  background-image: url(../icons/expert.png);
+  background-size: 100%;
+}

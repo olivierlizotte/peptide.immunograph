@@ -75,8 +75,8 @@ function showHelp (){
 	    title: 'Database structure',
 	    width: 400,
 	    height: 650,
-	    x: 10,
-	    y: 200,
+//	    x: 10,
+//	    y: 200,
 	    plain: true,
 	    headerPosition: 'top',
 	    layout: 'fit',
@@ -234,8 +234,8 @@ var toolWin = new Ext.create(
 			autoScroll:true,
 			width : 400,
 			height : 200,
-			x : 10,
-			y : 200,
+//			x : 10,
+//			y : 200,
 			plain : true,
 			loader : {
 				url : "tools.jsp?name=seq&id="+currentNodeID,
@@ -282,16 +282,18 @@ function CreateAttributes(attribs)
 	                ],//*/
 		   	bbar: [
 		   	{	   		
-		   		text   : '<table><tr><td align="center"><img src="icons/plus.png" height="20px"></td>'+
-				'<td align="center">&nbsp Add attribute </td></tr></table>',
+		   		text : 'Add attribute',
+	            iconCls: 'icon-plus',
+		   		//text   : '<table><tr><td align="center"><img src="icons/plus.png" height="20px"></td>'+
+				//'<td align="center">&nbsp Add attribute </td></tr></table>',
 		   	    handler: function() 
 		   	    {
 		   	    	Ext.MessageBox.prompt('New Attribute', 'Please enter the name for the new attribute:', AddAttribute);
 		   	    }
 		   	},
 		   	{	   		
-		   		text   : '<table><tr><td align="center"><img src="icons/save.png" height="20px"></td>'+
-				'<td align="center">&nbsp Save </td></tr></table>',
+		   		text   : 'Save',
+		   		iconCls: 'icon-save',
 		   	    handler: function() 
 		   	    {
 		   	    	Ext.Ajax.request({
@@ -308,8 +310,8 @@ function CreateAttributes(attribs)
 		   	    }
 		   	},
 		   	{	   		
-		   		text   : '<table><tr><td align="center"><img src="icons/tool.png" height="20px"></td>'+
-				'<td align="center">&nbsp Tools</td></tr></table>',
+		   		text   : 'Tools',
+		   		iconCls: 'icon-tools',
 		   	    handler: function() 
 		   	    {
 		   	    	showTools();
@@ -388,6 +390,7 @@ function CreateViewport()
                     flex: 1,
                     items: [
                         {
+                        	id: 'navigationPanel',
                             xtype: 'panel',
                             minHeight: 100,
                             minWidth: 100,
@@ -395,9 +398,21 @@ function CreateViewport()
                             collapseDirection: 'left',
                             collapsible: true,
                         	border: false,
-                            title: 'Navigation  ' + 
-                            '<button type="button" style="background:none;border:none" onclick="showHelp()">'+
-                            '<img src="icons/help.png"></button>',
+                            title: '<span style="cursor:help" title="Navigation" onclick=showHelp()>Navigation</span>',
+                            iconCls:'icon-help',
+                            /*{
+                		   		text : 'Navigation',
+                	            iconCls: 'icon-help',
+                		   		//text   : '<table><tr><td align="center"><img src="icons/plus.png" height="20px"></td>'+
+                				//'<td align="center">&nbsp Add attribute </td></tr></table>',
+                		   	    handler: function() 
+                		   	    {
+                		   	    	showHelp();
+                		   	    }},
+                            	
+                            	   //'Navigation',//<table><tr><td align="center">Navigation</td><td align="center"><button type="button" style="background:none;border:none" onclick="showHelp()">'+
+                            	   //'<img src="icons/help.png" height="11px"></button></td>'+
+            					   //'</tr></table>',//*/
                             floatable: false,
                             margins: '0 0 0 0',
                             flex: 0.4,
@@ -482,7 +497,6 @@ function CreateViewport()
                                     layout: 'card',
                                     collapseDirection: 'bottom',
                                     collapsible: true,
-                                    //title: '<button type="button" style="padding:0px,margin:0px,height:10px,border-radius:40px;font-size:small;font-weight:bold;color:#2B498B;background:#B9D0EE;" onClick="ShowChartsForm()"> <img src="icons/bar_chart.png" height="20px"/> Charts </button>',
                                     margins: '0 0 0 0',
                                     flex: 1,
                                     id: 'idGraphs',                                                               
@@ -491,9 +505,8 @@ function CreateViewport()
                                     bbar:[
                                           {
                                               id: 'idShowChartsForm',
-                                              //icon: "icons/bar_chart.png",
-                                              text: '<table><tr><td align="center"><img src="icons/bar_chart.png" height="20px"></td>'+
-												'<td align="center">&nbsp Charts</td></tr></table>',
+                                              iconCls: 'icon-barchart',
+                                              text: 'Charts',
                                               handler: function(btn) {
                                             	  ShowChartsForm();                                              
                                                   //navigate(btn.up("panel"), "prev");
@@ -626,7 +639,7 @@ function OnNodeClick(node)
 
 Ext.onReady(function() {
 	viewport = CreateViewport();
-
+	
 	CreateGraph(dataObject, "navigationID", OnNodeClick);
 });
 

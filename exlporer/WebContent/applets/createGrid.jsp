@@ -176,8 +176,8 @@
 <!-- 										}, -->
 										{
 											xtype : 'button',
-											text : '<table><tr><td align="center"><img src="icons/export.png" height="15px" width="20px"></td>'+
-													'<td align="center">  csv export</td></tr></table>',
+											text : 'csv export',
+											iconCls: 'icon-csvExport',
 											handler : function() {
 												var csvExpWin = new Ext.create(
 														'Ext.Window',
@@ -189,8 +189,8 @@
 															autoScroll:true,
 															width : 400,
 															height : 200,
-															x : 10,
-															y : 200,
+//															x : 10,
+//															y : 200,
 															plain : true,
 															//autoLoad: {url:'tool.jsp?name='+keyName+'&url='+document.URL, scripts:true},
 															loader : {
@@ -240,8 +240,8 @@
 										},
 										{
 											xtype : 'button',
-											text : '<table><tr><td align="center"><img src="icons/import.png" height="15px" width="20px"></td>'+
-													'<td align="center">  csv import</td></tr></table>',
+											text : 'csv import',
+											iconCls: 'icon-csvImport',
 											handler : function() {
 												//var attributeForm=createForm();
 												var csvWin = new Ext.create(
@@ -254,8 +254,8 @@
 															autoScroll:true,
 															width : 400,
 															height : 200,
-															x : 10,
-															y : 200,
+//															x : 10,
+//															y : 200,
 															plain : true,
 															//autoLoad: {url:'tool.jsp?name='+keyName+'&url='+document.URL, scripts:true},
 															loader : {
@@ -273,8 +273,8 @@
 										},
 										{
 											xtype : 'button',
-											text : '<table><tr><td align="center"><img src="icons/expert.png" height="15px" width="20px"></td>'+
-													'<td align="center">&nbsp Expert mode</td></tr></table>',
+											text : 'Expert mode',
+											iconCls: 'icon-expert',
 											handler : function() {
 												//var attributeForm=createForm();
 												var queryWin = new Ext.create(
@@ -285,8 +285,8 @@
 															closable : true,
 															width : 400,
 															height : 180,
-															x : 10,
-															y : 200,
+//															x : 10,
+//															y : 200,
 															plain : true,
 															//autoLoad: {url:'tool.jsp?name='+keyName+'&url='+document.URL, scripts:true},
 															loader : {

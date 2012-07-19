@@ -73,10 +73,10 @@ abstract public class DefaultTemplate
 	}
 	
 	
-	public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
-	//public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph3.db";
+	//public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
+	public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph3.db";
 	
-	//public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph2.db";
+	//public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph3.db";
 	
 	//Singleton pattern to force every user into a single database connexion object
 	private static EmbeddedGraphDatabase theGraph = null;
@@ -212,43 +212,40 @@ abstract public class DefaultTemplate
 	{
 		DefaultNode theNode = new DefaultNode(nodeID);
 		String type = theNode.getType();
+		List<String> tools = new ArrayList<String>();
 		if("Peptidome".equals(type))
 		{
-			String[] testE = {"applets/tools/SequenceAnalysis",
-							  "applets/tools/EasyQuery"};
-			return testE;
+			tools.add("applets/tools/SequenceAnalysis");
+			tools.add("applets/tools/EasyQuery");
 		}
 		if("Sequence Search".equals(type))
 		{
-			String[] testE = {"applets/tools/SequenceAnalysis",
-							  "applets/tools/EasyQuery",
-							  "applets/tools/CsvExport"};
-			return testE;
+			tools.add("applets/tools/SequenceAnalysis");
+			tools.add("applets/tools/EasyQuery");
+			tools.add("applets/tools/CsvExport");
 		}
 		if("Temporary Node".equals(type))
 		{
-			String[] testE = {"applets/tools/DeleteNode"};
-			return testE;
+			tools.add("applets/tools/DeleteNode");
 		}
 		
 		if("easyQuery_output".equals(type))
 		{
-			String[] testE = {"applets/tools/SavePipeLine",
-							  "applets/tools/EasyQuery",
-							  "applets/tools/DeleteNode"};
-			return testE;
+			tools.add("applets/tools/SavePipeLine");
+			tools.add("applets/tools/EasyQuery");
+			tools.add("applets/tools/DeleteNode");
 		}
 		if("ExpertMode_output".equals(type))
 		{
-			String[] testE = {"applets/tools/DeleteNode"};
-			return testE;
+			tools.add("applets/tools/DeleteNode");
 		}
 		if("Pipeline".equals(type))
 		{
-			String[] testE = {"applets/tools/DeleteNode"};
-			return testE;
+			
 		}
-		return new String[0];
+		
+		tools.add("applets/tools/DeleteNode");
+		return tools.toArray(new String[tools.size()]);
 	}
 	
 	/** Transform a Text referring to another node into a link to this node
