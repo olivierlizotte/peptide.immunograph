@@ -41,7 +41,7 @@ Map<String,String> getMascotScoreDistribution(EmbeddedGraphDatabase graphDb,
 	List<String> keyOrder = new ArrayList<String>();
 	String jsonString = "";
 	int maxValue = 0;
-	Double mascotScore;
+	double mascotScore;
 	boolean isDecoy = true;
 	HashMap<String,Integer> target = new HashMap<String,Integer>();
 	HashMap<String,Integer> decoy = new HashMap<String,Integer>();
@@ -63,24 +63,30 @@ Map<String,String> getMascotScoreDistribution(EmbeddedGraphDatabase graphDb,
 	
 	Node peptideSequence;
 	Node peptideIdentification;
-	for (Relationship rel : allRels){
+	for (Relationship rel : allRels)
+	{
 		Node otherNode = rel.getOtherNode(currentNode);
 		mascotScore = 0.0;
-		if (NodeHelper.getType(otherNode).equals("Peptide")) {
+		if ("Peptide".equals(NodeHelper.getType(otherNode))) 
+		{
 			// get the unique peptide sequence node
 			peptideSequence = otherNode.getSingleRelationship(DynamicRelationshipType.withName("Sequence"), Direction.OUTGOING).getEndNode();
 			// the loop below searches the max of the peptide's MASCOT score in all peptide identification nodes related to the peptide sequence node
-			for (Relationship associated : peptideSequence.getRelationships(DynamicRelationshipType.withName("Associated"), Direction.INCOMING)){
+			for (Relationship associated : peptideSequence.getRelationships(DynamicRelationshipType.withName("Associated"), Direction.INCOMING))
+			{
 				peptideIdentification = associated.getStartNode();
-				
-				if (Double.valueOf(peptideIdentification.getProperty("Score").toString()) >= mascotScore){
-					mascotScore = Double.valueOf(peptideIdentification.getProperty("Score").toString());
-					isDecoy = peptideIdentification.getProperty("Decoy").toString().equals("True") ? true : false;
+				double tmpMascot = Double.valueOf(peptideIdentification.getProperty("Score").toString());
+				if ( tmpMascot >= mascotScore)
+				{
+					mascotScore = tmpMascot;
+					isDecoy = "True".equals(peptideIdentification.getProperty("Decoy").toString()) ? true : false;
 				}
 			}
-			if (isDecoy){
+			if (isDecoy)
+			{
 				decoy = putInApropriateKey(decoy, mascotScore.intValue(), max);
-			}else{
+			}else
+			{
 				target = putInApropriateKey(target, mascotScore.intValue(), max);
 			}
 			

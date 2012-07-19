@@ -73,10 +73,10 @@ abstract public class DefaultTemplate
 	}
 	
 	
-	//public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
+	public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
 	//public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph3.db";
 	
-	public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph2.db";
+	//public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph2.db";
 	
 	//Singleton pattern to force every user into a single database connexion object
 	private static EmbeddedGraphDatabase theGraph = null;
@@ -221,7 +221,8 @@ abstract public class DefaultTemplate
 		if("Sequence Search".equals(type))
 		{
 			String[] testE = {"applets/tools/SequenceAnalysis",
-							  "applets/tools/EasyQuery"};
+							  "applets/tools/EasyQuery",
+							  "applets/tools/CsvExport"};
 			return testE;
 		}
 		if("Temporary Node".equals(type))
@@ -233,7 +234,18 @@ abstract public class DefaultTemplate
 		if("easyQuery_output".equals(type))
 		{
 			String[] testE = {"applets/tools/SavePipeLine",
-							  "applets/tools/EasyQuery"};
+							  "applets/tools/EasyQuery",
+							  "applets/tools/DeleteNode"};
+			return testE;
+		}
+		if("ExpertMode_output".equals(type))
+		{
+			String[] testE = {"applets/tools/DeleteNode"};
+			return testE;
+		}
+		if("Pipeline".equals(type))
+		{
+			String[] testE = {"applets/tools/DeleteNode"};
 			return testE;
 		}
 		return new String[0];

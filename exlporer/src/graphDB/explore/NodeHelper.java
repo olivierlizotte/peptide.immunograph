@@ -237,6 +237,7 @@ public class NodeHelper
 		
 		public NavNode(int index, Node node, Relationship relation, int indexOther, int size)
 		{			
+			Size = size;
 			theNodeIndex = index;
 			strToAdd = "relation:'" + relation.getType().name() + "'";
 			theNode = node;			

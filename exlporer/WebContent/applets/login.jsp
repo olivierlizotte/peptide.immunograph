@@ -27,8 +27,6 @@
 	                allowBlank:false,
 	                listeners: {
 	                    afterrender: function(field) {
-	                      //field.focus(false, 0);
-	                      //field.focus(false, 50);
 	                      field.focus(false, 200);
 	                    }
 	                }
