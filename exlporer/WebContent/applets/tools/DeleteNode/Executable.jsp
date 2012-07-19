@@ -19,9 +19,15 @@ EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
 //ResultHeadNode.setProperty("information", "Result of a database query");
 try
 {
+	String idToGo;
 	Transaction tx = graphDb.beginTx();
 	Node tempNode = graphDb.getNodeById(Long.valueOf(nodeID));
-	String idToGo = tempNode.getProperty("created from id").toString();
+	if (tempNode.hasProperty("created from id")){
+		idToGo = tempNode.getProperty("created from id").toString();
+	}else{
+		idToGo = session.getAttribute("userNodeID").toString();
+	}
+	
 	Iterable<Relationship> tempRels = tempNode.getRelationships();
 	for (Relationship rel : tempRels){
 		rel.delete();

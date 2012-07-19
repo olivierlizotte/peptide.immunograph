@@ -1,3 +1,4 @@
+<%@page import="org.neo4j.graphdb.DynamicRelationshipType"%>
 <%@page import="scala.util.parsing.json.JSONFormat"%>
 <%@ page import="graphDB.explore.*" %>
 <%@ page import =" org.neo4j.cypher.javacompat.ExecutionEngine" %>
@@ -16,89 +17,77 @@
 <%@ page import="java.util.*"%>
 <%@ page import="java.io.*"%>
 
-<%@page import="org.apache.tomcat.util.http.*"%>
-<%@page import="org.apache.commons.fileupload.servlet.*" %>
-<%@page import="org.apache.commons.fileupload.util.*" %>
-<%@page import="org.apache.commons.fileupload.*" %>
-<%@page import="org.apache.commons.fileupload.disk.*" %>
-<%@page import="org.apache.commons.io.*" %>
-
 <%
 
 
 
 String nodeID = request.getParameter("id").toString();
-String relationType = request.getParameter("rel").toString();
 String csvContent = request.getParameter("fileContent").toString();
+String isBindingScore = request.getParameter("isBindingScore").toString();
 csvContent = csvContent.trim();
-String[] lines = csvContent.split("\n");
-for (String l : lines){
-	System.out.println("#"+l+"#"+" ["+l.split(",")[0]+","+l.split(",")[1]+"]");
+String[] csvLines = csvContent.split("\n");
+System.out.println(csvContent);
+
+
+EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
+Node currentNode = graphDb.getNodeById(Long.valueOf(request.getParameter("id"))); 
+HashMap<String, Node> nodesToUpdate = new HashMap<String, Node>();
+
+// first read the header
+//attributeName is the attribute to consider to identify one node only and change its value
+String attributeNameToIdentify = csvLines[0].split(",")[0].trim();
+System.out.println("attributeNameToIdentify:"+attributeNameToIdentify);
+ArrayList<String> attributeNameToUpdate = new ArrayList<String>(); 
+
+System.out.println("attributeNameToUpdate:");
+for (int i=1 ; i<csvLines[0].split(",").length ; i+=1){
+	attributeNameToUpdate.add(csvLines[0].split(",")[i].trim());
+	System.out.println(attributeNameToUpdate.get(i-1));
 }
 
+Iterable<Relationship> allRels = currentNode.getRelationships(Direction.OUTGOING, DynamicRelationshipType.withName("Listed"));
+for (Relationship rel : allRels){
+	Node otherNode = rel.getOtherNode(currentNode);
+	if (otherNode.hasProperty(attributeNameToIdentify)){
+		if (nodesToUpdate.containsKey(otherNode.getProperty(attributeNameToIdentify))){
+				System.out.println("not unique!!");
+		}else{
+			nodesToUpdate.put(otherNode.getProperty(attributeNameToIdentify).toString(), otherNode);
+		}
+	}
+}
 
-
-//EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
-
-//HashMap<String,Node> nodesToUpdate = new HashMap<String,Node>();
-
-
-// String csvFilePath = "/home/antoine/workspace/test.csv";
-// File f = new File(csvFilePath);
-// Scanner csvScanner = new Scanner(f);
-
-// Node currentNode = graphDb.getNodeById(Long.valueOf(request.getParameter("id"))); 
-// HashMap<String, Node> nodesToUpdate = new HashMap<String, Node>();
-
-// String line = csvScanner.nextLine();
-// String[] elmts = line.split(",");// contains the two elements of the current csv row
-// // attributeName is the attribute to consider to identify one node only and change its value
-// String attributeNameToUpdate = elmts[1].trim();
-// String attributeNameToIdentify = elmts[0].trim();
-
-// if (NodeHelper.getType(currentNode).equals("Peptidome")){
-// 	Iterable<Relationship> allRels = currentNode.getRelationships(Direction.OUTGOING);
-// 	for (Relationship rel : allRels){
-// 		Node otherNode = rel.getOtherNode(currentNode);
-// 		if (otherNode.hasProperty("Sequence")){
-// 			if (nodesToUpdate.containsKey(otherNode.getProperty("Sequence"))){
-// 				System.out.println("not unique!!");
-// 			}else{
-// 				nodesToUpdate.put(otherNode.getProperty("Sequence").toString(), otherNode);
-// 			}
-// 		}
-// 	}
+System.out.println("created hashmap");
+try
+{
 	
-// 	try
-// 	{
-// 		Transaction tx = graphDb.beginTx();
-// 		while (csvScanner.hasNextLine()) {
-// 			line = csvScanner.nextLine();
-// 			elmts = line.split(",");
-// 			//System.out.println(nodesToUpdate.get(elmts[0].trim()).getProperty("type"));
-			
-// 			nodesToUpdate.get(elmts[0].trim()).setProperty(attributeNameToUpdate, elmts[1].trim());
-			
-// 		 }
-// 		tx.success();
-// 		tx.finish();
-// 	}
-// 	catch(Exception e)
-// 	{
-// 		e.printStackTrace();
-// 	}
-// 	finally
-// 	{
-// 		//graphDb.shutdown();
-// 	}
-	
-	
-	
-	
-// }else{
-// 	out.print("operation not available for this node!");
-// }
-
+	String identifier;
+	Node tmpNode;
+	Transaction tx = graphDb.beginTx();
+	for (int l=1 ; l<csvLines.length ; l+=1){
+		identifier = csvLines[l].split(",")[0];
+		System.out.print(identifier);
+		tmpNode = nodesToUpdate.get(identifier);
+		if (("true".equals(isBindingScore)) && 
+			(NodeHelper.getType(graphDb.getNodeById(Long.valueOf(nodeID))).equals("Peptidome"))){
+			tmpNode = tmpNode.getSingleRelationship(DynamicRelationshipType.withName("Sequence"), Direction.OUTGOING).
+					getEndNode();
+		}
+		for (int i=1 ; i<csvLines[l].split(",").length ; i+=1){
+			tmpNode.setProperty(attributeNameToUpdate.get(i-1) , csvLines[l].split(",")[i].trim());
+		}
+	}
+	tx.success();
+	tx.finish();
+}
+catch(Exception e)
+{
+	e.printStackTrace();
+}
+finally
+{
+	//graphDb.shutdown();
+}
 
 
 

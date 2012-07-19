@@ -14,13 +14,13 @@ function Launch()
 	    //alert(contents);
 	    $.post("applets/tools/CsvImport/Executable.jsp",
 			{"id":<%=request.getParameter("id") %>,
-			"rel":<%= request.getParameter("rel")%>,
 			"fileContent": contents,
+			"isBindingScore": document.getElementById("isBindingScore").checked,
 			},
 			function(results)
 			{		
 				alert(results);
-				//window.parent.location.href='http://localhost:8080/exlporer/index.jsp?id='+results;
+				window.parent.location.reload();
 			});
       }
       reader.readAsText(csvFile);
@@ -39,9 +39,6 @@ function Launch()
 // 					//window.parent.location.href='http://localhost:8080/exlporer/index.jsp?id='+results;
 // 				});
 
-
-
-
 	</script>
 	
 	<!-- JavaScript -->
@@ -53,8 +50,9 @@ function Launch()
 	<body>
 	<jsp:include page="Description.txt"/>
 		<br>
+		<br>
 	<fieldset style="background-color:#99BCE8">
-	<legend style="background-color:#D3E1F1">Upload the file you created with ProteoProfile</legend>
+	<legend style="background-color:#D3E1F1">Upload one csv file only</legend>
 	
 	
 	<input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
@@ -66,11 +64,10 @@ function Launch()
 	</div>
 	</form>
 	<div id="submitbutton" >
+		<input type="checkbox" id="isBindingScore"/>the csv file contains binding score information (then do the import from <b>Peptidome</b>)<br>
 		<button onclick="Launch()">Launch!</button>
 		<!-- <button type="submit">Create the Database!</button> -->
 	</div>
-	<input type="hidden" name="id" value="<%=request.getParameter("id")%>" />
-	<input type="hidden" name="rel"	value="<%= request.getParameter("rel")%>" />
 	</fieldset>
 	
 	<div id="messages">
