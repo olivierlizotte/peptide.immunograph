@@ -120,6 +120,10 @@
         window.open( "data:text/csv;charset=utf-8," + escape(csv))
     	}
 		
+    var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
+        clicksToEdit: 1
+    });
+    
 		var theGrid = Ext.create('Ext.grid.Panel',
 						{
 							id : 'grid' + currentNodeType + keyName,
@@ -132,6 +136,7 @@
 							iconCls : 'icon-grid',
 							store : nodeStore,
 							title : gridName[keyName],
+							plugins: [cellEditing],
 							//features: [groupingFeature],
 							columns : gridColumns[keyName],
 
@@ -318,7 +323,7 @@
 	 * 
 	 * http://www.sencha.com/forum/archive/index.php/t-142291.html?
 	 * http://www.sencha.com/forum/showthread.php?136674-Howto-disable-grid-focus-on-click/page2
-	 */
+	 */	 
 	Ext.override(Ext.selection.RowModel, {
 		onRowMouseDown : function(view, record, item, index, e) {
 			//view.el.focus();
@@ -359,7 +364,7 @@
 						me.fireEvent('edit', me, me.context);
 					}
 				}
-			});
+			});//*/
 //----------------END OF GRID FOCUS FIX-----------------------------------------------------------------------------------
 
 	Ext.require('Ext.tab.*');

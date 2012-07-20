@@ -87,7 +87,7 @@ public class DefaultNode
 				out.print(",{text:'Relation', flex:1, dataIndex:'Relation', hidden:true}");
 				for (String attribute : sortedAttribs)
 					out.print(",{text:'" + attribute
-							+ "', flex:1, dataIndex:'" + attribute + "'}");
+							+ "', flex:1, dataIndex:'" + attribute + "', editor: { allowBlank: true }}");
 				out.print("];\n");
 
 				out.print("gridFields['" + strType + "'] = [");

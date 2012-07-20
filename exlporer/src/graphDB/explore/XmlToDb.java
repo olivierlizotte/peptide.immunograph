@@ -4,6 +4,7 @@ import graphDB.explore.DefaultTemplate;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.HashMap;
+
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -151,6 +152,9 @@ public class XmlToDb extends DefaultHandler
 					if(line != null && !line.isEmpty())
 					{
 						String[] Info = line.split("=(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+						if(Info.length > 2)
+							Info[1] = line.substring(Info[0].length() + 1);
+							
 						if(Info.length > 1)
 						{
 							String cleaned1 = cleanText(Info[1]);
@@ -159,11 +163,8 @@ public class XmlToDb extends DefaultHandler
 							   !cleaned1.equals("Infinity") && 
 							   NodeHelper.isNumeric(cleaned1))
 							{
-								try{
-									double d = Double.valueOf(cleanText(Info[1]));  
-									NumberFormat formatter = new DecimalFormat("#.########");  
-									String f = formatter.format(d);
-									currentNode.setProperty(cleanText(Info[0]), Double.valueOf(f));
+								try{  
+									currentNode.setProperty(cleanText(Info[0]), Double.valueOf(cleanText(Info[1])));
 								}
 								catch(Exception ex)
 								{
@@ -199,8 +200,31 @@ public class XmlToDb extends DefaultHandler
 					if(line != null && !line.isEmpty())
 					{
 						String[] Info = line.split("=(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+						if(Info.length > 2)
+							Info[1] = line.substring(Info[0].length() + 1);
+							
 						if(Info.length > 1)
-							currentRelationship.setProperty(cleanText(Info[0]), cleanText(Info[1]));
+						{
+							String cleaned1 = cleanText(Info[1]);
+							
+							if(!cleaned1.equals("NaN") &&
+							   !cleaned1.equals("Infinity") && 
+							   NodeHelper.isNumeric(cleaned1))
+							{
+								try{
+									double d = Double.valueOf(cleanText(Info[1]));  
+									NumberFormat formatter = new DecimalFormat("#.########");  
+									String f = formatter.format(d);
+									currentRelationship.setProperty(cleanText(Info[0]), Double.valueOf(f));
+								}
+								catch(Exception ex)
+								{
+									currentRelationship.setProperty(cleanText(Info[0]), cleaned1);
+								}
+							}else{
+								currentRelationship.setProperty(cleanText(Info[0]), cleanText(Info[1]));
+							}
+						}	
 					}
 				}
 			}

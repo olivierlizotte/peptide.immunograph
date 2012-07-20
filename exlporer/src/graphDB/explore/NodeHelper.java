@@ -1,6 +1,8 @@
 package graphDB.explore;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
@@ -377,7 +379,22 @@ public class NodeHelper
 		return result;
 	}
 	
-	
+	public static String MakeHtmlFriendly(Object value)
+	{
+		if(value instanceof String)
+		{
+			String str = (String)value;
+			if(str.startsWith("http"))
+				return "<a href=\"" + value + "\">" + value + "</a>";
+		}
+		if(value instanceof Double)
+		{
+			Double d = (Double)value;
+			NumberFormat formatter = new DecimalFormat("#.##");  
+			return formatter.format(d);									
+		}
+		return value + "";
+	}
 	
 	private static String getInfo(Node theNode, int size)	
 	{
