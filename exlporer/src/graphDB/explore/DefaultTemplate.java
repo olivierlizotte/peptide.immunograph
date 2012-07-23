@@ -1,10 +1,14 @@
 package graphDB.explore;
 
+import graphDB.explore.tools.AlphanumComparator;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-
-
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -134,6 +138,26 @@ abstract public class DefaultTemplate
 			return false;
 		return true;
 	}
+
+	/** This function returns an ordered list of String based on a given key set
+	 * @param keySet the key set of a hashmap, used to create the ordered attribute list
+	 * @return the list of attributes, ordered
+	 */
+	public static List<String> sortAttributes(Set<String> keySet)
+	{
+		final AlphanumComparator alNum = new AlphanumComparator();
+		List<String> results = new ArrayList<String>();
+		results.addAll(keySet);
+		Collections.sort(results, 
+        		new Comparator<String>()
+                {
+                    public int compare( String n1, String n2 )
+                    {
+                    	return alNum.compare((String)n1, (String)n2);
+                    }
+                } );//*/
+		return results;
+	}
 /*
 	public static void registerShutdownHook( final GraphDatabaseService graphDb )
 	{
@@ -188,43 +212,40 @@ abstract public class DefaultTemplate
 	{
 		DefaultNode theNode = new DefaultNode(nodeID);
 		String type = theNode.getType();
+		List<String> tools = new ArrayList<String>();
 		if("Peptidome".equals(type))
 		{
-			String[] testE = {"applets/tools/SequenceAnalysis",
-							  "applets/tools/EasyQuery"};
-			return testE;
+			tools.add("applets/tools/SequenceAnalysis");
+			tools.add("applets/tools/EasyQuery");
 		}
 		if("Sequence Search".equals(type))
 		{
-			String[] testE = {"applets/tools/SequenceAnalysis",
-							  "applets/tools/EasyQuery",
-							  "applets/tools/CsvExport"};
-			return testE;
+			tools.add("applets/tools/SequenceAnalysis");
+			tools.add("applets/tools/EasyQuery");
+			tools.add("applets/tools/CsvExport");
 		}
 		if("Temporary Node".equals(type))
 		{
-			String[] testE = {"applets/tools/DeleteNode"};
-			return testE;
+			tools.add("applets/tools/DeleteNode");
 		}
 		
 		if("easyQuery_output".equals(type))
 		{
-			String[] testE = {"applets/tools/SavePipeLine",
-							  "applets/tools/EasyQuery",
-							  "applets/tools/DeleteNode"};
-			return testE;
+			tools.add("applets/tools/SavePipeLine");
+			tools.add("applets/tools/EasyQuery");
+			tools.add("applets/tools/DeleteNode");
 		}
 		if("ExpertMode_output".equals(type))
 		{
-			String[] testE = {"applets/tools/DeleteNode"};
-			return testE;
+			tools.add("applets/tools/DeleteNode");
 		}
 		if("Pipeline".equals(type))
 		{
-			String[] testE = {"applets/tools/DeleteNode"};
-			return testE;
+			
 		}
-		return new String[0];
+		
+		tools.add("applets/tools/DeleteNode");
+		return tools.toArray(new String[tools.size()]);
 	}
 	
 	/** Transform a Text referring to another node into a link to this node
@@ -321,6 +342,65 @@ abstract public class DefaultTemplate
 			//System.out.println(n.getProperty("type"));
 			//System.out.println(n.getId());
 			n.createRelationshipTo(node, DynamicRelationshipType.withName(RelationName));
+		}
+	}
+	
+	/** Calculate number of elements for a grouping node such as 
+	 * peptides for peptidome, proteins for proteome etc. 
+	 */
+	public static int numberOfElements(EmbeddedGraphDatabase graphDb, Node groupingNode, String nodeTypeToCount){
+		int nb=0;
+		for (Relationship rel : groupingNode.getRelationships(Direction.OUTGOING)){
+			if (nodeTypeToCount.equals(NodeHelper.getType(rel.getEndNode()))){
+				nb+=1;
+			}
+		}
+		return nb;
+	}
+	
+	/** Calculate FPR for a grouping node such as Peptidome, proteome. 
+	 * The nodes OUTGING must have decoy properties. 
+	 */
+	public static int calculateFPR(EmbeddedGraphDatabase graphDb, Node groupingNode){
+		Node tmpNode;
+		int total = 0;
+		double decoyHits = 0;
+		for (Relationship rel : groupingNode.getRelationships(Direction.OUTGOING)){
+			tmpNode = rel.getEndNode();
+			total+=1;
+			if (tmpNode.hasProperty("Decoy")){
+				total += 1;
+				if ("true".equals(tmpNode.getProperty("Decoy")))
+					decoyHits += 1;
+			}
+		}
+		groupingNode.setProperty("FPR (decoy hits/ total)", decoyHits/total);
+		groupingNode.setProperty("Total hits", total);
+		return total;
+	}
+	
+	
+	/** Add basic information to the database just after creating it: 
+	 *  - Flase positive rate to Peptidome, Sequence Search and Quantification
+	 *  - Number of nodes for each node grouped to many other.
+	 *  - General Experiment's information: number of peptides, proteins etc.
+	 */
+	public static void addBasicInformation(EmbeddedGraphDatabase graphDb, Long experimentNodeId){
+		Node experimentNode = graphDb.getNodeById(experimentNodeId);
+		Node tmpNode;
+		int total;
+		for (Relationship rel : experimentNode.getRelationships(Direction.OUTGOING)){
+			tmpNode = rel.getEndNode();
+			if ("Peptidome".equals(NodeHelper.getType(tmpNode))){
+				total = calculateFPR(graphDb, tmpNode);
+				
+			}
+			if ("Sequence Search".equals(NodeHelper.getType(tmpNode))){
+				calculateFPR(graphDb, tmpNode);
+			}
+			if ("Cluster".equals(NodeHelper.getType(tmpNode))){
+				calculateFPR(graphDb, tmpNode);
+			}
 		}
 	}
 }

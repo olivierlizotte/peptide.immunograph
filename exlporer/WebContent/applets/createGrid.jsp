@@ -93,7 +93,7 @@
 			//EndNew
 			//data : gridData[keyName]
 		});
-		
+		/*
 		var groupingFeature = Ext.create('Ext.grid.feature.Grouping',{
 		    groupHeaderTpl: 'Relation: {name} ({rows.length} Item{[(values.rows.length > 1 ? "s" : "")]})'
 		});//*/
@@ -120,6 +120,10 @@
         window.open( "data:text/csv;charset=utf-8," + escape(csv))
     	}
 		
+    var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
+        clicksToEdit: 1
+    });
+    
 		var theGrid = Ext.create('Ext.grid.Panel',
 						{
 							id : 'grid' + currentNodeType + keyName,
@@ -132,7 +136,8 @@
 							iconCls : 'icon-grid',
 							store : nodeStore,
 							title : gridName[keyName],
-							features: [groupingFeature],
+							plugins: [cellEditing],
+							//features: [groupingFeature],
 							columns : gridColumns[keyName],
 
 							loadMask : true,
@@ -176,8 +181,8 @@
 <!-- 										}, -->
 										{
 											xtype : 'button',
-											text : '<table><tr><td align="center"><img src="icons/export.png" height="15px" width="20px"></td>'+
-													'<td align="center">  csv export</td></tr></table>',
+											text : 'csv export',
+											iconCls: 'icon-csvExport',
 											handler : function() {
 												var csvExpWin = new Ext.create(
 														'Ext.Window',
@@ -189,8 +194,8 @@
 															autoScroll:true,
 															width : 400,
 															height : 200,
-															x : 10,
-															y : 200,
+//															x : 10,
+//															y : 200,
 															plain : true,
 															//autoLoad: {url:'tool.jsp?name='+keyName+'&url='+document.URL, scripts:true},
 															loader : {

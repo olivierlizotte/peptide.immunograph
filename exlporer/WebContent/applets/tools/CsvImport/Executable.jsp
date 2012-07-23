@@ -1,3 +1,4 @@
+<%@page import="org.neo4j.cypher.internal.commands.IsNull"%>
 <%@page import="org.neo4j.graphdb.DynamicRelationshipType"%>
 <%@page import="scala.util.parsing.json.JSONFormat"%>
 <%@ page import="graphDB.explore.*" %>
@@ -18,9 +19,6 @@
 <%@ page import="java.io.*"%>
 
 <%
-
-
-
 String nodeID = request.getParameter("id").toString();
 String csvContent = request.getParameter("fileContent").toString();
 String isBindingScore = request.getParameter("isBindingScore").toString();
@@ -45,36 +43,59 @@ for (int i=1 ; i<csvLines[0].split(",").length ; i+=1){
 	System.out.println(attributeNameToUpdate.get(i-1));
 }
 
-Iterable<Relationship> allRels = currentNode.getRelationships(Direction.OUTGOING, DynamicRelationshipType.withName("Listed"));
-for (Relationship rel : allRels){
-	Node otherNode = rel.getOtherNode(currentNode);
-	if (otherNode.hasProperty(attributeNameToIdentify)){
-		if (nodesToUpdate.containsKey(otherNode.getProperty(attributeNameToIdentify))){
-				System.out.println("not unique!!");
-		}else{
-			nodesToUpdate.put(otherNode.getProperty(attributeNameToIdentify).toString(), otherNode);
-		}
+
+//Hashmap containing the csv data. <Sequence, < new attribute name, value>>
+HashMap<String, HashMap<String, String>> csvHash = new HashMap<String, HashMap<String, String>>();
+//HashMap<String, String> tempAttributesHashMap = new HashMap<String, String>();
+for (int l=1 ; l<csvLines.length ; l+=1){
+	HashMap<String, String> tempAttributesHashMap = new HashMap<String, String>();
+	for (int i=1 ; i<csvLines[l].split(",").length ; i+=1){
+		//System.out.println(attributeNameToUpdate.get(i-1) +" "+ csvLines[l].split(",")[i].trim());
+		tempAttributesHashMap.put(attributeNameToUpdate.get(i-1) , csvLines[l].split(",")[i].trim());
 	}
+	csvHash.put(csvLines[l].split(",")[0].trim(),tempAttributesHashMap);
 }
 
-System.out.println("created hashmap");
+System.out.println("created csv hashmap");
+for (String seq : csvHash.keySet()){
+ 	System.out.println(seq+" "+csvHash.get(seq).get("HLA-A03:01"));
+}
+
 try
 {
-	
-	String identifier;
-	Node tmpNode;
-	Transaction tx = graphDb.beginTx();
-	for (int l=1 ; l<csvLines.length ; l+=1){
-		identifier = csvLines[l].split(",")[0];
-		System.out.print(identifier);
-		tmpNode = nodesToUpdate.get(identifier);
-		if (("true".equals(isBindingScore)) && 
-			(NodeHelper.getType(graphDb.getNodeById(Long.valueOf(nodeID))).equals("Peptidome"))){
-			tmpNode = tmpNode.getSingleRelationship(DynamicRelationshipType.withName("Sequence"), Direction.OUTGOING).
-					getEndNode();
+	Transaction tx = graphDb.beginTx(); 
+	Iterable<Relationship> allRels = currentNode.getRelationships(Direction.OUTGOING, DynamicRelationshipType.withName("Listed"));
+	// if the csv contains information about bindingscore, put it in the "Sequence" Node.
+	if ("true".equals(isBindingScore)){
+		System.out.println("isBindingScore "+isBindingScore);
+		for (Relationship rel : allRels){
+			Node otherNode = rel.getOtherNode(currentNode);
+			// if the node has the property we are loking for to identify
+			if (otherNode.hasProperty(attributeNameToIdentify)){
+				// if the other node is part of the nodes to update
+				if (csvHash.containsKey(otherNode.getProperty(attributeNameToIdentify).toString())){
+					for (String attributeName : csvHash.get(otherNode.getProperty(attributeNameToIdentify).toString()).keySet()){
+						System.out.println(attributeName);
+						otherNode.getSingleRelationship(DynamicRelationshipType.withName("Sequence"), Direction.OUTGOING)
+								 .getEndNode()
+								 .setProperty(attributeName, csvHash.get(otherNode.getProperty(attributeNameToIdentify).toString()).get(attributeName));
+					}
+				}
+			}
 		}
-		for (int i=1 ; i<csvLines[l].split(",").length ; i+=1){
-			tmpNode.setProperty(attributeNameToUpdate.get(i-1) , csvLines[l].split(",")[i].trim());
+	}else{
+		System.out.println("isBindingScore "+isBindingScore);
+		for (Relationship rel : allRels){
+			Node otherNode = rel.getOtherNode(currentNode);
+			// if the node has the property we are loking for to identify
+			if (otherNode.hasProperty(attributeNameToIdentify)){
+				// if the other node is part of the nodes to update
+				if (csvHash.containsKey(otherNode.getProperty(attributeNameToIdentify).toString())){
+					for (String attributeName : csvHash.get(otherNode.getProperty(attributeNameToIdentify).toString()).keySet()){
+						otherNode.setProperty(attributeName, csvHash.get(otherNode.getProperty(attributeNameToIdentify).toString()).get(attributeName));
+					}
+				}
+			}
 		}
 	}
 	tx.success();
@@ -88,7 +109,4 @@ finally
 {
 	//graphDb.shutdown();
 }
-
-
-
 %>
