@@ -77,27 +77,28 @@ public class DefaultNode
 	{
 		try 
 		{				
-			for(String strType : listOfAttributes.keySet())
+			for(String strType : DefaultTemplate.sortAttributes(listOfAttributes.keySet()))
 			{
 				HashMap<String, String> attribs = listOfAttributes.get(strType);
+				List<String> sortedAttribs = DefaultTemplate.sortAttributes(attribs.keySet());
 				
 				out.print("gridColumns['" + strType + "'] = [");
 				out.print("{text:'Link', flex:1, dataIndex:'Link'}");
 				out.print(",{text:'Relation', flex:1, dataIndex:'Relation', hidden:true}");
-				for (String attribute : attribs.keySet())
+				for (String attribute : sortedAttribs)
 					out.print(",{text:'" + attribute
-							+ "', flex:1, dataIndex:'" + attribute + "'}");
+							+ "', flex:1, dataIndex:'" + attribute + "', editor: { allowBlank: true }}");
 				out.print("];\n");
 
 				out.print("gridFields['" + strType + "'] = [");
 				out.print("'Link','Relation'");
-				for (String attribute : attribs.keySet())
+				for (String attribute : sortedAttribs)
 					out.print(",'" + attribute + "'");
 				out.print("];\n");
 
 				out.print("gridSorters['" + strType + "'] = [");
 				out.print("'Link'");
-				for (String attribute : attribs.keySet())
+				for (String attribute : sortedAttribs)
 					out.print(",'" + attribute + "'");
 				out.print("];\n");
 

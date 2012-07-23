@@ -245,8 +245,8 @@
 										},
 										{
 											xtype : 'button',
-											text : '<table><tr><td align="center"><img src="icons/import.png" height="15px" width="20px"></td>'+
-													'<td align="center">  csv import</td></tr></table>',
+											text : 'csv import',
+											iconCls: 'icon-csvImport',
 											handler : function() {
 												//var attributeForm=createForm();
 												var csvWin = new Ext.create(
@@ -259,8 +259,8 @@
 															autoScroll:true,
 															width : 400,
 															height : 200,
-															x : 10,
-															y : 200,
+//															x : 10,
+//															y : 200,
 															plain : true,
 															//autoLoad: {url:'tool.jsp?name='+keyName+'&url='+document.URL, scripts:true},
 															loader : {
@@ -278,8 +278,8 @@
 										},
 										{
 											xtype : 'button',
-											text : '<table><tr><td align="center"><img src="icons/expert.png" height="15px" width="20px"></td>'+
-													'<td align="center">&nbsp Expert mode</td></tr></table>',
+											text : 'Expert mode',
+											iconCls: 'icon-expert',
 											handler : function() {
 												//var attributeForm=createForm();
 												var queryWin = new Ext.create(
@@ -290,8 +290,8 @@
 															closable : true,
 															width : 400,
 															height : 180,
-															x : 10,
-															y : 200,
+//															x : 10,
+//															y : 200,
 															plain : true,
 															//autoLoad: {url:'tool.jsp?name='+keyName+'&url='+document.URL, scripts:true},
 															loader : {
@@ -323,7 +323,7 @@
 	 * 
 	 * http://www.sencha.com/forum/archive/index.php/t-142291.html?
 	 * http://www.sencha.com/forum/showthread.php?136674-Howto-disable-grid-focus-on-click/page2
-	 */
+	 */	 
 	Ext.override(Ext.selection.RowModel, {
 		onRowMouseDown : function(view, record, item, index, e) {
 			//view.el.focus();
@@ -364,7 +364,7 @@
 						me.fireEvent('edit', me, me.context);
 					}
 				}
-			});
+			});//*/
 //----------------END OF GRID FOCUS FIX-----------------------------------------------------------------------------------
 
 	Ext.require('Ext.tab.*');

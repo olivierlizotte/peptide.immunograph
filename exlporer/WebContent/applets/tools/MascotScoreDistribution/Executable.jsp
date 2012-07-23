@@ -41,7 +41,7 @@ Map<String,String> getMascotScoreDistribution(EmbeddedGraphDatabase graphDb,
 	List<String> keyOrder = new ArrayList<String>();
 	String jsonString = "";
 	int maxValue = 0;
-	Double mascotScore;
+	double mascotScore;
 	boolean isDecoy = true;
 	HashMap<String,Integer> target = new HashMap<String,Integer>();
 	HashMap<String,Integer> decoy = new HashMap<String,Integer>();
