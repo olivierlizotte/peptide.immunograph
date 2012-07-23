@@ -9,10 +9,7 @@ try{
 	//XmlToDb.RUN("/home/antoine/workspace/clusterML/ipi7.clusterML", "dev");
 	//XmlToDb.RUN("/home/antoine/workspace/clusterML/SpikeResults7.clusterML", "dev");
 	//XmlToDb.RUN("G:\\Thibault\\Olivier\\ForAntoine\\MandR.clusterML","dev");///u/caronlo/MandR.clusterML","dev");
-<<<<<<< HEAD
 	XmlToDb.RUN("/home/antoine/workspace/clusterML/ultraNew/MnR4Reps.clusterML", "dev");
-=======
->>>>>>> branch 'master' of https://github.com/olivierlizotte/peptide.immunograph.git
 	out.println("Added the new database... Matching Peptide sequences with available proteomes...");
 	PeptideSequence.MatchAllSequences();
 	out.println("Done!");

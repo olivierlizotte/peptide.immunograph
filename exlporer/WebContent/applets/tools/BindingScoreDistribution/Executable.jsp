@@ -29,6 +29,7 @@ boolean isInIntervall(double x, int a, int b){
 HashMap<String,String> getBindingScoreDistribution(EmbeddedGraphDatabase graphDb, long nodeID){
 	HashMap<String,String> info = new HashMap<String,String>();
 	String jsonString = "";
+	double ratio;
 	int maxValue = 0;
 	Node currentNode = graphDb.getNodeById(nodeID);
 	Map<String,Integer> target = new HashMap<String,Integer>();
@@ -101,10 +102,11 @@ HashMap<String,String> getBindingScoreDistribution(EmbeddedGraphDatabase graphDb
 	maxValue = Math.max(Collections.max(target.values()), Collections.max(target.values()));
 		
 	jsonString += "{"+
-		    "fields: ['category', 'target', 'decoy'],"+
+		    "fields: ['category', 'target', 'decoy', 'ratio'],"+
 			"data: [";
 	for (String i : keyOrder){
-		jsonString += "{category:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"'},";
+		ratio = Double.valueOf(decoy.get(i))/(target.get(i)+decoy.get(i));
+		jsonString += "{size:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"', ratio:'"+ratio+"'},";
 	}
 	jsonString=jsonString.substring(0, jsonString.length()-1);
 	jsonString += "]}";

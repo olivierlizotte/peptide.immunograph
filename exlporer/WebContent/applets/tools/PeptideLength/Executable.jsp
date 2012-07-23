@@ -22,6 +22,7 @@
 HashMap<String,String> getPeptidesLengthDistribution(EmbeddedGraphDatabase graphDb, long nodeID){
 	HashMap<String,String> info = new HashMap<String,String>(); 
 	int maxValue = 0;
+	double ratio;
 	String jsonString = "";
 	Node currentNode = graphDb.getNodeById(nodeID);
 	Map<Integer,Integer> target = new HashMap<Integer,Integer>();
@@ -62,10 +63,11 @@ HashMap<String,String> getPeptidesLengthDistribution(EmbeddedGraphDatabase graph
 	}
 	
 	jsonString += "{"+
-		    "fields: ['size', 'target', 'decoy'],"+
+		    "fields: ['size', 'target', 'decoy', 'ratio'],"+
 			"data: [";
 		for (int i : target.keySet()){
-			jsonString += "{size:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"'},";
+			ratio = Double.valueOf(decoy.get(i))/(target.get(i)+decoy.get(i));
+			jsonString += "{size:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"', ratio:'"+ratio+"'},";
 		}
 		jsonString=jsonString.substring(0, jsonString.length()-1);
 		jsonString += "]}";
