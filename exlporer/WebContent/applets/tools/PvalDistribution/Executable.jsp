@@ -95,7 +95,7 @@ Map<String,String> getPvalDistribution(EmbeddedGraphDatabase graphDb,
 	maxValue = Math.max(Collections.max(target.values()), Collections.max(target.values()));
 		
 	jsonString += "{"+
-		    "fields: ['pvalue', 'target', 'decoy'],"+
+		    "fields: ['pvalue', 'target', 'decoy', 'ratio'],"+
 			"data: [";
 	for (String i : keyOrder){
 		ratio = Double.valueOf(decoy.get(i))/(target.get(i)+decoy.get(i));

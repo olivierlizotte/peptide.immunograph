@@ -101,7 +101,7 @@ Map<String,String> getMascotScoreDistribution(EmbeddedGraphDatabase graphDb,
 	maxValue = Math.max(Collections.max(target.values()), Collections.max(target.values()));
 		
 	jsonString += "{"+
-		    "fields: ['score', 'target', 'decoy'],"+
+		    "fields: ['score', 'target', 'decoy', 'ratio'],"+
 			"data: [";
 	for (String i : keyOrder){
 		ratio = Double.valueOf(decoy.get(i))/(target.get(i)+decoy.get(i));

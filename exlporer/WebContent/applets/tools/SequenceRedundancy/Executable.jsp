@@ -86,7 +86,7 @@ Map<String,String> getSequenceRedundancyDistribution(EmbeddedGraphDatabase graph
 	maxValue = Math.max(Collections.max(target.values()), Collections.max(target.values()));
 		
 	jsonString += "{"+
-		    "fields: ['nbTime', 'target', 'decoy'],"+
+		    "fields: ['nbTime', 'target', 'decoy', 'ratio'],"+
 			"data: [";
 	for (String i : keyOrder){
 		ratio = Double.valueOf(decoy.get(i))/(target.get(i)+decoy.get(i));

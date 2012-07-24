@@ -243,7 +243,6 @@ abstract public class DefaultTemplate
 		{
 			
 		}
-		
 		tools.add("applets/tools/DeleteNode");
 		return tools.toArray(new String[tools.size()]);
 	}
@@ -361,20 +360,20 @@ abstract public class DefaultTemplate
 	/** Calculate FPR for a grouping node such as Peptidome, proteome. 
 	 * The nodes OUTGING must have decoy properties. 
 	 */
-	public static int calculateFPR(EmbeddedGraphDatabase graphDb, Node groupingNode){
+	public static double calculateFPR(EmbeddedGraphDatabase graphDb, Node groupingNode){
 		Node tmpNode;
-		int total = 0;
+		double total = 0;
 		double decoyHits = 0;
 		for (Relationship rel : groupingNode.getRelationships(Direction.OUTGOING)){
 			tmpNode = rel.getEndNode();
 			total+=1;
 			if (tmpNode.hasProperty("Decoy")){
 				total += 1;
-				if ("true".equals(tmpNode.getProperty("Decoy")))
+				if ("True".equals(tmpNode.getProperty("Decoy")))
 					decoyHits += 1;
 			}
 		}
-		groupingNode.setProperty("FPR (decoy hits/ total)", decoyHits/total);
+		groupingNode.setProperty("FPR (decoy hits/ total)", Double.valueOf(decoyHits/total));
 		groupingNode.setProperty("Total hits", total);
 		return total;
 	}
@@ -388,18 +387,27 @@ abstract public class DefaultTemplate
 	public static void addBasicInformation(EmbeddedGraphDatabase graphDb, Long experimentNodeId){
 		Node experimentNode = graphDb.getNodeById(experimentNodeId);
 		Node tmpNode;
-		int total;
+		double total;
+		
 		for (Relationship rel : experimentNode.getRelationships(Direction.OUTGOING)){
 			tmpNode = rel.getEndNode();
 			if ("Peptidome".equals(NodeHelper.getType(tmpNode))){
 				total = calculateFPR(graphDb, tmpNode);
-				
+				//if (!experimentNode.hasProperty("number of peptides")){
+					experimentNode.setProperty("number of peptides", total);
+				//}
 			}
 			if ("Sequence Search".equals(NodeHelper.getType(tmpNode))){
-				calculateFPR(graphDb, tmpNode);
+				total = calculateFPR(graphDb, tmpNode);
+				//if (!experimentNode.hasProperty("number of peptide identifications")){
+					experimentNode.setProperty("number of peptide identifications", total);
+				//}
 			}
-			if ("Cluster".equals(NodeHelper.getType(tmpNode))){
-				calculateFPR(graphDb, tmpNode);
+			if ("Quantification".equals(NodeHelper.getType(tmpNode))){
+				total = calculateFPR(graphDb, tmpNode);
+				//if (!experimentNode.hasProperty("number of clusters")){
+					experimentNode.setProperty("number of clusters", total);
+				//}
 			}
 		}
 	}
