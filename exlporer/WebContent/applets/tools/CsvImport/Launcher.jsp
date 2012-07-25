@@ -12,6 +12,7 @@ function Launch()
       reader.onload = function(e) { 
 	    contents = e.target.result;
 	    //alert(contents);
+	    document.getElementById("wait").innerHTML="<img src=../../../icons/waiting.gif width=\"150\" height=\"20\" />";
 	    $.post("applets/tools/CsvImport/Executable.jsp",
 			{"id":<%=request.getParameter("id") %>,
 			"fileContent": contents,
@@ -69,7 +70,7 @@ function Launch()
 		<!-- <button type="submit">Create the Database!</button> -->
 	</div>
 	</fieldset>
-	
+	<div id="wait"></div>
 	<div id="messages">
 	<p>Status Messages</p>
 	</div>

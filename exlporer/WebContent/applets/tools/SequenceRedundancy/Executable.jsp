@@ -24,7 +24,7 @@
 HashMap<String,Integer> putInApropriateKey(HashMap<String,Integer> targetOrDecoy, String value){
 	int start, end;
 	HashMap<String,Integer> res = targetOrDecoy;
-	if (Integer.valueOf(value) >= 40){
+	if (Double.valueOf(value) >= 40){
 		res.put("40+", res.get("40+")+1);
 	}else{
 		for (String key : res.keySet()){
@@ -51,7 +51,7 @@ Map<String,String> getSequenceRedundancyDistribution(EmbeddedGraphDatabase graph
 	HashMap<String,Integer> decoy = new HashMap<String,Integer>();
 	int start, end;
 	// initialize target and decoy hashmaps
-	for (int i=0 ; i<40 ; i++){
+	for (double i=0 ; i<40 ; i++){
 		target.put(String.valueOf(i), 0);
 		decoy.put(String.valueOf(i), 0);
 		keyOrder.add(String.valueOf(i));
@@ -71,9 +71,13 @@ Map<String,String> getSequenceRedundancyDistribution(EmbeddedGraphDatabase graph
 		if (NodeHelper.getType(otherNode).equals("Peptide")) {
 			nbTimeSequenced = otherNode.getProperty("Number of Time Sequenced").toString();
 			isDecoy = otherNode.getProperty("Decoy").toString().equals("True") ? true : false;
+			System.out.println("before if");
+			
 			if (isDecoy){
+				System.out.println("decoy True");
 				decoy = putInApropriateKey(decoy, nbTimeSequenced);
 			}else{
+				System.out.println("decoy False");
 				target = putInApropriateKey(target, nbTimeSequenced);
 			}
 			
@@ -118,7 +122,6 @@ EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
 
 //String cypherQuery ="start n=node("+nodeID+") match n-->p where has(p.Sequence) return p.Sequence";
 String nodeType = NodeHelper.getType(graphDb.getNodeById(Integer.valueOf(nodeID)));
-String chartName=nodeType.replaceAll(" ", "")+"_peptideLength";
 try{
 	Transaction tx = graphDb.beginTx();
 	// get the relashionship to the node storing information about charts. In theory there should only be one node concerned.
