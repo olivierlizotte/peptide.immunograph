@@ -17,6 +17,7 @@
 <%@ page import="java.util.List"%>
 <%@ page import="java.util.Map"%>
 <%@ page import="java.util.Map.Entry"%>
+<%@ page import="java.text.*"%>
 <%!
 
 // This function puts a value in the right interval represented by keys in target or decoy hashmap
@@ -105,7 +106,7 @@ Map<String,String> getMascotScoreDistribution(EmbeddedGraphDatabase graphDb,
 			"data: [";
 	for (String i : keyOrder){
 		ratio = Double.valueOf(decoy.get(i))/(target.get(i)+decoy.get(i));
-		jsonString += "{size:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"', ratio:'"+ratio+"'},";
+		jsonString += "{score:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"', ratio:'"+ratio+"'},";
 	}
 	jsonString=jsonString.substring(0, jsonString.length()-1);
 	jsonString += "]}";
@@ -155,6 +156,9 @@ try{
 		charts.setProperty("maxYaxis", nodeInfo.get("maxYaxis"));
 		charts.setProperty("xfield", "'score'");
 		charts.setProperty("yfield", "['decoy', 'target']");
+		Date date = new Date();
+		SimpleDateFormat dateFormat = new SimpleDateFormat ("yyyy.MM.dd 'at' hh:mm:ss");
+		charts.setProperty("creation date", dateFormat.format(date));
 		graphDb.getNodeById(Integer.valueOf(nodeID)).
 				createRelationshipTo(charts, DynamicRelationshipType.withName("Tool_output"));
 		DefaultTemplate.linkToExperimentNode(graphDb, charts, "Tool_output");
