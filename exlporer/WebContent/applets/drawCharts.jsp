@@ -102,34 +102,50 @@ try{
 	//String nodeID = request.getParameter("id");
 	
 	DefaultNode theNode = (DefaultNode)session.getAttribute("currentNode");
-
-	int graphNumber=0;
-	//only if there are any charts to draw
-	//boolean chartsToDraw = graphDb.getNodeById(Long.valueOf(nodeID)).
-	//								hasRelationship(DynamicRelationshipType.
-	//								withName("Tool_output"));
-	for (Relationship chartsRel : theNode.NODE().getRelationships(DynamicRelationshipType.withName("Tool_output"), Direction.OUTGOING))
-	{
-		Node chartsNode = chartsRel.getOtherNode(theNode.NODE());
-		if(chartsNode.hasProperty("data") && chartsNode.hasProperty("Name") )
+	
+	if ("Charts".equals(NodeHelper.getType(theNode.NODE()))){
+		int graphNumber=1;
+		Node chartsNode = theNode.NODE();
+		String jsonData = chartsNode.getProperty("data").toString();
+		String strAxeY = "Number of Peptides";
+		if(chartsNode.hasProperty("AxeY"))
+			strAxeY = chartsNode.getProperty("AxeY").toString();
+		// x axis field name in the Json data
+		String xfield = chartsNode.getProperty("xfield").toString();
+		// y axis field name in the Json data
+		String yfield = chartsNode.getProperty("yfield").toString();
+		// max value of the y axis. Needed to scale the chart
+		String maxYaxis = chartsNode.getProperty("maxYaxis").toString();
+		CreateJsonStore(jsonData, graphNumber, out);
+		CreateExtJsChart("chart" + graphNumber, "store"+graphNumber, chartsNode.getProperty("Name").toString(), out,
+						 strAxeY, xfield, yfield, maxYaxis);
+		out.println("charts["+(graphNumber-1)+"] = " + "chart" + graphNumber);
+	}else{
+		int graphNumber=0;
+		for (Relationship chartsRel : theNode.NODE().getRelationships(DynamicRelationshipType.withName("Tool_output"), Direction.OUTGOING))
 		{
-			graphNumber++;
-			String jsonData = chartsNode.getProperty("data").toString();
-			String strAxeY = "Number of Peptides";
-			if(chartsNode.hasProperty("AxeY"))
-				strAxeY = chartsNode.getProperty("AxeY").toString();
-			// x axis field name in the Json data
-			String xfield = chartsNode.getProperty("xfield").toString();
-			// y axis field name in the Json data
-			String yfield = chartsNode.getProperty("yfield").toString();
-			// max value of the y axis. Needed to scale the chart
-			String maxYaxis = chartsNode.getProperty("maxYaxis").toString();
-			CreateJsonStore(jsonData, graphNumber, out);
-			CreateExtJsChart("chart" + graphNumber, "store"+graphNumber, chartsNode.getProperty("Name").toString(), out,
-							 strAxeY, xfield, yfield, maxYaxis);
-			out.println("charts["+(graphNumber-1)+"] = " + "chart" + graphNumber);
+			Node chartsNode = chartsRel.getOtherNode(theNode.NODE());
+			if(chartsNode.hasProperty("data") && chartsNode.hasProperty("Name") )
+			{
+				graphNumber++;
+				String jsonData = chartsNode.getProperty("data").toString();
+				String strAxeY = "Number of Peptides";
+				if(chartsNode.hasProperty("AxeY"))
+					strAxeY = chartsNode.getProperty("AxeY").toString();
+				// x axis field name in the Json data
+				String xfield = chartsNode.getProperty("xfield").toString();
+				// y axis field name in the Json data
+				String yfield = chartsNode.getProperty("yfield").toString();
+				// max value of the y axis. Needed to scale the chart
+				String maxYaxis = chartsNode.getProperty("maxYaxis").toString();
+				CreateJsonStore(jsonData, graphNumber, out);
+				CreateExtJsChart("chart" + graphNumber, "store"+graphNumber, chartsNode.getProperty("Name").toString(), out,
+								 strAxeY, xfield, yfield, maxYaxis);
+				out.println("charts["+(graphNumber-1)+"] = " + "chart" + graphNumber);
+			}
 		}
-	}
+	}	
+	
 }
 catch(Exception e)
 {
