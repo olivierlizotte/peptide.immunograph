@@ -106,9 +106,3 @@
   background-size: 100%;
 }
 
-/*Row selection in ExtJS grids*/
-.x-grid-cell-inner, .x-selectable {
-    -moz-user-select: text !important;
-    -khtml-user-select: text !important;
-    -webkit-user-select: text !important;
-}

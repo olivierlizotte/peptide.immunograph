@@ -73,10 +73,10 @@ abstract public class DefaultTemplate
 	}
 	
 	
-	//public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
+	public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
 	//public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph3.db";
 	
-	public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph3.db";
+	//public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph3.db";
 	
 	//Singleton pattern to force every user into a single database connexion object
 	private static EmbeddedGraphDatabase theGraph = null;
@@ -243,7 +243,6 @@ abstract public class DefaultTemplate
 		{
 			
 		}
-		
 		tools.add("applets/tools/DeleteNode");
 		return tools.toArray(new String[tools.size()]);
 	}
@@ -342,6 +341,74 @@ abstract public class DefaultTemplate
 			//System.out.println(n.getProperty("type"));
 			//System.out.println(n.getId());
 			n.createRelationshipTo(node, DynamicRelationshipType.withName(RelationName));
+		}
+	}
+	
+	/** Calculate number of elements for a grouping node such as 
+	 * peptides for peptidome, proteins for proteome etc. 
+	 */
+	public static int numberOfElements(EmbeddedGraphDatabase graphDb, Node groupingNode, String nodeTypeToCount){
+		int nb=0;
+		for (Relationship rel : groupingNode.getRelationships(Direction.OUTGOING)){
+			if (nodeTypeToCount.equals(NodeHelper.getType(rel.getEndNode()))){
+				nb+=1;
+			}
+		}
+		return nb;
+	}
+	
+	/** Calculate FPR for a grouping node such as Peptidome, proteome. 
+	 * The nodes OUTGING must have decoy properties. 
+	 */
+	public static double calculateFPR(EmbeddedGraphDatabase graphDb, Node groupingNode){
+		Node tmpNode;
+		double total = 0;
+		double decoyHits = 0;
+		for (Relationship rel : groupingNode.getRelationships(Direction.OUTGOING)){
+			tmpNode = rel.getEndNode();
+			total+=1;
+			if (tmpNode.hasProperty("Decoy")){
+				total += 1;
+				if ("True".equals(tmpNode.getProperty("Decoy")))
+					decoyHits += 1;
+			}
+		}
+		groupingNode.setProperty("FPR (decoy hits/ total)", Double.valueOf(decoyHits/total));
+		groupingNode.setProperty("Total hits", total);
+		return total;
+	}
+	
+	
+	/** Add basic information to the database just after creating it: 
+	 *  - Flase positive rate to Peptidome, Sequence Search and Quantification
+	 *  - Number of nodes for each node grouped to many other.
+	 *  - General Experiment's information: number of peptides, proteins etc.
+	 */
+	public static void addBasicInformation(EmbeddedGraphDatabase graphDb, Long experimentNodeId){
+		Node experimentNode = graphDb.getNodeById(experimentNodeId);
+		Node tmpNode;
+		double total;
+		
+		for (Relationship rel : experimentNode.getRelationships(Direction.OUTGOING)){
+			tmpNode = rel.getEndNode();
+			if ("Peptidome".equals(NodeHelper.getType(tmpNode))){
+				total = calculateFPR(graphDb, tmpNode);
+				//if (!experimentNode.hasProperty("number of peptides")){
+					experimentNode.setProperty("number of peptides", total);
+				//}
+			}
+			if ("Sequence Search".equals(NodeHelper.getType(tmpNode))){
+				total = calculateFPR(graphDb, tmpNode);
+				//if (!experimentNode.hasProperty("number of peptide identifications")){
+					experimentNode.setProperty("number of peptide identifications", total);
+				//}
+			}
+			if ("Quantification".equals(NodeHelper.getType(tmpNode))){
+				total = calculateFPR(graphDb, tmpNode);
+				//if (!experimentNode.hasProperty("number of clusters")){
+					experimentNode.setProperty("number of clusters", total);
+				//}
+			}
 		}
 	}
 }
