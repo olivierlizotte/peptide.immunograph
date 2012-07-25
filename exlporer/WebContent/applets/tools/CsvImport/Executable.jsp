@@ -57,9 +57,6 @@ for (int l=1 ; l<csvLines.length ; l+=1){
 }
 
 System.out.println("created csv hashmap");
-for (String seq : csvHash.keySet()){
- 	System.out.println(seq+" "+csvHash.get(seq).get("HLA-A03:01"));
-}
 
 try
 {
@@ -71,9 +68,11 @@ try
 	if ("true".equals(isBindingScore)){
 		System.out.println("isBindingScore "+isBindingScore);
 		double bestHLAscore, tmpScore;
+		String bestAllel;
 		for (Relationship rel : allRels){
 			Node otherNode = rel.getOtherNode(currentNode);
 			bestHLAscore = Double.MAX_VALUE;
+			bestAllel="";
 			// if the node has the property we are loking for to identify
 			if (otherNode.hasProperty(attributeNameToIdentify)){
 				// if the other node is part of the nodes to update
@@ -83,10 +82,13 @@ try
 						otherNode.getSingleRelationship(DynamicRelationshipType.withName("Sequence"), Direction.OUTGOING)
 								 .getEndNode()
 								 .setProperty(attributeName, tmpScore);
-						if (tmpScore < bestHLAscore)
+						if (tmpScore < bestHLAscore){
 							bestHLAscore = tmpScore;
+							bestAllel = attributeName;
+						}
 					}
-					otherNode.setProperty("best HLA", bestHLAscore);
+					otherNode.setProperty("best HLA allele", bestAllel);
+					
 				}
 			}
 		}
