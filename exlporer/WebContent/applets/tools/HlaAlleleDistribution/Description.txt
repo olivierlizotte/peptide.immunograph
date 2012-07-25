@@ -1,0 +1,2 @@
+HLA allele Distribution :: <br>
+This tool creates a graph of the HLA allele distribution. For each peptide, only the best binding score is taken into account.  

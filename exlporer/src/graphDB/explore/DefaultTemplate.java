@@ -196,7 +196,8 @@ abstract public class DefaultTemplate
 							  "applets/tools/MascotScoreDistribution",
 							  "applets/tools/IntensityDistribution",
 							  "applets/tools/PvalDistribution",
-							  "applets/tools/SequenceRedundancy"};
+							  "applets/tools/SequenceRedundancy",
+							  "applets/tools/HlaAlleleDistribution"};
 			return testE;
 		}
 		if("ExpertMode_output".equals(type))
@@ -207,7 +208,8 @@ abstract public class DefaultTemplate
 							  "applets/tools/MascotScoreDistribution",
 							  "applets/tools/IntensityDistribution",
 							  "applets/tools/PvalDistribution",
-							  "applets/tools/SequenceRedundancy"};
+							  "applets/tools/SequenceRedundancy", 
+							  "applets/tools/HlaAlleleDistribution"};
 			return testE;
 		}
 		if("EasyQuery_output".equals(type))
@@ -218,7 +220,8 @@ abstract public class DefaultTemplate
 							  "applets/tools/MascotScoreDistribution",
 							  "applets/tools/IntensityDistribution",
 							  "applets/tools/PvalDistribution",
-							  "applets/tools/SequenceRedundancy"};
+							  "applets/tools/SequenceRedundancy",
+							  "applets/tools/HlaAlleleDistribution"};
 			return testE;
 		}
 		if("Sequence Search".equals(type))
