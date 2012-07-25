@@ -65,10 +65,13 @@ Map<String,String> getMascotScoreDistribution(EmbeddedGraphDatabase graphDb,
 	for (Relationship rel : allRels)
 	{
 		Node peptideIdentification = rel.getOtherNode(currentNode);
-		
+		double mascotScore = -1;
 		if (peptideIdentification.hasProperty("Score")) 
+			mascotScore = NodeHelper.PropertyToDouble(peptideIdentification.getProperty("Score"));
+		else if(peptideIdentification.hasProperty("Highest Score"))
+			mascotScore = NodeHelper.PropertyToDouble(peptideIdentification.getProperty("Highest Score"));
+		if(mascotScore >= 0)
 		{
-			double mascotScore = NodeHelper.PropertyToDouble(peptideIdentification.getProperty("Score"));
 			boolean isDecoy = false;
 			if(peptideIdentification.hasProperty("Decoy"))
 				isDecoy = "True".equals(peptideIdentification.getProperty("Decoy").toString()) ? true : false;
