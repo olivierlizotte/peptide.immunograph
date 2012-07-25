@@ -17,6 +17,7 @@
 <%@ page import="java.util.List"%>
 <%@ page import="java.util.Map"%>
 <%@ page import="java.util.Map.Entry"%>
+<%@ page import="java.text.*"%>
 <%!
 
 boolean isInIntervall(double x, int a, int b){
@@ -54,12 +55,15 @@ HashMap<String,String> getBindingScoreDistribution(EmbeddedGraphDatabase graphDb
 	keyOrder.add("[5000,20000]");
 	keyOrder.add(">20000");
 	
+	String bestHLA;
 	for (Relationship rel : allRels){
 		Node otherNode = rel.getOtherNode(currentNode);
-		if ((otherNode.hasProperty("Sequence")) && (otherNode.hasProperty("Binding Score"))) {
-			int currentScore = Integer.valueOf(otherNode.getProperty("Binding Score").toString().trim());
+		
+		//if ((otherNode.hasProperty("Sequence")) && (otherNode.hasProperty("Binding Score"))) {
+		if (("Peptide".equals(NodeHelper.getType(otherNode)))&&(otherNode.hasProperty("best HLA allele"))){
+			bestHLA = otherNode.getProperty("best HLA allele").toString();
+			double currentScore = Double.valueOf(otherNode.getSingleRelationship(DynamicRelationshipType.withName("Sequence"), Direction.OUTGOING).getEndNode().getProperty(bestHLA).toString());
 			// if target hit
-			System.out.println(currentScore);
 			if(otherNode.getProperty("Decoy").toString().equals("False")){
 				if (currentScore < 50){
 					target.put("<50", target.get("<50")+1);
@@ -106,7 +110,7 @@ HashMap<String,String> getBindingScoreDistribution(EmbeddedGraphDatabase graphDb
 			"data: [";
 	for (String i : keyOrder){
 		ratio = Double.valueOf(decoy.get(i))/(target.get(i)+decoy.get(i));
-		jsonString += "{size:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"', ratio:'"+ratio+"'},";
+		jsonString += "{category:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"', ratio:'"+ratio+"'},";
 	}
 	jsonString=jsonString.substring(0, jsonString.length()-1);
 	jsonString += "]}";
@@ -156,6 +160,9 @@ try{
 		charts.setProperty("maxYaxis", nodeInfo.get("maxYaxis"));
 		charts.setProperty("xfield", "'category'");
 		charts.setProperty("yfield", "['target', 'decoy']");
+		Date date = new Date();
+		SimpleDateFormat dateFormat = new SimpleDateFormat ("yyyy.MM.dd 'at' hh:mm:ss");
+		charts.setProperty("creation date", dateFormat.format(date));
 		graphDb.getNodeById(Integer.valueOf(nodeID)).
 				createRelationshipTo(charts, DynamicRelationshipType.withName("Tool_output"));
 		DefaultTemplate.linkToExperimentNode(graphDb, charts, "Tool_output");

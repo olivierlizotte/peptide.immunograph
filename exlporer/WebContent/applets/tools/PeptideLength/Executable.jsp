@@ -17,6 +17,7 @@
 <%@ page import="java.util.List"%>
 <%@ page import="java.util.Map"%>
 <%@ page import="java.util.Map.Entry"%>
+<%@ page import="java.text.*"%>
 <%!
 
 HashMap<String,String> getPeptidesLengthDistribution(EmbeddedGraphDatabase graphDb, long nodeID){
@@ -117,6 +118,9 @@ try{
 		charts.setProperty("maxYaxis", nodeInfo.get("maxYaxis"));
 		charts.setProperty("xfield", "'size'");
 		charts.setProperty("yfield", "['decoy', 'target']");
+		Date date = new Date();
+		SimpleDateFormat dateFormat = new SimpleDateFormat ("yyyy.MM.dd 'at' hh:mm:ss");
+		charts.setProperty("creation date", dateFormat.format(date));
 		graphDb.getNodeById(Integer.valueOf(nodeID)).
 				createRelationshipTo(charts, DynamicRelationshipType.withName("Tool_output"));
 		DefaultTemplate.linkToExperimentNode(graphDb, charts, "Tool_output");

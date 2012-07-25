@@ -57,34 +57,44 @@ for (int l=1 ; l<csvLines.length ; l+=1){
 }
 
 System.out.println("created csv hashmap");
-for (String seq : csvHash.keySet()){
- 	System.out.println(seq+" "+csvHash.get(seq).get("HLA-A03:01"));
-}
 
 try
 {
+	
+	
 	Transaction tx = graphDb.beginTx(); 
 	Iterable<Relationship> allRels = currentNode.getRelationships(Direction.OUTGOING, DynamicRelationshipType.withName("Listed"));
 	// if the csv contains information about bindingscore, put it in the "Sequence" Node.
 	if ("true".equals(isBindingScore)){
 		System.out.println("isBindingScore "+isBindingScore);
+		double bestHLAscore, tmpScore;
+		String bestAllel;
 		for (Relationship rel : allRels){
 			Node otherNode = rel.getOtherNode(currentNode);
+			bestHLAscore = Double.MAX_VALUE;
+			bestAllel="";
 			// if the node has the property we are loking for to identify
 			if (otherNode.hasProperty(attributeNameToIdentify)){
 				// if the other node is part of the nodes to update
 				if (csvHash.containsKey(otherNode.getProperty(attributeNameToIdentify).toString())){
 					for (String attributeName : csvHash.get(otherNode.getProperty(attributeNameToIdentify).toString()).keySet()){
-						System.out.println(attributeName);
+						tmpScore = Double.valueOf(csvHash.get(otherNode.getProperty(attributeNameToIdentify).toString()).get(attributeName));
 						otherNode.getSingleRelationship(DynamicRelationshipType.withName("Sequence"), Direction.OUTGOING)
 								 .getEndNode()
-								 .setProperty(attributeName, csvHash.get(otherNode.getProperty(attributeNameToIdentify).toString()).get(attributeName));
+								 .setProperty(attributeName, tmpScore);
+						if (tmpScore < bestHLAscore){
+							bestHLAscore = tmpScore;
+							bestAllel = attributeName;
+						}
 					}
+					otherNode.setProperty("best HLA allele", bestAllel);
+					
 				}
 			}
 		}
 	}else{
 		System.out.println("isBindingScore "+isBindingScore);
+		String value;
 		for (Relationship rel : allRels){
 			Node otherNode = rel.getOtherNode(currentNode);
 			// if the node has the property we are loking for to identify
@@ -92,7 +102,11 @@ try
 				// if the other node is part of the nodes to update
 				if (csvHash.containsKey(otherNode.getProperty(attributeNameToIdentify).toString())){
 					for (String attributeName : csvHash.get(otherNode.getProperty(attributeNameToIdentify).toString()).keySet()){
-						otherNode.setProperty(attributeName, csvHash.get(otherNode.getProperty(attributeNameToIdentify).toString()).get(attributeName));
+						value = csvHash.get(otherNode.getProperty(attributeNameToIdentify).toString()).get(attributeName);
+						if (NodeHelper.isNumeric(value))
+							otherNode.setProperty(attributeName, Double.valueOf(csvHash.get(otherNode.getProperty(attributeNameToIdentify).toString()).get(attributeName)));
+						else
+							otherNode.setProperty(attributeName, csvHash.get(otherNode.getProperty(attributeNameToIdentify).toString()).get(attributeName));
 					}
 				}
 			}

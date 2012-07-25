@@ -74,6 +74,7 @@ Map<String,String> getSequenceRedundancyDistribution(EmbeddedGraphDatabase graph
 	jsonString += "{"+
 		    "fields: ['nbTime', 'target', 'decoy', 'ratio'],"+
 			"data: [";
+
 	for (int i = 0; i <= 40; i++)
 	{
 		double ratio = 0;

@@ -20,7 +20,7 @@ function Launch()
 			 		
 			 		//document.getElementById("query-result").innerHTML = "</br><b>Result</b></br>"+results+"</br>";
 			 		if (document.getElementById("returnID").checked == true){
-			 			window.parent.location.href='../../../index.jsp?id='+results;
+			 			window.parent.location.href='./index.jsp?id='+results;
 			 		}else{
 				 		var resultLines = results.split("|");
 						
