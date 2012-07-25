@@ -29,6 +29,7 @@ HashMap<String,Integer> putInApropriateKey(HashMap<String,Integer> targetOrDecoy
 		end=interval.split(":")[1].equals("+") ? Integer.MAX_VALUE : Integer.valueOf(interval.split(":")[1]);
 		if ((value>=start)&&(value<end)){
 			res.put(interval, res.get(interval)+1);
+			return res;
 		}
 	}
 	return res;
@@ -43,8 +44,6 @@ Map<String,String> getMascotScoreDistribution(EmbeddedGraphDatabase graphDb,
 	String jsonString = "";
 	
 	int maxValue = 0;
-	double mascotScore;
-	boolean isDecoy = true;
 	HashMap<String,Integer> target = new HashMap<String,Integer>();
 	HashMap<String,Integer> decoy = new HashMap<String,Integer>();
 	int start, end;
@@ -63,36 +62,24 @@ Map<String,String> getMascotScoreDistribution(EmbeddedGraphDatabase graphDb,
 	Node currentNode = graphDb.getNodeById(nodeID);
 	Iterable<Relationship> allRels = currentNode.getRelationships(Direction.OUTGOING);
 	
-	Node peptideSequence;
-	Node peptideIdentification;
 	for (Relationship rel : allRels)
 	{
-		Node otherNode = rel.getOtherNode(currentNode);
-		mascotScore = 0.0;
-		if ("Peptide".equals(NodeHelper.getType(otherNode))) 
+		Node peptideIdentification = rel.getOtherNode(currentNode);
+		
+		if (peptideIdentification.hasProperty("Score")) 
 		{
-			// get the unique peptide sequence node
-			peptideSequence = otherNode.getSingleRelationship(DynamicRelationshipType.withName("Sequence"), Direction.OUTGOING).getEndNode();
-			// the loop below searches the max of the peptide's MASCOT score in all peptide identification nodes related to the peptide sequence node
-			for (Relationship associated : peptideSequence.getRelationships(DynamicRelationshipType.withName("Associated"), Direction.INCOMING))
-			{
-				peptideIdentification = associated.getStartNode();
-				double tmpMascot = Double.valueOf(peptideIdentification.getProperty("Score").toString());
-				if ( tmpMascot >= mascotScore)
-				{
-					mascotScore = tmpMascot;
-					isDecoy = "True".equals(peptideIdentification.getProperty("Decoy").toString()) ? true : false;
-				}
-			}
-			if (isDecoy)
-			{
-				decoy = putInApropriateKey(decoy, mascotScore, max);
-			}else
-			{
-				target = putInApropriateKey(target, mascotScore, max);
-			}
+			double mascotScore = NodeHelper.PropertyToDouble(peptideIdentification.getProperty("Score"));
+			boolean isDecoy = false;
+			if(peptideIdentification.hasProperty("Decoy"))
+				isDecoy = "True".equals(peptideIdentification.getProperty("Decoy").toString()) ? true : false;
 			
-		}else{
+			if (isDecoy)
+				decoy = putInApropriateKey(decoy, mascotScore, max);
+			else
+				target = putInApropriateKey(target, mascotScore, max);			
+		}
+		else
+		{
 			System.out.println("not if");
 		}
 	}
