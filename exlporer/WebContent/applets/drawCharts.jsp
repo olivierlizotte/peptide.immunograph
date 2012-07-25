@@ -69,8 +69,10 @@ public void CreateExtJsChart(String chartName, String storeName, String title, J
             "highlight: true,\n"+
             "tips: {\n"+
               "trackMouse: true,\n"+
+              "width:140,"+
               "renderer: function(storeItem, item) {\n"+
-                   "this.setTitle(storeItem.get('ratio') + ': ' + item.value[1]);\n"+
+                   "this.setTitle('Decoy/(Target+Decoy): \\n'+storeItem.get('ratio'));\n"+ 
+                		   //+ ': ' + item.value[1]);\n"+
               "}\n"+
             "},\n"+
             "label: {\n"+
