@@ -108,7 +108,7 @@ Map<String,String> getMascotScoreDistribution(EmbeddedGraphDatabase graphDb,
 	{
 		double ratio = 0;
 		if(target.get(i)+decoy.get(i) > 0)
-			ratio = decoy.get(i) / (target.get(i) + decoy.get(i));
+			ratio = Double.valueOf(decoy.get(i) / (target.get(i) + decoy.get(i)));
 		jsonString += "{score:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"', ratio:'"+ratio+"'},";
 	}
 	jsonString=jsonString.substring(0, jsonString.length()-1);
