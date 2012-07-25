@@ -3,7 +3,7 @@
 <%
 try{
 	Transaction tx = DefaultTemplate.graphDb().beginTx();
-	DefaultTemplate.addBasicInformation(DefaultTemplate.graphDb(), Long.valueOf(2));
+	DefaultTemplate.addBasicInformation(DefaultTemplate.graphDb(), Long.valueOf(request.getParameter("id")));
 	tx.success();
 	tx.finish();
 	System.out.println("added info");
