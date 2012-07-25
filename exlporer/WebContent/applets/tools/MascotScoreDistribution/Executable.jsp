@@ -41,7 +41,7 @@ Map<String,String> getMascotScoreDistribution(EmbeddedGraphDatabase graphDb,
 	Map<String,String> info = new HashMap<String,String>();
 	List<String> keyOrder = new ArrayList<String>();
 	String jsonString = "";
-	double ratio;
+	
 	int maxValue = 0;
 	double mascotScore;
 	boolean isDecoy = true;
@@ -104,8 +104,11 @@ Map<String,String> getMascotScoreDistribution(EmbeddedGraphDatabase graphDb,
 	jsonString += "{"+
 		    "fields: ['score', 'target', 'decoy', 'ratio'],"+
 			"data: [";
-	for (String i : keyOrder){
-		ratio = Double.valueOf(decoy.get(i))/(target.get(i)+decoy.get(i));
+	for (String i : keyOrder)
+	{
+		double ratio = 0;
+		if(target.get(i)+decoy.get(i) > 0)
+			ratio = decoy.get(i) / (target.get(i) + decoy.get(i));
 		jsonString += "{score:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"', ratio:'"+ratio+"'},";
 	}
 	jsonString=jsonString.substring(0, jsonString.length()-1);

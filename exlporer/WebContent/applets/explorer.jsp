@@ -257,6 +257,13 @@ function CreateAttributes(attribs)
 		attribPanel = Ext.create('Ext.grid.property.Grid', {        
 	    	border: true,
 	        hideHeaders : true,
+	        listeners://Add listener to adjust column width of first column
+	        {
+	        	render: function(grid)
+	        	{
+	        		grid.columns[0].width = 200;//().setColumnWidth(0, 200);
+	        	}
+	        },
 	        editable:true,
 	        /*plugins: [
 	              Ext.create('Ext.grid.plugin.RowEditing', {
