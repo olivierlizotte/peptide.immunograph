@@ -195,6 +195,28 @@ abstract public class DefaultTemplate
 							  "applets/tools/SequenceRedundancy"};
 			return testE;
 		}
+		if("ExpertMode_output".equals(type))
+		{
+			String[] testE = {"applets/tools/PeptideLength", 
+							  "applets/tools/DecoyAnalysis", 
+							  "applets/tools/BindingScoreDistribution",
+							  "applets/tools/MascotScoreDistribution",
+							  "applets/tools/IntensityDistribution",
+							  "applets/tools/PvalDistribution",
+							  "applets/tools/SequenceRedundancy"};
+			return testE;
+		}
+		if("EasyQuery_output".equals(type))
+		{
+			String[] testE = {"applets/tools/PeptideLength", 
+							  "applets/tools/DecoyAnalysis", 
+							  "applets/tools/BindingScoreDistribution",
+							  "applets/tools/MascotScoreDistribution",
+							  "applets/tools/IntensityDistribution",
+							  "applets/tools/PvalDistribution",
+							  "applets/tools/SequenceRedundancy"};
+			return testE;
+		}
 		if("Sequence Search".equals(type))
 		{
 			String[] testE = {"applets/tools/PeptideLength"};
@@ -229,15 +251,13 @@ abstract public class DefaultTemplate
 			tools.add("applets/tools/DeleteNode");
 		}
 		
-		if("easyQuery_output".equals(type))
+		if("EasyQuery_output".equals(type))
 		{
 			tools.add("applets/tools/SavePipeLine");
 			tools.add("applets/tools/EasyQuery");
-			tools.add("applets/tools/DeleteNode");
 		}
 		if("ExpertMode_output".equals(type))
 		{
-			tools.add("applets/tools/DeleteNode");
 		}
 		if("Pipeline".equals(type))
 		{
@@ -364,17 +384,21 @@ abstract public class DefaultTemplate
 		Node tmpNode;
 		double total = 0;
 		double decoyHits = 0;
+		boolean hasDecoy=false;
 		for (Relationship rel : groupingNode.getRelationships(Direction.OUTGOING)){
 			tmpNode = rel.getEndNode();
 			total+=1;
 			if (tmpNode.hasProperty("Decoy")){
+				hasDecoy=true;
 				total += 1;
 				if ("True".equals(tmpNode.getProperty("Decoy")))
 					decoyHits += 1;
 			}
 		}
-		groupingNode.setProperty("FPR (decoy hits/ total)", Double.valueOf(decoyHits/total));
-		groupingNode.setProperty("Total hits", total);
+		if (hasDecoy){
+			groupingNode.setProperty("FPR (decoy hits/ total)", Double.valueOf(decoyHits/total));
+			groupingNode.setProperty("Total hits", total);
+		}
 		return total;
 	}
 	

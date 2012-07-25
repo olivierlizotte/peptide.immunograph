@@ -64,8 +64,6 @@ String addFilterToQuery(String oldQuery, String andor, String property, String c
 	}
 	return newQuery;
 }
-
-
 %>
 <%
 String nodeID = request.getParameter("id").toString();
@@ -114,7 +112,7 @@ try
 	// create a new temp node linked to the resluts
 	Transaction tx = graphDb.beginTx();
 	Node tempNode = graphDb.createNode();
-	tempNode.setProperty("type", "easyQuery_output");
+	tempNode.setProperty("type", "EasyQuery_output");
 	tempNode.setProperty("query", query);
 	tempNode.setProperty("created from", graphDb.getNodeById(Long.valueOf(nodeID)).getProperty("type"));
 	tempNode.setProperty("created from id", graphDb.getNodeById(Long.valueOf(nodeID)).getId());
@@ -128,9 +126,8 @@ try
 	}else{
 		tempNode.setProperty("step",1);
 	}
-	
+	DefaultTemplate.calculateFPR(graphDb, tempNode);
 	// calculate de percentage of decoy peptides removed
-	
 
 	//Link to node it was created from
 	graphDb.getNodeById(Long.valueOf(nodeID)).createRelationshipTo(tempNode,

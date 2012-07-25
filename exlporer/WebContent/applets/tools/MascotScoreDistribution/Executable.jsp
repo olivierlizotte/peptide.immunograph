@@ -20,7 +20,7 @@
 <%!
 
 // This function puts a value in the right interval represented by keys in target or decoy hashmap
-HashMap<String,Integer> putInApropriateKey(HashMap<String,Integer> targetOrDecoy, int value, int max){
+HashMap<String,Integer> putInApropriateKey(HashMap<String,Integer> targetOrDecoy, double value, int max){
 	int start, end;
 	HashMap<String,Integer> res = targetOrDecoy;
 	for (String interval : res.keySet()){
@@ -85,10 +85,10 @@ Map<String,String> getMascotScoreDistribution(EmbeddedGraphDatabase graphDb,
 			}
 			if (isDecoy)
 			{
-				decoy = putInApropriateKey(decoy, mascotScore.intValue(), max);
+				decoy = putInApropriateKey(decoy, mascotScore, max);
 			}else
 			{
-				target = putInApropriateKey(target, mascotScore.intValue(), max);
+				target = putInApropriateKey(target, mascotScore, max);
 			}
 			
 		}else{

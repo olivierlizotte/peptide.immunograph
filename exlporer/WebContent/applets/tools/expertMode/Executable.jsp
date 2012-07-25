@@ -73,7 +73,6 @@ try
 		Transaction tx = graphDb.beginTx();
 		Date date = new Date();
 		SimpleDateFormat dateFormat = new SimpleDateFormat ("yyyy.MM.dd 'at' hh:mm:ss");
-
 		Node tempNode = graphDb.createNode();
 		tempNode.setProperty("type", "ExpertMode_output");
 		tempNode.setProperty("query", cypherQuery);
@@ -84,6 +83,7 @@ try
 		createLinkerNodeFromIds(graphDb, tempNode, getQueryResultAsNodeIds(graphDb, cypherQuery));
 		graphDb.getNodeById(Long.valueOf(session.getAttribute("userNodeID").toString())).
 				createRelationshipTo(tempNode, DynamicRelationshipType.withName("Expert"));
+		DefaultTemplate.calculateFPR(graphDb, tempNode);
 		tx.success();
 		tx.finish();
 		out.print(tempNodeID);

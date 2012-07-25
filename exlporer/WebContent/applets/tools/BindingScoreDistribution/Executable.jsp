@@ -56,7 +56,8 @@ HashMap<String,String> getBindingScoreDistribution(EmbeddedGraphDatabase graphDb
 	
 	for (Relationship rel : allRels){
 		Node otherNode = rel.getOtherNode(currentNode);
-		if ((otherNode.hasProperty("Sequence")) && (otherNode.hasProperty("Binding Score"))) {
+		//if ((otherNode.hasProperty("Sequence")) && (otherNode.hasProperty("Binding Score"))) {
+		if ("Peptide".equals(NodeHelper.getType(otherNode))){
 			int currentScore = Integer.valueOf(otherNode.getProperty("Binding Score").toString().trim());
 			// if target hit
 			System.out.println(currentScore);
