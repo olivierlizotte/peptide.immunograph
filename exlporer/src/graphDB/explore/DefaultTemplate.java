@@ -109,6 +109,10 @@ abstract public class DefaultTemplate
 				"passwd".equals(theAttributeName) ||
 				"created from id".equals(theAttributeName) ||
 				"Peptidome_peptideLength".equals(theAttributeName)||
+				"data".equals(theAttributeName)||
+				"xfield".equals(theAttributeName)||
+				"yfield".equals(theAttributeName)||
+				"maxYaxis".equals(theAttributeName)||
 				"queries".equals(theAttributeName))
 			return false;
 		return true;
@@ -132,10 +136,10 @@ abstract public class DefaultTemplate
 	 */
 	public static Boolean keepRelation( String theRelationName )
 	{
-		if("Tool_output".equals(theRelationName) //|| "Comment".equals(theRelationName)				
+		//if("Tool_output".equals(theRelationName) //|| "Comment".equals(theRelationName)				
 			//|| theRelationName == "Hash"
-				)
-			return false;
+		//		)
+		//	return false;
 		return true;
 	}
 
