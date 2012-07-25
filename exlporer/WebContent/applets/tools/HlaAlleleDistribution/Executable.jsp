@@ -74,8 +74,12 @@ HashMap<String,String> getHlaAlleleDistribution(EmbeddedGraphDatabase graphDb, l
 	jsonString += "{"+
 		    "fields: ['allele', 'target', 'decoy', 'ratio'],"+
 			"data: [";
-	for (String i : target.keySet()){
-		ratio = Double.valueOf(decoy.get(i))/(target.get(i)+decoy.get(i));
+	for (String i : target.keySet())
+	{
+		if(target.get(i)+decoy.get(i) > 0)
+			ratio = decoy.get(i) / (double)(target.get(i)+decoy.get(i));
+		else
+			ratio = 0;
 		jsonString += "{allele:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"', ratio:'"+ratio+"'},";
 	}
 	jsonString=jsonString.substring(0, jsonString.length()-1);

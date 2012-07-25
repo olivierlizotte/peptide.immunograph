@@ -67,7 +67,7 @@ EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
 
 //String cypherQueryPeptideIdentification ="start n=node("+nodeID+") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide Identification\" return p.Sequence";
 
-String cypherQuery ="start n=node("+nodeID+") match n-->p where has(p.Decoy) return p.Decoy";
+String cypherQuery = "start n=node("+nodeID+") match n-->p where has(p.Decoy) return p.Decoy";
 String nodeType = NodeHelper.getType(graphDb.getNodeById(Integer.valueOf(nodeID)));
 String chartName=nodeType.replaceAll(" ", "")+"_decoyAnalysis";
 try

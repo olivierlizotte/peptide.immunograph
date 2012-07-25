@@ -99,7 +99,7 @@ Map<String,String> getPvalDistribution(EmbeddedGraphDatabase graphDb,
 			"data: [";
 	for (String i : keyOrder){
 		if(target.get(i) + decoy.get(i) > 0)
-			ratio = decoy.get(i) / (target.get(i)+decoy.get(i));
+			ratio = decoy.get(i) / (double)(target.get(i)+decoy.get(i));
 		else
 			ratio = 0;
 		jsonString += "{pvalue:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"', ratio:'"+ratio+"'},";

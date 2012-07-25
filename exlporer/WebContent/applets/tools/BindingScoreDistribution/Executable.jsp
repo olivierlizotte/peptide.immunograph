@@ -62,7 +62,7 @@ HashMap<String,String> getBindingScoreDistribution(EmbeddedGraphDatabase graphDb
 		//if ((otherNode.hasProperty("Sequence")) && (otherNode.hasProperty("Binding Score"))) {
 		if (("Peptide".equals(NodeHelper.getType(otherNode)))&&(otherNode.hasProperty("best HLA allele"))){
 			bestHLA = otherNode.getProperty("best HLA allele").toString();
-			double currentScore = Double.valueOf(otherNode.getSingleRelationship(DynamicRelationshipType.withName("Sequence"), Direction.OUTGOING).getEndNode().getProperty(bestHLA).toString());
+			double currentScore = NodeHelper.PropertyToDouble(otherNode.getSingleRelationship(DynamicRelationshipType.withName("Sequence"), Direction.OUTGOING).getEndNode().getProperty(bestHLA));
 			// if target hit
 			if(otherNode.getProperty("Decoy").toString().equals("False")){
 				if (currentScore < 50){
@@ -108,8 +108,12 @@ HashMap<String,String> getBindingScoreDistribution(EmbeddedGraphDatabase graphDb
 	jsonString += "{"+
 		    "fields: ['category', 'target', 'decoy', 'ratio'],"+
 			"data: [";
-	for (String i : keyOrder){
-		ratio = Double.valueOf(decoy.get(i))/(target.get(i)+decoy.get(i));
+	for (String i : keyOrder)
+	{
+		if(target.get(i)+decoy.get(i) > 0)
+			ratio = decoy.get(i) / (double)(target.get(i) + decoy.get(i));
+		else
+			ratio = 0;
 		jsonString += "{category:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"', ratio:'"+ratio+"'},";
 	}
 	jsonString=jsonString.substring(0, jsonString.length()-1);
