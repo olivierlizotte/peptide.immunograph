@@ -46,6 +46,7 @@ Map<String,String> getPvalDistribution(EmbeddedGraphDatabase graphDb,
 	Map<String,String> info = new HashMap<String,String>();
 	List<String> keyOrder = new ArrayList<String>();
 	String jsonString = "";
+	double ratio;
 	int maxValue = 0;
 	String pval;
 	boolean isDecoy = true;
@@ -94,10 +95,11 @@ Map<String,String> getPvalDistribution(EmbeddedGraphDatabase graphDb,
 	maxValue = Math.max(Collections.max(target.values()), Collections.max(target.values()));
 		
 	jsonString += "{"+
-		    "fields: ['pvalue', 'target', 'decoy'],"+
+		    "fields: ['pvalue', 'target', 'decoy', 'ratio'],"+
 			"data: [";
 	for (String i : keyOrder){
-		jsonString += "{pvalue:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"'},";
+		ratio = Double.valueOf(decoy.get(i))/(target.get(i)+decoy.get(i));
+		jsonString += "{size:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"', ratio:'"+ratio+"'},";
 	}
 	jsonString=jsonString.substring(0, jsonString.length()-1);
 	jsonString += "]}";

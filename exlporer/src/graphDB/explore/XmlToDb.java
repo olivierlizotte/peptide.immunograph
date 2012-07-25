@@ -266,6 +266,7 @@ public class XmlToDb extends DefaultHandler
 		xr.setErrorHandler(handler);
 		
 		FileReader f = new FileReader(file);
-		xr.parse(new InputSource(f));		
+		xr.parse(new InputSource(f));
+		
 	}
 }

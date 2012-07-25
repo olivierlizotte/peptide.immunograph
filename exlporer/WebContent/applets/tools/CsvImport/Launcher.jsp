@@ -19,7 +19,7 @@ function Launch()
 			},
 			function(results)
 			{		
-				alert(results);
+				//alert(results);
 				window.parent.location.reload();
 			});
       }
