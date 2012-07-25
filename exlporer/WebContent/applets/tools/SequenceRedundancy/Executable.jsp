@@ -20,65 +20,50 @@
 <%!
 
 // This function puts a value in the right interval represented by keys in target or decoy hashmap
-HashMap<String,Integer> putInApropriateKey(HashMap<String,Integer> targetOrDecoy, String value){
-	int start, end;
-	HashMap<String,Integer> res = targetOrDecoy;
-	if (Integer.valueOf(value) >= 40){
-		res.put("40+", res.get("40+")+1);
-	}else{
-		for (String key : res.keySet()){
-			if (!key.equals("40+")){
-				if ((value.equals(key))){
-					res.put(key, res.get(key)+1);
-				}
-			}	
-		}
-	}
-	return res;
+void putInApropriateKey(HashMap<Integer,Integer> targetOrDecoy, int value)
+{
+	if(value > 40)
+		targetOrDecoy.put(40, targetOrDecoy.get(40)+1);
+	else
+		targetOrDecoy.put(value, targetOrDecoy.get(value)+1);
 }
 
 Map<String,String> getSequenceRedundancyDistribution(EmbeddedGraphDatabase graphDb, 
 													long nodeID){
 	Map<String,String> info = new HashMap<String,String>();
-	List<String> keyOrder = new ArrayList<String>();
 	String jsonString = "";
-	double ratio;
+	
 	int maxValue = 0;
-	String nbTimeSequenced;
 	boolean isDecoy = true;
-	HashMap<String,Integer> target = new HashMap<String,Integer>();
-	HashMap<String,Integer> decoy = new HashMap<String,Integer>();
+	HashMap<Integer,Integer> target = new HashMap<Integer,Integer>();
+	HashMap<Integer,Integer> decoy = new HashMap<Integer,Integer>();
 	int start, end;
 	// initialize target and decoy hashmaps
-	for (int i=0 ; i<40 ; i++){
-		target.put(String.valueOf(i), 0);
-		decoy.put(String.valueOf(i), 0);
-		keyOrder.add(String.valueOf(i));
+	for (int i=0 ; i<=40 ; i++)
+	{
+		target.put(i, 0);
+		decoy.put(i, 0);
 	}
-	target.put("40+",0);
-	decoy.put("40+",0);
-	keyOrder.add("40+");
 	
 	Node currentNode = graphDb.getNodeById(nodeID);
 	Iterable<Relationship> allRels = currentNode.getRelationships(Direction.OUTGOING);
 	
 	Node peptideSequence;
 	Node peptideIdentification;
-	for (Relationship rel : allRels){
+	for (Relationship rel : allRels)
+	{
 		Node otherNode = rel.getOtherNode(currentNode);
 		
-		if (NodeHelper.getType(otherNode).equals("Peptide")) {
-			nbTimeSequenced = otherNode.getProperty("Number of Time Sequenced").toString();
+		if (NodeHelper.getType(otherNode).equals("Peptide")) 
+		{			
 			isDecoy = otherNode.getProperty("Decoy").toString().equals("True") ? true : false;
-			if (isDecoy){
-				decoy = putInApropriateKey(decoy, nbTimeSequenced);
-			}else{
-				target = putInApropriateKey(target, nbTimeSequenced);
-			}
-			
-		}else{
-			System.out.println("not if");
+			if (isDecoy)
+				putInApropriateKey(decoy, NodeHelper.PropertyToInt(otherNode.getProperty("Number of Time Sequenced")));
+			else
+				putInApropriateKey(target, NodeHelper.PropertyToInt(otherNode.getProperty("Number of Time Sequenced")));			
 		}
+		else
+			System.out.println("not if");
 	}
 	// some peptides lengths are not represented by any peptide in the DB. 
 	// In order to get a proper histogram, the values for these lengths are set to 0
@@ -88,8 +73,11 @@ Map<String,String> getSequenceRedundancyDistribution(EmbeddedGraphDatabase graph
 	jsonString += "{"+
 		    "fields: ['nbTime', 'target', 'decoy', 'ratio'],"+
 			"data: [";
-	for (String i : keyOrder){
-		ratio = Double.valueOf(decoy.get(i))/(target.get(i)+decoy.get(i));
+	for (int i = 0; i <= 40; i++)
+	{
+		double ratio = 0;
+		if(target.get(i) + decoy.get(i) > 0)
+			ratio = decoy.get(i) / (target.get(i) + decoy.get(i));
 		jsonString += "{size:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"', ratio:'"+ratio+"'},";
 	}
 	jsonString=jsonString.substring(0, jsonString.length()-1);
@@ -116,7 +104,7 @@ String relationType = request.getParameter("rel").toString();
 EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
 
 //String cypherQuery ="start n=node("+nodeID+") match n-->p where has(p.Sequence) return p.Sequence";
-String nodeType = NodeHelper.getType(graphDb.getNodeById(Integer.valueOf(nodeID)));
+String nodeType = NodeHelper.getType(graphDb.getNodeById(Long.valueOf(nodeID)));
 String chartName=nodeType.replaceAll(" ", "")+"_peptideLength";
 try{
 	Transaction tx = graphDb.beginTx();

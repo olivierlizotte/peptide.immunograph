@@ -395,6 +395,18 @@ public class NodeHelper
 		}
 		return value + "";
 	}
+
+	public static int PropertyToInt(Object value)
+	{
+		if(value instanceof String)
+			return Integer.parseInt((String) value);
+		
+		if(value instanceof Double)
+		{
+			return (int)Math.round((Double)value);									
+		}
+		return 0;
+	}
 	
 	private static String getInfo(Node theNode, int size)	
 	{

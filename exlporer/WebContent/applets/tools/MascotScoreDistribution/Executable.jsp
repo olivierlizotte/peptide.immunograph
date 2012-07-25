@@ -85,10 +85,10 @@ Map<String,String> getMascotScoreDistribution(EmbeddedGraphDatabase graphDb,
 			}
 			if (isDecoy)
 			{
-				decoy = putInApropriateKey(decoy, mascotScore.intValue(), max);
+				decoy = putInApropriateKey(decoy, (int)Math.round(mascotScore), max);
 			}else
 			{
-				target = putInApropriateKey(target, mascotScore.intValue(), max);
+				target = putInApropriateKey(target, (int)Math.round(mascotScore), max);
 			}
 			
 		}else{
