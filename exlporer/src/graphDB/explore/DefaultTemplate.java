@@ -265,6 +265,8 @@ abstract public class DefaultTemplate
 		}
 		if("ExpertMode_output".equals(type))
 		{
+			tools.add("applets/tools/SavePipeLine");
+			tools.add("applets/tools/EasyQuery");
 		}
 		if("Pipeline".equals(type))
 		{

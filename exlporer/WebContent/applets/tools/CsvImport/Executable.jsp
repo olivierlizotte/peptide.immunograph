@@ -88,7 +88,7 @@ try
 						}
 					}
 					otherNode.setProperty("best HLA allele", bestAllel);
-					
+					otherNode.setProperty("best HLA score", bestHLAscore);
 				}
 			}
 		}

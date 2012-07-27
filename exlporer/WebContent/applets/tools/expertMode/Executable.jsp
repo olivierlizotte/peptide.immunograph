@@ -81,8 +81,13 @@ try
 		tempNode.setProperty("creation date", dateFormat.format(date));
 		Long tempNodeID = tempNode.getId();
 		createLinkerNodeFromIds(graphDb, tempNode, getQueryResultAsNodeIds(graphDb, cypherQuery));
-		graphDb.getNodeById(Long.valueOf(session.getAttribute("userNodeID").toString())).
-				createRelationshipTo(tempNode, DynamicRelationshipType.withName("Expert"));
+		if(graphDb.getNodeById(Long.valueOf(nodeID)).hasProperty("step")){
+			tempNode.setProperty("step", Integer.valueOf(graphDb.getNodeById(Long.valueOf(nodeID)).getProperty("step").toString())+1);
+		}else{
+			tempNode.setProperty("step",1);
+		}
+		graphDb.getNodeById(Long.valueOf(nodeID)).
+				createRelationshipTo(tempNode, DynamicRelationshipType.withName("FilterStep"));
 		DefaultTemplate.calculateFPR(graphDb, tempNode);
 		tx.success();
 		tx.finish();
