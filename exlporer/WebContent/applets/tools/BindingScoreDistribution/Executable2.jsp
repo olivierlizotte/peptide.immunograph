@@ -21,7 +21,7 @@
 <%!
 /*
 50-500-5000-20000->20000
-1-2-4-8-16-32-64-128-256-512-1024-2048-4096-8192-16384-32768-65536
+0-1-2-4-8-16-32-64-128-256-512-1024-2048-4096-8192-16384-32768-65536-131072
 */
 boolean isInIntervall(double x, int a, int b){
 	if ((x>=a)&&(x<b))
@@ -33,93 +33,74 @@ boolean isInIntervall(double x, int a, int b){
 HashMap<String,String> getBindingScoreDistribution(EmbeddedGraphDatabase graphDb, long nodeID)
 {
 	HashMap<String,String> info = new HashMap<String,String>();
-	String jsonString = "";
-	double ratio;
-	int maxValue = 0;
+	String jsonString = "";	
 	Node currentNode = graphDb.getNodeById(nodeID);
-	Map<String,Integer> target = new HashMap<String,Integer>();
-	Map<String,Integer> decoy = new HashMap<String,Integer>();
+	Map<Integer,Integer> target = new HashMap<Integer,Integer>();
+	Map<Integer,Integer> decoy = new HashMap<Integer,Integer>();
 	Iterable<Relationship> allRels = currentNode.getRelationships(Direction.OUTGOING);
-	target.put("<50", 0);
-	target.put("[50,500]", 0);
-	target.put("[500,5000]", 0);
-	target.put("[5000,20000]", 0);
-	target.put(">20000", 0);
 	
-	decoy.put("<50", 0);
-	decoy.put("[50,500]", 0);
-	decoy.put("[500,5000]", 0);
-	decoy.put("[5000,20000]", 0);
-	decoy.put(">20000", 0);
-	
-	List<String> keyOrder = new ArrayList<String>();
-	keyOrder.add("<50");
-	keyOrder.add("[50,500]");
-	keyOrder.add("[500,5000]");
-	keyOrder.add("[5000,20000]");
-	keyOrder.add(">20000");
+	for(int i = 1; i <= 131072; i *= 2)
+	{
+		target.put(i, 0);
+		decoy.put(i, 0);
+	}
+	//Add extra zone to get everything
+	target.put(Integer.MAX_VALUE, 0);
+	decoy.put(Integer.MAX_VALUE, 0);
 	
 	String bestHLA;
-	for (Relationship rel : allRels){
+	for (Relationship rel : allRels)
+	{
 		Node otherNode = rel.getOtherNode(currentNode);
 		
 		//if ((otherNode.hasProperty("Sequence")) && (otherNode.hasProperty("Binding Score"))) {
-		if (("Peptide".equals(NodeHelper.getType(otherNode)))&&(otherNode.hasProperty("best HLA allele"))){
+		if (("Peptide".equals(NodeHelper.getType(otherNode)))&&(otherNode.hasProperty("best HLA allele")))
+		{
 			bestHLA = otherNode.getProperty("best HLA allele").toString();
 			double currentScore = NodeHelper.PropertyToDouble(otherNode.getSingleRelationship(DynamicRelationshipType.withName("Sequence"), Direction.OUTGOING).getEndNode().getProperty(bestHLA));
 			// if target hit
-			if(otherNode.getProperty("Decoy").toString().equals("False")){
-				if (currentScore < 50){
-					target.put("<50", target.get("<50")+1);
-				}
-				if(isInIntervall(currentScore, 50, 500)){
-					target.put("[50,500]", target.get("[50,500]")+1);
-				}
-				if(isInIntervall(currentScore, 500, 5000)){
-					target.put("[500,5000]", target.get("[500,5000]")+1);
-				}
-				if(isInIntervall(currentScore, 5000, 20000)){
-					target.put("[5000,20000]", target.get("[5000,20000]")+1);
-				}
-				if(currentScore >= 20000){
-					target.put(">20000", target.get(">20000")+1);
-				}
-			// if decoy hit
-			}else{
-				if (currentScore < 50){
-					decoy.put("<50", decoy.get("<50")+1);
-				}
-				if(isInIntervall(currentScore, 50, 500)){
-					decoy.put("[50,500]", decoy.get("[50,500]")+1);
-				}
-				if(isInIntervall(currentScore, 500, 5000)){
-					decoy.put("[500,5000]", decoy.get("[500,5000]")+1);
-				}
-				if(isInIntervall(currentScore, 5000, 20000)){
-					decoy.put("[5000,20000]", decoy.get("[5000,20000]")+1);
-				}
-				if(currentScore >= 20000){
-					decoy.put(">20000", decoy.get(">20000")+1);
-				}
-			}
+			boolean notFound = true;
+			for(int i = 1; i <= 131072 && notFound; i *= 2)
+				if(currentScore < i)
+				{
+					if("False".equals(otherNode.getProperty("Decoy").toString()))
+						target.put(i, target.get(i) + 1);
+					else
+						decoy.put(i, decoy.get(i) + 1);
+					notFound = false;
+				}				
+			if(notFound)
+				if("False".equals(otherNode.getProperty("Decoy").toString()))
+					target.put(Integer.MAX_VALUE, target.get(Integer.MAX_VALUE) + 1);
+				else
+					decoy.put(Integer.MAX_VALUE, decoy.get(Integer.MAX_VALUE) + 1);
 		}
 	}
-	// some peptides lengths are not represented by any peptide in the DB. 
-	// In order to get a proper histogram, the values for these lengths are set to 0
 	
-	maxValue = Math.max(Collections.max(target.values()), Collections.max(target.values()));
+	int maxValue = Math.max(Collections.max(target.values()), Collections.max(target.values()));
 		
 	jsonString += "{"+
 		    "fields: ['category', 'target', 'decoy', 'ratio'],"+
 			"data: [";
-	for (String i : keyOrder)
-	{
+			
+	double ratio;
+	int pastI = 0;
+	for(int i = 1; i <= 131072; i *= 2)
+	{	
 		if(target.get(i)+decoy.get(i) > 0)
 			ratio = decoy.get(i) / (double)(target.get(i) + decoy.get(i));
 		else
 			ratio = 0;
-		jsonString += "{category:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"', ratio:'"+ratio+"'},";
+		jsonString += "{category:'["+pastI + "," + i + "[', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"', ratio:'"+ratio+"'},";
+		pastI = i;
 	}
+	//Add last category
+	if(target.get(Integer.MAX_VALUE) + decoy.get(Integer.MAX_VALUE) > 0)
+		ratio = decoy.get(Integer.MAX_VALUE) / (double)(target.get(Integer.MAX_VALUE) + decoy.get(Integer.MAX_VALUE));
+	else
+		ratio = 0;
+	jsonString += "{category:'>"+pastI + "', target:'"+target.get(Integer.MAX_VALUE)+"', decoy:'"+decoy.get(Integer.MAX_VALUE)+"', ratio:'"+ratio+"'},";
+	
 	jsonString=jsonString.substring(0, jsonString.length()-1);
 	jsonString += "]}";
 	

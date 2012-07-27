@@ -50,17 +50,30 @@
 	function Launch()
 	{
 		document.getElementById("wait").innerHTML="<img src=../../../icons/waiting.gif width=\"150\" height=\"20\" />";
-			$.post(	"applets/tools/CsvExport/Executable.jsp", 
-					{"id": <%=request.getParameter("id")%>, 
-					"nodeType":document.getElementById('nodeType').value,
-					"nodeProperties":document.getElementById('nodeProperties').value},
-					function(results)
-					{
-						//MessageTop.msg("Query executed successfuly!", "");
-						window.open( "data:text/csv;charset=utf-8," + escape(trim(results)));					
-				 		window.parent.location.reload();
-					});
-			document.getElementById("wait").innerHTML="";
+		var form = document.createElement("form");
+	    form.setAttribute("method", "post");
+	    form.setAttribute("action", "applets/tools/CsvExport/Executable.jsp");
+
+        var hiddenField1 = document.createElement("input");
+        hiddenField1.setAttribute("type", "hidden"); // 'hidden' is the less annoying html data control
+        hiddenField1.setAttribute("name", "id");
+        hiddenField1.setAttribute("value",  <%=request.getParameter("id")%>);
+        form.appendChild(hiddenField1); // append the newly created control to the form
+
+        var hiddenField2 = document.createElement("input");
+        hiddenField2.setAttribute("type", "hidden"); // 'hidden' is the less annoying html data control
+        hiddenField2.setAttribute("name", "nodeType");
+        hiddenField2.setAttribute("value", document.getElementById('nodeType').value);
+        form.appendChild(hiddenField2); // append the newly created control to the form
+        
+        var hiddenField3 = document.createElement("input");
+        hiddenField3.setAttribute("type", "hidden"); // 'hidden' is the less annoying html data control
+        hiddenField3.setAttribute("name", "nodeProperties");
+        hiddenField3.setAttribute("value", document.getElementById('nodeProperties').value);
+        form.appendChild(hiddenField3); // append the newly created control to the form
+        	 
+	    document.body.appendChild(form); // inject the form object into the body section
+	    form.submit();	    
 	}
 	
 	
