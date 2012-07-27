@@ -408,6 +408,18 @@ public class NodeHelper
 		return 0;
 	}
 	
+	public static double PropertyToDouble(Object value)
+	{
+		if(value instanceof String)
+			return Double.parseDouble((String) value);
+		
+		if(value instanceof Double)
+		{
+			return (Double)value;									
+		}
+		return Double.NaN;
+	}
+	
 	private static String getInfo(Node theNode, int size)	
 	{
 		String result = "Node type: <b>" + theNode.getProperty("type") + "</b><br><hr>";

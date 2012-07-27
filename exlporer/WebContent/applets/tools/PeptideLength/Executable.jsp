@@ -66,8 +66,12 @@ HashMap<String,String> getPeptidesLengthDistribution(EmbeddedGraphDatabase graph
 	jsonString += "{"+
 		    "fields: ['size', 'target', 'decoy', 'ratio'],"+
 			"data: [";
-		for (int i : target.keySet()){
-			ratio = Double.valueOf(decoy.get(i))/(target.get(i)+decoy.get(i));
+		for (int i : target.keySet())
+		{
+			if(target.get(i) + decoy.get(i) > 0)
+				ratio = decoy.get(i) / (double)(target.get(i)+decoy.get(i));
+			else
+				ratio = 0;
 			jsonString += "{size:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"', ratio:'"+ratio+"'},";
 		}
 		jsonString=jsonString.substring(0, jsonString.length()-1);

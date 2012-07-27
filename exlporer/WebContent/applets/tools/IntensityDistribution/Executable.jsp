@@ -73,9 +73,8 @@ Map<String,String> getIntensityDistribution(EmbeddedGraphDatabase graphDb,
 		intensity = 0.0;
 		if (NodeHelper.getType(otherNode).equals("Peptide")) {
 			for(int i=1 ; i<= numberOfConditions ; i++){
-				if (Double.valueOf(otherNode.getProperty("Condition "+i).toString()) > intensity){
-					intensity= Double.valueOf(otherNode.getProperty("Condition "+i).toString());
-				}
+				if (NodeHelper.PropertyToDouble(otherNode.getProperty("Condition "+i)) > intensity)
+					intensity = NodeHelper.PropertyToDouble(otherNode.getProperty("Condition "+i));
 			}
 			isDecoy = otherNode.getProperty("Decoy").toString().equals("True") ? true : false;
 			if (isDecoy){
@@ -96,8 +95,12 @@ Map<String,String> getIntensityDistribution(EmbeddedGraphDatabase graphDb,
 	jsonString += "{"+
 		    "fields: ['intensity', 'target', 'decoy', 'ratio'],"+
 			"data: [";
-	for (String i : keyOrder){
-		ratio = Double.valueOf(decoy.get(i))/(target.get(i)+decoy.get(i));
+	for (String i : keyOrder)
+	{
+		if(target.get(i)+decoy.get(i) > 0)
+			ratio = decoy.get(i) / (double)(target.get(i)+decoy.get(i));
+		else
+			ratio = 0;
 		jsonString += "{intensity:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"', ratio:'"+ratio+"'},";
 	}
 	jsonString=jsonString.substring(0, jsonString.length()-1);

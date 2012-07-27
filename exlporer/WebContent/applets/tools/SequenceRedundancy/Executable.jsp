@@ -20,24 +20,8 @@
 <%@ page import="java.text.*"%>
 <%!
 
-// This function puts a value in the right interval represented by keys in target or decoy hashmap
 
-// HashMap<String,Integer> putInApropriateKey(HashMap<String,Integer> targetOrDecoy, String value){
-// 	int start, end;
-// 	HashMap<String,Integer> res = targetOrDecoy;
-// 	if (Double.valueOf(value) >= 40){
-// 		res.put("40+", res.get("40+")+1);
-// 	}else{
-// 		for (String key : res.keySet()){
-// 			if (!key.equals("40+")){
-// 				if ((value.equals(key))){
-// 					res.put(key, res.get(key)+1);
-// 				}
-// 			}	
-// 		}
-// 	}
-// 	return res;
-// }
+// This function puts a value in the right interval represented by keys in target or decoy hashmap
 void putInApropriateKey(HashMap<Integer,Integer> targetOrDecoy, int value)
 {
 	if(value > 40)
@@ -50,18 +34,12 @@ Map<String,String> getSequenceRedundancyDistribution(EmbeddedGraphDatabase graph
 													long nodeID){
 	Map<String,String> info = new HashMap<String,String>();
 	String jsonString = "";
-	List<String> keyOrder = new ArrayList<String>();
 	int maxValue = 0;
 	boolean isDecoy = true;
 	HashMap<Integer,Integer> target = new HashMap<Integer,Integer>();
 	HashMap<Integer,Integer> decoy = new HashMap<Integer,Integer>();
 	int start, end;
 	// initialize target and decoy hashmaps
-	for (int i=0 ; i<40 ; i++){
-		target.put(i, 0);
-		decoy.put(i, 0);
-		keyOrder.add(String.valueOf(i));
-	}	
 	for (int i=0 ; i<=40 ; i++)
 	{
 		target.put(i, 0);
@@ -77,10 +55,9 @@ Map<String,String> getSequenceRedundancyDistribution(EmbeddedGraphDatabase graph
 	{
 		Node otherNode = rel.getOtherNode(currentNode);
 		
-		if (NodeHelper.getType(otherNode).equals("Peptide")) 
+		if ("Peptide".equals(NodeHelper.getType(otherNode))) 
 		{			
 			isDecoy = otherNode.getProperty("Decoy").toString().equals("True") ? true : false;
-			System.out.println("before if");
 			if (isDecoy)
 				putInApropriateKey(decoy, NodeHelper.PropertyToInt(otherNode.getProperty("Number of Time Sequenced")));
 			else
@@ -102,7 +79,7 @@ Map<String,String> getSequenceRedundancyDistribution(EmbeddedGraphDatabase graph
 	{
 		double ratio = 0;
 		if(target.get(i) + decoy.get(i) > 0)
-			ratio = Double.valueOf(decoy.get(i) / (target.get(i) + decoy.get(i)));
+			ratio = decoy.get(i) / (double)(target.get(i) + decoy.get(i));
 		jsonString += "{nbTime:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"', ratio:'"+ratio+"'},";
 	}
 	jsonString=jsonString.substring(0, jsonString.length()-1);

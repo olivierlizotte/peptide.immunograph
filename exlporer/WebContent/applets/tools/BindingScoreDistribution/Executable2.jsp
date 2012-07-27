@@ -19,88 +19,88 @@
 <%@ page import="java.util.Map.Entry"%>
 <%@ page import="java.text.*"%>
 <%!
-
-// This function puts a value in the right interval represented by keys in target or decoy hashmap
-HashMap<String,Integer> putInApropriateKey(HashMap<String,Integer> targetOrDecoy, double value, int max){
-	int start, end;
-	HashMap<String,Integer> res = targetOrDecoy;
-	for (String interval : res.keySet()){
-		start=Integer.valueOf(interval.split(":")[0]);
-		end=interval.split(":")[1].equals("+") ? Integer.MAX_VALUE : Integer.valueOf(interval.split(":")[1]);
-		if ((value>=start)&&(value<end)){
-			res.put(interval, res.get(interval)+1);
-			return res;
-		}
-	}
-	return res;
+/*
+50-500-5000-20000->20000
+0-1-2-4-8-16-32-64-128-256-512-1024-2048-4096-8192-16384-32768-65536-131072
+*/
+boolean isInIntervall(double x, int a, int b){
+	if ((x>=a)&&(x<b))
+		return true;
+	else
+		return false;
 }
 
-Map<String,String> getMascotScoreDistribution(EmbeddedGraphDatabase graphDb, 
-													long nodeID,
-													int intervalSize,
-													int max){
-	Map<String,String> info = new HashMap<String,String>();
-	List<String> keyOrder = new ArrayList<String>();
-	String jsonString = "";
-	
-	int maxValue = 0;
-	HashMap<String,Integer> target = new HashMap<String,Integer>();
-	HashMap<String,Integer> decoy = new HashMap<String,Integer>();
-	int start, end;
-	// initialize target and decoy hashmaps
-	for (int i=0 ; i<max ; i+=intervalSize){
-		start=i;
-		end=i+intervalSize;
-		target.put(start+":"+end, 0);
-		decoy.put(start+":"+end, 0);
-		keyOrder.add(start+":"+end);
-	}
-	target.put(max+":+",0);
-	decoy.put(max+":+",0);
-	keyOrder.add(max+":+");
-	
+HashMap<String,String> getBindingScoreDistribution(EmbeddedGraphDatabase graphDb, long nodeID)
+{
+	HashMap<String,String> info = new HashMap<String,String>();
+	String jsonString = "";	
 	Node currentNode = graphDb.getNodeById(nodeID);
+	Map<Integer,Integer> target = new HashMap<Integer,Integer>();
+	Map<Integer,Integer> decoy = new HashMap<Integer,Integer>();
 	Iterable<Relationship> allRels = currentNode.getRelationships(Direction.OUTGOING);
 	
+	for(int i = 1; i <= 131072; i *= 2)
+	{
+		target.put(i, 0);
+		decoy.put(i, 0);
+	}
+	//Add extra zone to get everything
+	target.put(Integer.MAX_VALUE, 0);
+	decoy.put(Integer.MAX_VALUE, 0);
+	
+	String bestHLA;
 	for (Relationship rel : allRels)
 	{
-		Node peptideIdentification = rel.getOtherNode(currentNode);
-		double mascotScore = -1;
-		if (peptideIdentification.hasProperty("Score")) 
-			mascotScore = NodeHelper.PropertyToDouble(peptideIdentification.getProperty("Score"));
-		else if(peptideIdentification.hasProperty("Highest Score"))
-			mascotScore = NodeHelper.PropertyToDouble(peptideIdentification.getProperty("Highest Score"));
-		if(mascotScore >= 0)
+		Node otherNode = rel.getOtherNode(currentNode);
+		
+		//if ((otherNode.hasProperty("Sequence")) && (otherNode.hasProperty("Binding Score"))) {
+		if (("Peptide".equals(NodeHelper.getType(otherNode)))&&(otherNode.hasProperty("best HLA allele")))
 		{
-			boolean isDecoy = false;
-			if(peptideIdentification.hasProperty("Decoy"))
-				isDecoy = "True".equals(peptideIdentification.getProperty("Decoy").toString()) ? true : false;
-			
-			if (isDecoy)
-				decoy = putInApropriateKey(decoy, mascotScore, max);
-			else
-				target = putInApropriateKey(target, mascotScore, max);			
-		}
-		else
-		{
-			System.out.println("not if");
+			bestHLA = otherNode.getProperty("best HLA allele").toString();
+			double currentScore = NodeHelper.PropertyToDouble(otherNode.getSingleRelationship(DynamicRelationshipType.withName("Sequence"), Direction.OUTGOING).getEndNode().getProperty(bestHLA));
+			// if target hit
+			boolean notFound = true;
+			for(int i = 1; i <= 131072 && notFound; i *= 2)
+				if(currentScore < i)
+				{
+					if("False".equals(otherNode.getProperty("Decoy").toString()))
+						target.put(i, target.get(i) + 1);
+					else
+						decoy.put(i, decoy.get(i) + 1);
+					notFound = false;
+				}				
+			if(notFound)
+				if("False".equals(otherNode.getProperty("Decoy").toString()))
+					target.put(Integer.MAX_VALUE, target.get(Integer.MAX_VALUE) + 1);
+				else
+					decoy.put(Integer.MAX_VALUE, decoy.get(Integer.MAX_VALUE) + 1);
 		}
 	}
-	// some peptides lengths are not represented by any peptide in the DB. 
-	// In order to get a proper histogram, the values for these lengths are set to 0
 	
-	maxValue = Math.max(Collections.max(target.values()), Collections.max(target.values()));
+	int maxValue = Math.max(Collections.max(target.values()), Collections.max(target.values()));
 		
 	jsonString += "{"+
-		    "fields: ['score', 'target', 'decoy', 'ratio'],"+
+		    "fields: ['category', 'target', 'decoy', 'ratio'],"+
 			"data: [";
-	for (String i : keyOrder)
-	{
-		double ratio = 0;
+			
+	double ratio;
+	int pastI = 0;
+	for(int i = 1; i <= 131072; i *= 2)
+	{	
 		if(target.get(i)+decoy.get(i) > 0)
 			ratio = decoy.get(i) / (double)(target.get(i) + decoy.get(i));
-		jsonString += "{score:'"+i+"', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"', ratio:'"+ratio+"'},";
+		else
+			ratio = 0;
+		jsonString += "{category:'["+pastI + "," + i + "[', target:'"+target.get(i)+"', decoy:'"+decoy.get(i)+"', ratio:'"+ratio+"'},";
+		pastI = i;
 	}
+	//Add last category
+	if(target.get(Integer.MAX_VALUE) + decoy.get(Integer.MAX_VALUE) > 0)
+		ratio = decoy.get(Integer.MAX_VALUE) / (double)(target.get(Integer.MAX_VALUE) + decoy.get(Integer.MAX_VALUE));
+	else
+		ratio = 0;
+	jsonString += "{category:'>"+pastI + "', target:'"+target.get(Integer.MAX_VALUE)+"', decoy:'"+decoy.get(Integer.MAX_VALUE)+"', ratio:'"+ratio+"'},";
+	
 	jsonString=jsonString.substring(0, jsonString.length()-1);
 	jsonString += "]}";
 	
@@ -113,22 +113,23 @@ Map<String,String> getMascotScoreDistribution(EmbeddedGraphDatabase graphDb,
 // TODO get a parameter to know which type of peptide to get the distribution from: SequenceSearch, Peptidome etc.
 // The data is stored in a node of type "Charts". It will have as attributes key the name of the chart 
 // and as value the data to use to draw it. keys will be for example :"Peptidome_peptideLength", "SequenceSearch_peptideLength"...
-// QUERY : start n=node(1) match n-[:Result]->t-[:Listed]->p where p.type="Peptide" return p.Sequence
-//String cypherQuery = "start n=node(" + request.getAttribute("id") + ") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide\" return p.Sequence";
-//String cypherQuery = "start n=node(" + nodeID + ") match n-[:" + relationType + "]->p where has(p.Sequence) return p.Sequence";
-// String cypherQueryPeptidome ="start n=node("+nodeID+") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide\" return p.Sequence";
-//String cypherQueryPeptideIdentification ="start n=node("+nodeID+") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide Identification\" return p.Sequence";
 
 String nodeID = request.getParameter("id").toString();
 String relationType = request.getParameter("rel").toString();
-int intervalSize = Integer.valueOf(request.getParameter("intervalSize"));
-int max = Integer.valueOf(request.getParameter("max"));
 
-
+// QUERY : start n=node(1) match n-[:Result]->t-[:Listed]->p where p.type="Peptide" return p.Sequence
 
 EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
 
-//String cypherQuery ="start n=node("+nodeID+") match n-->p where has(p.Sequence) return p.Sequence";
+//String cypherQuery = "start n=node(" + request.getAttribute("id") + ") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide\" return p.Sequence";
+
+//String cypherQuery = "start n=node(" + nodeID + ") match n-[:" + relationType + "]->p where has(p.Sequence) return p.Sequence";
+
+// String cypherQueryPeptidome ="start n=node("+nodeID+") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide\" return p.Sequence";
+
+//String cypherQueryPeptideIdentification ="start n=node("+nodeID+") match n-[:Result]->t-[:Listed]->p where p.type=\"Peptide Identification\" return p.Sequence";
+
+String cypherQuery ="start n=node("+nodeID+") match n-->p where has(p.Sequence) return p.Sequence";
 String nodeType = NodeHelper.getType(graphDb.getNodeById(Integer.valueOf(nodeID)));
 String chartName=nodeType.replaceAll(" ", "")+"_peptideLength";
 try{
@@ -139,15 +140,14 @@ try{
 	// if the relationship doesn't existe yet, create it
 	//if(!graphDb.getNodeById(Integer.valueOf(nodeID)).hasRelationship(DynamicRelationshipType.withName("Tool_output"), Direction.OUTGOING))
 	{		
-		Map<String,String> nodeInfo = getMascotScoreDistribution(graphDb, Long.valueOf(request.getParameter("id")), intervalSize, max);
-		System.out.print(nodeInfo.get("data"));
+		HashMap<String,String> nodeInfo = getBindingScoreDistribution(graphDb, Long.valueOf(request.getParameter("id")));
 		Node charts = graphDb.createNode();
 		charts.setProperty("type", "Charts");
 		charts.setProperty("AxeY", "Number of Peptides");
-		charts.setProperty("Name", "MASCOT score [" + nodeType + "]");
+		charts.setProperty("Name", "Binding Score [" + nodeType + "]");
 		charts.setProperty("data", nodeInfo.get("data"));
 		charts.setProperty("maxYaxis", nodeInfo.get("maxYaxis"));
-		charts.setProperty("xfield", "'score'");
+		charts.setProperty("xfield", "'category'");
 		charts.setProperty("yfield", "['decoy', 'target']");
 		Date date = new Date();
 		SimpleDateFormat dateFormat = new SimpleDateFormat ("yyyy.MM.dd 'at' hh:mm:ss");

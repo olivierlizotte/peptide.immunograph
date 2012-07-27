@@ -33,7 +33,7 @@
 	function Launch()
 	{		
 		document.getElementById("wait").innerHTML="<img src=../../../icons/waiting.gif width=\"150\" height=\"20\" /><br><img src=../../../icons/waitingGrandMa.png width=\"150\" height=\"150\" />";
-		$.post(	"Executable.jsp",
+		$.post(	"Executable2.jsp",
 					{"id":<%=request.getParameter("id") %>,"rel":<%= request.getParameter("rel")%>}, 
 					function(results)
 					{
