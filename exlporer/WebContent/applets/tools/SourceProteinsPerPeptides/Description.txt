@@ -1,0 +1,2 @@
+Number of associated Proteins :: <br>
+This tool creates a graph of the number of source proteins distribution. It searches the number of source proteins for each peptide.  

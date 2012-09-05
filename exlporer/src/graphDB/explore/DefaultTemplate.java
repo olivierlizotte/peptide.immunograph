@@ -73,10 +73,10 @@ abstract public class DefaultTemplate
 	}
 	
 	
-	//public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
+	public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
 	//public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph3.db";
 	
-	public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph3.db";
+	//public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph3.db";
 	
 	//Singleton pattern to force every user into a single database connexion object
 	private static EmbeddedGraphDatabase theGraph = null;
@@ -197,7 +197,8 @@ abstract public class DefaultTemplate
 							  "applets/tools/IntensityDistribution",
 							  "applets/tools/PvalDistribution",
 							  "applets/tools/SequenceRedundancy",
-							  "applets/tools/HlaAlleleDistribution"};
+							  "applets/tools/HlaAlleleDistribution",
+							  "applets/tools/SourceProteinsPerPeptides"};
 			return testE;
 		}
 		if("ExpertMode_output".equals(type))
