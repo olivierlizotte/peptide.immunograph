@@ -204,19 +204,22 @@ function updateGraph()
   svgGroup.append("svg:text")	  
   	  .attr("x", function(d) { return -(d.name.length * 0.5 * 5); })
 	  .text(fcText);
-    
- $('svg g.node').tipsy({ 
-        gravity: 'w', 
-        html: true, 
-        title: function() 
-        {
-        	var d = this.__data__;//, c = colors(d.i);
-        	if(d.info)
-        		return d.info;
-        	else
-        		return d.name;
-        }
-      });
+ 
+  if($('svg g.node').tipsy)
+  {
+	 $('svg g.node').tipsy({ 
+	        gravity: 'w', 
+	        html: true, 
+	        title: function() 
+	        {
+	        	var d = this.__data__;//, c = colors(d.i);
+	        	if(d.info)
+	        		return d.info;
+	        	else
+	        		return d.name;
+	        }
+	      });
+  }
   // Exit any old nodes.
   node.exit().remove();
 }
