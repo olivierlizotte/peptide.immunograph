@@ -3,7 +3,8 @@
 <%
 try{
 	//XmlToDb.RUN("/home/caronlio/mandR.clusterML", "dev");
-	XmlToDb.RUN("/apps/Files/toInclude.clusterML", "dev");
+	//XmlToDb.RUN("/apps/Files/toInclude.clusterML", "dev");
+	XmlToDb.RUN("C:\\_IRIC\\DATA\\test.clusterML","dev");
 	//XmlToDb.RUN("G:\\Thibault\\Olivier\\MnR\\4Reps\\ProteoProfileClustering\\MnR4Reps.clusterML","dev");
 	//XmlToDb.RUN("/home/antoine/workspace/clusterML/ipi7.clusterML", "dev");
 	//XmlToDb.RUN("/home/antoine/workspace/clusterML/SpikeResults7.clusterML", "dev");

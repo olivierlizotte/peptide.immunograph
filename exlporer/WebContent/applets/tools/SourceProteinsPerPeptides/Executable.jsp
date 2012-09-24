@@ -34,18 +34,20 @@ HashMap<String,String> getSourceProteinsDistribution(EmbeddedGraphDatabase graph
 		if (NodeHelper.getType(otherNode).equals("Peptide")){
 			int numberOfAssociatedProteins = 0;
 			// GET PROTEIN SEQUENCES ASSOCIATED TO PEPTIDE SEQUENCES
-// 			Node peptideSequence = otherNode.getSingleRelationship(DynamicRelationshipType.withName("Sequence"), Direction.OUTGOING).getEndNode();
-// 			for (Relationship protSeq : peptideSequence.getRelationships()){
-// 				System.out.println("toto");
-// 				if (NodeHelper.getType(protSeq.getOtherNode(peptideSequence)).equals("Protein Sequence")){
-// 					numberOfAssociatedProteins+=1;
-// 				}
-// 			}
-
+ 			Node peptideSequence = otherNode.getSingleRelationship(DynamicRelationshipType.withName("Sequence"), Direction.OUTGOING).getEndNode();
+ 			for (Relationship protSeq : peptideSequence.getRelationships()){
+ 				System.out.println(NodeHelper.getType(protSeq.getOtherNode(peptideSequence)));
+ 				if (NodeHelper.getType(protSeq.getOtherNode(peptideSequence)).equals("Protein Sequence")){
+ 					numberOfAssociatedProteins+=1;
+ 				}
+ 			}
+ 			if(numberOfAssociatedProteins == 0)
+ 				numberOfAssociatedProteins = numberOfAssociatedProteins;
+/*
 			// GET PROTEINS ASSOCIATED TO PEPTIDES
 			for(Relationship prot : otherNode.getRelationships(DynamicRelationshipType.withName("Associated"), Direction.INCOMING)){
 				numberOfAssociatedProteins+=1;
-			}
+			}//*/
 			// if target hit
 			if(otherNode.getProperty("Decoy").toString().equals("False")){
 				if (target.containsKey(numberOfAssociatedProteins)){

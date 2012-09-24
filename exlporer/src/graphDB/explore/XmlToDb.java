@@ -108,7 +108,7 @@ public class XmlToDb extends DefaultHandler
 		{
 			if(atts.getValue("Get") != null)
 				currentNode = RetrieveNode(cleanText(atts.getValue("Type")), cleanText(atts.getValue("Get")), cleanText(atts.getValue("Match")));
-			
+						
 			if(currentNode == null)
 			{
 				currentNode = graphDb.createNode();
