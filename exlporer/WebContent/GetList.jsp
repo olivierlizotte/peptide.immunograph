@@ -28,10 +28,11 @@ if(session.getAttribute("user") != null)
 	String sort 	  = request.getParameter("sort");
 	String nodeId     = request.getParameter("id");
 	String nodeType   = request.getParameter("type");
+	String filter       = request.getParameter("filter");
 	int iStart        = Integer.parseInt(request.getParameter("start"));
 	int iLimit	      = Integer.parseInt(request.getParameter("limit"));
 	int iPage		  = Integer.parseInt(request.getParameter("page"));
-	Grid.GetList(out, iStart, iLimit, sort, nodeId, nodeType);
+	Grid.GetList(out, iStart, iLimit, sort, nodeId, nodeType, filter);
 //		out.println("OK!");
 //	else
 //		out.println("Not ok...");
