@@ -30,17 +30,22 @@ public class Grid
 			//Filter params 
 			//Encoded : (field / value / comparison / type)
 			//not encoded: (field / data->value / data->comparison / data->type)
-			String strFilter   = null;
-			String strProperty = null;
+			String[] strFilter   = null;
+			String[] strProperty = null;
 			if(filter != null)
 			{
 				JSONArray arrayFi = new JSONArray(filter);
-				JSONObject objFilter  = arrayFi.getJSONObject(0);
-				strFilter = objFilter.getString("value");
-				strProperty = objFilter.getString("field");
+				strFilter = new String[arrayFi.length()];
+				strProperty = new String[arrayFi.length()];
+				for(int i = 0; i < arrayFi.length(); i++)
+				{
+					JSONObject objFilter  = arrayFi.getJSONObject(i);				
+					strFilter[i] = objFilter.getString("value");
+					strProperty[i] = objFilter.getString("field");
+				}
 			}
-			final String filterWords = strFilter;
-			final String filterProperty = strProperty;
+			final String[] filterWords = strFilter;
+			final String[] filterProperty = strProperty;
 			
 			String direction= obj.getString("direction");
 			final boolean dir = ("ASC".equals(direction) ? true : false);
@@ -58,17 +63,25 @@ public class Grid
 					{
 						if(filterWords != null)
 						{
-							if(theOtherNode.hasProperty(filterProperty))
+							boolean allProp = true;
+							for(int i = 0; i < filterWords.length; i++)
 							{
-								Object myValue = theOtherNode.getProperty(filterProperty);
-								String strComp = "";
-	                    		if(myValue instanceof Number)
-	                    			strComp = ((Double) myValue).toString();
-	                    		else if(myValue instanceof String)
-	                    			strComp = (String)myValue;
-	                    		if(strComp.indexOf(filterWords) >= 0)
-	                    			nodes.add(Pair.of(theOtherNode, relation));
+								if(theOtherNode.hasProperty(filterProperty[i]))							
+								{
+									Object myValue = theOtherNode.getProperty(filterProperty[i]);
+									String strComp = "";
+		                    		if(myValue instanceof Number)
+		                    			strComp = ((Double) myValue).toString();
+		                    		else if(myValue instanceof String)
+		                    			strComp = (String)myValue;
+		                    		if(strComp.indexOf(filterWords[i]) < 0)
+		                    			allProp = false;
+								}
+								else
+									allProp = false;
 							}
+							if(allProp)
+								nodes.add(Pair.of(theOtherNode, relation));														
 						}
 						else
 							nodes.add(Pair.of(theOtherNode, relation));
