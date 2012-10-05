@@ -8,6 +8,7 @@
 	
 function Launch()
 {
+	alert(<%=request.getParameter("id") %>);
 	document.getElementById("wait").innerHTML="<img src=../../../icons/waiting.gif width=\"150\" height=\"20\" />";
 		$.post(	"applets/tools/expertMode/Executable.jsp",
 				{"query":document.getElementById("textQuery").value, 

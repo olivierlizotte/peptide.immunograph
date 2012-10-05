@@ -296,7 +296,7 @@
 															//autoLoad: {url:'tool.jsp?name='+keyName+'&url='+document.URL, scripts:true},
 															loader : {
 																url : 'applets/tools/expertMode/Launcher.jsp?url='
-																		+ document.URL,
+																		+ document.URL+'&id='+currentNodeID,
 																scripts : true,
 																autoLoad : true
 															},

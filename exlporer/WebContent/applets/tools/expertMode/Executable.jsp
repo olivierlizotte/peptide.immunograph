@@ -59,8 +59,10 @@ void createLinkerNodeFromIds(EmbeddedGraphDatabase graphDb, Node newNode, List<L
 %>
 <%
 String nodeID = request.getParameter("id").toString();
+System.out.println(nodeID);
 String relationType = request.getParameter("rel").toString();
 String returnID = request.getParameter("returnID").toString();
+System.out.println(returnID);
 String cypherQuery = request.getParameter("query");
 EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
 
