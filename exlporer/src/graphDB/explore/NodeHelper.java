@@ -379,6 +379,11 @@ public class NodeHelper
 		return result;
 	}
 	
+	public static boolean IsNumber(Object value)
+	{
+		return value instanceof Double;
+	}
+	
 	public static String MakeHtmlFriendly(Object value)
 	{
 		if(value instanceof String)

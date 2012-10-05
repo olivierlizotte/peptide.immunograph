@@ -17,14 +17,35 @@ import org.neo4j.shell.util.json.*;
 
 public class Grid 
 {
-	private static List<Pair<Node, Relationship>> GetValues(String sort, String nodeID, String nodeType)
+	private static List<Pair<Node, Relationship>> GetValues(String sort, String nodeID, String nodeType, String filter)
 	{
 		List<Pair<Node, Relationship>> nodes = new LinkedList<Pair<Node, Relationship>>();
 		try 
 		{
+			//Sort params
 			JSONArray array = new JSONArray(sort);
 			JSONObject obj  = array.getJSONObject(0);
 			final String property	= obj.getString("property");
+			
+			//Filter params 
+			//Encoded : (field / value / comparison / type)
+			//not encoded: (field / data->value / data->comparison / data->type)
+			String[] strFilter   = null;
+			String[] strProperty = null;
+			if(filter != null)
+			{
+				JSONArray arrayFi = new JSONArray(filter);
+				strFilter = new String[arrayFi.length()];
+				strProperty = new String[arrayFi.length()];
+				for(int i = 0; i < arrayFi.length(); i++)
+				{
+					JSONObject objFilter  = arrayFi.getJSONObject(i);				
+					strFilter[i] = objFilter.getString("value");
+					strProperty[i] = objFilter.getString("field");
+				}
+			}
+			final String[] filterWords = strFilter;
+			final String[] filterProperty = strProperty;
 			
 			String direction= obj.getString("direction");
 			final boolean dir = ("ASC".equals(direction) ? true : false);
@@ -40,7 +61,30 @@ public class Grid
 					Node theOtherNode = relation.getOtherNode(head);
 					if(nodeType.equals(NodeHelper.getType(theOtherNode)))
 					{
-						nodes.add(Pair.of(theOtherNode, relation));
+						if(filterWords != null)
+						{
+							boolean allProp = true;
+							for(int i = 0; i < filterWords.length; i++)
+							{
+								if(theOtherNode.hasProperty(filterProperty[i]))							
+								{
+									Object myValue = theOtherNode.getProperty(filterProperty[i]);
+									String strComp = "";
+		                    		if(myValue instanceof Number)
+		                    			strComp = ((Double) myValue).toString();
+		                    		else if(myValue instanceof String)
+		                    			strComp = (String)myValue;
+		                    		if(strComp.indexOf(filterWords[i]) < 0)
+		                    			allProp = false;
+								}
+								else
+									allProp = false;
+							}
+							if(allProp)
+								nodes.add(Pair.of(theOtherNode, relation));														
+						}
+						else
+							nodes.add(Pair.of(theOtherNode, relation));
 					}
 				}
 			}
@@ -89,14 +133,14 @@ public class Grid
 		return nodes;
 	}
 
-	public static boolean GetList(JspWriter out, int start, int limit, String sort, String nodeID, String nodeType)
+	public static boolean GetList(JspWriter out, int start, int limit, String sort, String nodeID, String nodeType, String filter)
 	{		
 		try
 		{
 			out.println("{root:[");
 			long nbElem = 0;
 			long nbPrinted = 0;
-			List<Pair<Node, Relationship>> nodes = GetValues(sort, nodeID, nodeType);
+			List<Pair<Node, Relationship>> nodes = GetValues(sort, nodeID, nodeType, filter);
 			for(Pair<Node, Relationship> aPair : nodes)
 			{
 				nbElem++;
@@ -154,7 +198,7 @@ public class Grid
 			out.println();
 				
 			//Get all the nodes and relations
-			List<Pair<Node, Relationship>> nodes = GetValues(sort, nodeID, nodeType);
+			List<Pair<Node, Relationship>> nodes = GetValues(sort, nodeID, nodeType, "");
 			
 			for(Pair<Node, Relationship> aPair : nodes)
 			{

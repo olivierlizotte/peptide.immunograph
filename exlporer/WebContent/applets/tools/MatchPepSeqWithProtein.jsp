@@ -1,5 +1,5 @@
-<%@ page import="graphDB.explore.*" %>
-<%@ page import ="org.neo4j.graphdb.Transaction" %>
+<%@ page import="graphDB.explore.*"%>
+<%@ page import="org.neo4j.graphdb.Transaction"%>
 
 <%
 try	{				

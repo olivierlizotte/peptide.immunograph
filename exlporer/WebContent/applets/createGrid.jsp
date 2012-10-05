@@ -63,7 +63,6 @@
 		var nodeStore = Ext.create('Ext.data.Store', {
 			storeId : 'nodeStoreID' + keyName,
 			model : 'nodeModel' + keyName,
-			//TODO Fix sorting problems on infinite scroll grids
 			sorters : gridSorters[keyName],
 			//New
 			pageSize : 100,//50000,
@@ -124,6 +123,21 @@
         clicksToEdit: 1
     });
     
+    var filters = {
+        ftype: 'filters',
+        // encode and local configuration options defined previously for easier reuse
+        encode: true, // json encode the filter query
+        local: false,
+        //local: local,   // defaults to false (remote filtering)
+
+        // Filters are most naturally placed in the column definition, but can also be
+        // added here.
+        filters: [{
+            type: 'boolean',
+            dataIndex: 'visible'
+        }]
+    };
+    
 		var theGrid = Ext.create('Ext.grid.Panel',
 						{
 							id : 'grid' + currentNodeType + keyName,
@@ -138,6 +152,7 @@
 							title : gridName[keyName],
 							plugins: [cellEditing],
 							//features: [groupingFeature],
+				        features: [filters],
 							columns : gridColumns[keyName],
 
 							loadMask : true,
@@ -366,8 +381,10 @@
 				}
 			});//*/
 //----------------END OF GRID FOCUS FIX-----------------------------------------------------------------------------------
-
-	Ext.require('Ext.tab.*');
+    
+    Ext.Loader.setPath('Ext.ux', 'ExtJS/examples/ux');
+	Ext.require(['Ext.tab.*',
+				 'Ext.ux.grid.FiltersFeature']);
 
     var Grid;
 	Ext.onReady(function() 
