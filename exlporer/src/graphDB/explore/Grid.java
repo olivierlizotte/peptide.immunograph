@@ -32,7 +32,7 @@ public class Grid
 			//not encoded: (field / data->value / data->comparison / data->type)
 			String[] strFilter   = null;
 			String[] strProperty = null;
-			if(filter != null)
+			if(filter != null && !filter.isEmpty())
 			{
 				JSONArray arrayFi = new JSONArray(filter);
 				strFilter = new String[arrayFi.length()];

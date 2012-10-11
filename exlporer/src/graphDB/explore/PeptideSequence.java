@@ -2,7 +2,6 @@ package graphDB.explore;
 
 import java.util.Arrays;
 import java.util.HashMap;
-
 import graphDB.explore.tools.Parallel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
@@ -73,6 +72,31 @@ public class PeptideSequence
 	
 	public static int IsSimpleMatch(String protein, String peptide)
 	{
+		//char[] pepArray  = peptide.toCharArray();		
+		//char[] protArray = protein.toCharArray();
+		int maxProteins = protein.length();
+		int maxPeptide  = peptide.length();
+		for(int i = 0; i < maxProteins - maxPeptide; i++)
+		{
+			int j = 0;
+			while(j < maxPeptide)
+			{
+				if(protein.charAt(i+j) == '*' || peptide.charAt(j) == protein.charAt(i+j))
+					j++;
+				else
+					break;
+			}
+			if(j == maxPeptide)
+				return i;
+		}
+		return -1;
+		/*
+		Pattern p = Pattern.compile(protein);
+		Matcher m = p.matcher(peptide);
+		if(m.matches())
+			return m.start();
+		else return -1;//*/
+		/*
 		char[] protArray = protein.toCharArray();
 		int iProt = protein.length() - 1;
 		int currentCheck = -1;
@@ -105,12 +129,11 @@ public class PeptideSequence
 		if(iPep < 0)
 			return iProt + 1;
 		else
-			return -1;
-	}
+			return -1;//*/
+	}	
 	
 	public static Node[] GetAllProteins()
 	{
-
 		Index<Node> proteinIndex = DefaultTemplate.graphDb().index().forNodes("Protein Sequence");						
 		IndexHits<Node> proteinHits = proteinIndex.query("Unique ID", "*");
 		
@@ -121,6 +144,8 @@ public class PeptideSequence
 			proteins[index] = protein;
 			index++;			
 		}
+		proteinHits.close();
+		System.gc();
 		return proteins;
 	}
 	
@@ -137,6 +162,9 @@ public class PeptideSequence
 			peptides[index] = peptide;
 			index++;			
 		}
+		peptideHits.close();
+		System.gc();
+		
 		return peptides;
 	}
 	
@@ -164,8 +192,58 @@ public class PeptideSequence
 		}
 		return peptideMap;
 	}
+
+	public static void Match(final Node[] proteins, final Node[] peptides)
+	{
+		try
+		{			
+			final RelationshipType relType = DynamicRelationshipType.withName( "Found In" );			
 	
-	public static void Match(Node[] proteins, final Node[] peptides)
+			Parallel.ForEach(Arrays.asList(peptides), new Parallel.LoopBody <Node>()
+		    {
+		        public void run(Node peptide)
+			//for(Node peptide : peptides)
+			{					
+				String pepSeq = (String)peptide.getProperty("Sequence");
+				long pepID = peptide.getId();
+				int nbPeptideMatch = 0;
+								
+				for(Node protein : proteins)
+				{						
+					int indexPos = IsSimpleMatch((String)protein.getProperty("Sequence"), pepSeq);
+					if(indexPos >= 0)
+					{
+						boolean isAlreadyThere = false;
+						for(Relationship otherRelation : peptide.getRelationships(relType))
+							if(otherRelation.getOtherNode(peptide).getId() == pepID)
+								isAlreadyThere = true;
+						if(!isAlreadyThere)
+						{
+							Transaction tx = DefaultTemplate.graphDb().beginTx();
+							
+							Relationship relation = peptide.createRelationshipTo(protein, relType);
+							relation.setProperty("Position", indexPos);			
+
+							tx.success();
+							tx.finish();
+						}
+
+						nbPeptideMatch++;
+					}
+				}
+				if(nbPeptideMatch == 0)
+					System.out.println("Unable to match peptide : " + pepSeq);
+	        }});
+	
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		//System.out.println("Peptide Sequence Matching started");
+		System.out.println("Number of Peptide Sequences matched :" + peptides.length);
+		System.out.println("Number of Proteins matched          :" + proteins.length);//nbProteins);
+	}
+
+	public static void MatchB(Node[] proteins, final Node[] peptides)
 	{
 		try
 		{

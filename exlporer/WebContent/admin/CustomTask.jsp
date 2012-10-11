@@ -34,36 +34,26 @@ EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
 	//PeptideSequence.MatchAllSequences();
 
 	ArrayList<Node> unmatched = new ArrayList<Node>();
-
-	//PeptideSequence.MatchAllSequences();
-
-	Node currentNode = graphDb.getNodeById(555615);
 	
-	Iterable<Relationship> allRels = currentNode.getRelationships(Direction.OUTGOING);
-	for (Relationship rel : allRels)
+	out.println("Unmatched sequences :: ");
+	Node[] peptideSequences = PeptideSequence.GetAllPeptides();
+	
+	for (Node sequence : peptideSequences)
 	{
-		Node otherNode = rel.getOtherNode(currentNode);
-		if (NodeHelper.getType(otherNode).equals("Peptide"))
-		{
-			int numberOfAssociatedProteins = 0;
-			// GET PROTEIN SEQUENCES ASSOCIATED TO PEPTIDE SEQUENCES
- 			Node peptide = otherNode.getSingleRelationship(DynamicRelationshipType.withName("Sequence"), Direction.OUTGOING).getEndNode();
- 			for (Relationship protSeq : peptide.getRelationships())
- 			{
- 				//out.println(protSeq.getOtherNode(peptide) + "<br>");
- 				//System.out.println(NodeHelper.getType(protSeq.getOtherNode(peptide)));
- 				if (NodeHelper.getType(protSeq.getOtherNode(peptide)).equals("Protein Sequence")){
- 					numberOfAssociatedProteins+=1;
- 				}
- 			}
- 			if(numberOfAssociatedProteins == 0)
- 			{
- 				out.println(peptide.getProperty("Sequence").toString() + ": " + peptide.getId() + "<br>");
- 				unmatched.add(peptide);
- 			}
- 			else
- 				numberOfAssociatedProteins = numberOfAssociatedProteins;
-		}
+		int numberOfAssociatedProteins = 0;
+		
+		// GET PROTEIN SEQUENCES ASSOCIATED TO PEPTIDE SEQUENCES
+ 		for (Relationship protSeq : sequence.getRelationships())
+ 		{
+ 			if (NodeHelper.getType(protSeq.getOtherNode(sequence)).equals("Protein Sequence"))
+ 				numberOfAssociatedProteins ++;
+ 				
+ 		}
+ 		if(numberOfAssociatedProteins == 0)
+ 		{
+ 			//out.println(sequence.getProperty("Sequence").toString() + ": " + sequence.getId() + "<br>");
+ 			unmatched.add(sequence);
+ 		}
 	}
 /*
 	Node[] peptides = new Node[unmatched.size()];
@@ -130,12 +120,12 @@ EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
  				numberOfAssociatedProteins = numberOfAssociatedProteins;
 		}
 	}//*/
-/*
-	Node[] peptides = new Node[unmatched.size()];
+
+	Node[] peptides = new Node[unmatched.size()];//100];
 	
-	for(int i = 0; i < unmatched.size(); i++)
+	for(int i = 0; i < peptides.length; i++)
 		peptides[i] = unmatched.get(i);
-	
+	out.println("Number of unmatched peptides : " + unmatched.size());
 	PeptideSequence.MatchToProtein(peptides);
 //*/
 
@@ -151,6 +141,7 @@ for(Node protein : proteins)
 		out.println(PeptideSequence.IsSimpleMatch(protein.getProperty("Sequence"), "LEINNIWKR" + "  <BR>");
 	}
 //*/
+/*
 	Node[] peptides = PeptideSequence.GetAllPeptides();
 	Node[] proteins = PeptideSequence.GetAllProteins();
 	Node[] toMatch = new Node[1];
@@ -173,8 +164,9 @@ for(Node protein : proteins)
 			toMatch[0] = peptide;
 			PeptideSequence.Match(proteins, toMatch);
 		}
-	}
+	}//*/
 
+	//PeptideSequence.MatchToProtein(unmatched.toArray());
 //	PeptideSequence.MatchAllSequences();
 	out.println("L'Affaire Est Ketchup!");//
 }
