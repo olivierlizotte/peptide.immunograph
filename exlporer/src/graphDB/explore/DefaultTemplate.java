@@ -13,17 +13,16 @@ import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.ReturnableEvaluator;
-import org.neo4j.graphdb.StopEvaluator;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.TraversalPosition;
-import org.neo4j.graphdb.Traverser;
-import org.neo4j.graphdb.Traverser.Order;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
+import org.neo4j.graphdb.traversal.Evaluation;
+import org.neo4j.graphdb.traversal.Evaluator;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
+import org.neo4j.kernel.Traversal;
 
 /** This class determines the default behavior of the explorer
  *
@@ -75,9 +74,9 @@ abstract public class DefaultTemplate
 	
 	//public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
 	//public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph6.db";
-	//public static String GraphDBString = "C:\\_IRIC\\DATA\\M&R\\graphProject981.db";
+	public static String GraphDBString = "C:\\_IRIC\\DATA\\M&R\\graphProject981.db";
 	
-	public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph3.db";
+	//public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph3.db";
 	
 	//Singleton pattern to force every user into a single database connexion object
 	private static EmbeddedGraphDatabase theGraph = null;
@@ -314,7 +313,11 @@ abstract public class DefaultTemplate
 	
 		return sb.toString();
 	}
-	
+
+	/** Cleans a string to make it DB ready and HTML friendly
+	 * @param input String
+	 * @return String sanitized
+	 */
 	public static String Sanitize(String input)
 	{
 		String text = input.replaceAll("\\r","<br/>");
@@ -324,56 +327,46 @@ abstract public class DefaultTemplate
 		return text;
 	}	
 	
-	public static void linkToExperimentNode(EmbeddedGraphDatabase graphDb, Node node, String RelationName){
-		long startID = node.getId();
-		ReturnableEvaluator returnExperimentNode;
+	/** Creates a relation between the given node, and the closest Experiment node
+	 * @param graphDb EmbeddedGraphDatabase
+	 * @param node Node
+	 * @param relationName String
+	 */
+	public static void linkToExperimentNode(EmbeddedGraphDatabase graphDb, Node node, String relationName)
+	{
+		//TODO When available, use Neo4j option to select the direction of traversal, without specifying relations
 		
-		// custom ReturnableEvaluator(). Returns the node if it is an "Experiment" one.
-		returnExperimentNode = new ReturnableEvaluator()
-		{
-		    public boolean isReturnableNode( TraversalPosition position )
-		    {
-		        // Return nodes that don't have any outgoing relationships,
-		        // only incoming relationships, i.e. leaf nodes.
-		        return (position.currentNode().getProperty("type").toString().trim().equals("Experiment"));
-		    }
+		//Called at every node, checks if its the Experiment node
+		Evaluator test = new Evaluator() {			
+			@Override
+			public Evaluation evaluate(Path arg0) 
+			{
+				String theType = arg0.endNode().getProperty("type", "").toString();
+				if("Experiment".compareTo(theType) == 0)
+					return Evaluation.of(true,  false);
+				else
+					return Evaluation.EXCLUDE_AND_CONTINUE;
+			}
 		};
 		
-		// custom stop evaluator. Stops the traversal if the node is an "Experiment" one.
-		// to be sure to stop at first Experiment Node found
-		StopEvaluator stopAtFirstEsperimentFound= new StopEvaluator()
-		 {
-		     // Block traversal if the node has a property with key 'key' and value
-		     // 'someValue'
-		     public boolean isStopNode( TraversalPosition position )
-		     {
-		         if ( position.isStartNode() )
-		         {
-		             return false;
-		         }
-		         Node currentNode = position.currentNode();
-		         Object property = currentNode.getProperty( "type", null );
-		         return property instanceof String &&
-		             ((String) property).equals( "Experiment" );
-		     }
-		 };
-		
-		Traverser experimentNode = graphDb.getNodeById(startID).traverse(Order.BREADTH_FIRST, 
-				stopAtFirstEsperimentFound, 
-				returnExperimentNode,
-				DynamicRelationshipType.withName("Result"), Direction.INCOMING, 
-				DynamicRelationshipType.withName("Source"), Direction.INCOMING, 
-				DynamicRelationshipType.withName("Listed"), Direction.INCOMING, 
-				DynamicRelationshipType.withName("Associated"), Direction.INCOMING, 
-				DynamicRelationshipType.withName("Sequence"), Direction.INCOMING,
-				DynamicRelationshipType.withName("Tool_output"), Direction.INCOMING
-				);
-		// there should only be one node there
-		for (Node n : experimentNode){
-			//System.out.println(n.getProperty("type"));
-			//System.out.println(n.getId());
-			n.createRelationshipTo(node, DynamicRelationshipType.withName(RelationName));
+		// there should only be one node there, but check for sure
+		int nbExp = 0;
+		Node exp = null;
+		for (Node n : Traversal.traversal().breadthFirst()
+										   .evaluator(test)
+										   .relationships(DynamicRelationshipType.withName("Result"), Direction.INCOMING)
+										   .relationships(DynamicRelationshipType.withName("Source"), Direction.INCOMING) 
+										   .relationships(DynamicRelationshipType.withName("Listed"), Direction.INCOMING) 
+										   .relationships(DynamicRelationshipType.withName("Associated"), Direction.INCOMING) 
+										   .relationships(DynamicRelationshipType.withName("Sequence"), Direction.INCOMING)
+									  	   .relationships(DynamicRelationshipType.withName("Tool_output"), Direction.INCOMING)
+										   .traverse(node).nodes())
+		{
+			exp = n;
+			nbExp++;
 		}
+		if(nbExp == 1)
+			exp.createRelationshipTo(node, DynamicRelationshipType.withName(relationName));
 	}
 	
 	/** Calculate number of elements for a grouping node such as 
