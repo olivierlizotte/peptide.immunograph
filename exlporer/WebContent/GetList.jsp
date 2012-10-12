@@ -23,7 +23,7 @@
 <%
 if(session.getAttribute("user") != null)
 {	
-	//This jsp will add a comment and send back the new list of comments as a result
+	//Retrieve the list of nodes (in json) following a set of params
 	
 	String sort 	  = request.getParameter("sort");
 	String nodeId     = request.getParameter("id");
@@ -33,8 +33,5 @@ if(session.getAttribute("user") != null)
 	int iLimit	      = Integer.parseInt(request.getParameter("limit"));
 	int iPage		  = Integer.parseInt(request.getParameter("page"));
 	Grid.GetList(out, iStart, iLimit, sort, nodeId, nodeType, filter);
-//		out.println("OK!");
-//	else
-//		out.println("Not ok...");
 }
 %>

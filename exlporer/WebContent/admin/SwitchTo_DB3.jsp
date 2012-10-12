@@ -21,7 +21,9 @@
 
 <%
 try{
-	PeptideSequence.MatchAllSequences();
+	
+	DefaultTemplate.SwitchDB("/apps/Neo4J/neo4j-community-1.8.M03/data/graph3.db");
+	
 	out.println("L'Affaire Est Ketchup!");//
 }
 catch(Exception e)

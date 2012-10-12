@@ -44,13 +44,11 @@ abstract public class DefaultTemplate
 	        @Override
 	        public void run()
 			{
-	        	removeAllTempElements(graphDb);
-	        	if(theGraph != null)
-	        		graphDb.shutdown();
+	        	CloseDB(graphDb);
 			}
 		} );
 	}
-	
+		
 	public static void removeAllTempElements(GraphDatabaseService graphDb )
 	{
 		if(theGraph != null)
@@ -70,17 +68,35 @@ abstract public class DefaultTemplate
 			tx.finish();
 		}
 	}
+
+	public static void CloseDB(GraphDatabaseService graphDb)
+	{
+    	removeAllTempElements(graphDb);
+    	if(theGraph != null)
+    		graphDb.shutdown();
+	}
 	
+	public static void SwitchDB(String newPath)
+	{
+		EmbeddedGraphDatabase newGraph = new EmbeddedGraphDatabase( newPath );
+		registerShutdownHook(newGraph);
+		EmbeddedGraphDatabase previousGraph = theGraph;
+		
+		theGraph = newGraph;
+		CloseDB(previousGraph);
+	}
 	
 	//public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
 	//public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph6.db";
-	public static String GraphDBString = "C:\\_IRIC\\DATA\\M&R\\graphProject981.db";
+	//public static String GraphDBString = "C:\\_IRIC\\DATA\\M&R\\graphProject981.db";
 	
-	//public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph3.db";
+	public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph3.db";
 	
 	//Singleton pattern to force every user into a single database connexion object
 	private static EmbeddedGraphDatabase theGraph = null;
-	public static EmbeddedGraphDatabase graphDb()
+	
+	
+	synchronized public static EmbeddedGraphDatabase graphDb()
 	{
 		if(theGraph == null)
 		{
