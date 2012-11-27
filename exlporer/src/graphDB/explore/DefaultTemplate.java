@@ -51,10 +51,10 @@ abstract public class DefaultTemplate
 		
 	public static void removeAllTempElements(GraphDatabaseService graphDb )
 	{
-		if(theGraph != null)
+		try
 		{
 			Transaction tx = graphDb.beginTx();
-			Index<Node> index = theGraph.index().forNodes("tempNodes");
+			Index<Node> index = graphDb.index().forNodes("tempNodes");
 			IndexHits<Node> tempNodes = index.get("type", "tempNode");
 			while (tempNodes.hasNext())
 			{
@@ -67,12 +67,16 @@ abstract public class DefaultTemplate
 			tx.success();
 			tx.finish();
 		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}		
 	}
 
 	public static void CloseDB(GraphDatabaseService graphDb)
 	{
     	removeAllTempElements(graphDb);
-    	if(theGraph != null)
+    	if(graphDb != null)
     		graphDb.shutdown();
 	}
 	
@@ -87,10 +91,11 @@ abstract public class DefaultTemplate
 	}
 	
 	//public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
-	//public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph6.db";
-	//public static String GraphDBString = "C:\\_IRIC\\DATA\\M&R\\graphProject981.db";
+	//public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph8.db";
+	public static String GraphDBString = "C:\\_IRIC\\DATA\\M&R\\graphProject981.db";
 	
-	public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph3.db";
+	//public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph3.db";
+	//public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graphProject981.db";
 	
 	//Singleton pattern to force every user into a single database connexion object
 	private static EmbeddedGraphDatabase theGraph = null;

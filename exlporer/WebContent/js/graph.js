@@ -218,12 +218,13 @@ function updateGraph()
   
   svgGroup.append("svg:circle")
       .attr("r", fcSize)
-      .style("fill-opacity", 0.72)
+      .style("fill-opacity", 0.92)
       .style("fill", fcColor);  
 
 
   svgGroup.append("svg:text")	  
-  	  .attr("x", function(d) { return -(d.name.length * 2.6); })
+  	  .attr("x", function(d) { return -(d.name.length * 2.6)+0.5; })
+  	  .attr("y", 0.5 )
 	  .text(fcText);
  
   if($('svg g.node').tipsy)

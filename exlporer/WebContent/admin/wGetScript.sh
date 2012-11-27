@@ -1,0 +1,1 @@
+wget -O output.txt --cookies=on --load-cookies '/apps/cookies.txt' --keep-session-cookies --referer='http://mascot.iric.ca/mascot/cgi/login.pl'

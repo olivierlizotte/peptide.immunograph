@@ -35,6 +35,11 @@ public class NodeHelper
 	}
 
 
+	
+	public static String decimalFormat(String s) {
+		String[] tmp = s.split("\\.");
+		return tmp[0];
+	}
 
 	
 	public static String doubleFormat(String s) {
@@ -48,7 +53,7 @@ public class NodeHelper
 	
 	public static HashMap<String, String> getProperties(Node theNode)
 	{
-		HashMap<String, String> theProperties = new HashMap<String, String>();
+		HashMap<String, String> theProperties = new HashMap<String, String>();		
 		for (String p : theNode.getPropertyKeys()) {
 			String value = "";
 			String s = theNode.getProperty(p).toString();
@@ -334,15 +339,20 @@ public class NodeHelper
 		return 0;
 	}
 	
-	public static HashMap<String, Iterable<String>> getRelatedNodeTypesAndProperties(Node n){
-		HashMap<String,Iterable<String>> TypesAndAttributesRelated = new HashMap<String,Iterable<String>>();
+	public static HashMap<String, HashMap<String, Integer>> getRelatedNodeTypesAndProperties(Node n){
+		
+		HashMap<String, HashMap<String, Integer>> TypesAndAttributesRelated = new HashMap<String,HashMap<String, Integer>>();
 		String otherNodeType;
 		for (Relationship r : n.getRelationships(Direction.OUTGOING)){
 			if(DefaultTemplate.keepRelation(r.getType().toString())){
 				otherNodeType = getType(r.getOtherNode(n));
-				if (!TypesAndAttributesRelated.containsKey(otherNodeType)){
-					TypesAndAttributesRelated.put(otherNodeType, r.getOtherNode(n).getPropertyKeys());
-				}
+				if (!TypesAndAttributesRelated.containsKey(otherNodeType))
+					TypesAndAttributesRelated.put(otherNodeType, new HashMap<String, Integer>());
+				
+				HashMap<String, Integer> ptr = TypesAndAttributesRelated.get(otherNodeType);
+				for(String property : r.getOtherNode(n).getPropertyKeys())
+					if(!ptr.containsKey(property))
+						ptr.put(property, 1);
 			}
 		}
 		return TypesAndAttributesRelated;

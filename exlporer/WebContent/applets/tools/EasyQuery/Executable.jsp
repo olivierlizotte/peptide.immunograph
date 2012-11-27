@@ -53,9 +53,9 @@ String addFilterToQuery(String oldQuery, String andor, String property, String c
 		newQuery += oldQuery;
 	}
 	if (property.split(" ").length > 1){
-		newQuery += " p.`" +property+ "`" + comparator;
+		newQuery += " p.`" +property+ "`! " + comparator;
 	}else{
-		newQuery += " p." +property+ comparator;
+		newQuery += " p." +property+ "! " + comparator;
 	}
 	if (NodeHelper.isNumber(value)){
 		newQuery += value;
@@ -93,7 +93,7 @@ for (int i=2 ; i<=nbFilters ; i++){
 String query = "start n=node("+nodeID+") match n-->p where p.type=\""+nodeType+"\" and ";
 query=addFilterToQuery(query, null, properties.get(0), comparators.get(0), values.get(0));
 for(int i=1 ; i<nbFilters ; i++){
-	System.out.println(andOrs.get(i-1)+" "+properties.get(i)+" "+comparators.get(i) + " " +values.get(i));
+	System.out.println(andOrs.get(i-1)+" "+properties.get(i)+"! "+comparators.get(i) + " " +values.get(i));
 	query=addFilterToQuery(query, andOrs.get(i-1), properties.get(i), comparators.get(i), values.get(i));
 }
 

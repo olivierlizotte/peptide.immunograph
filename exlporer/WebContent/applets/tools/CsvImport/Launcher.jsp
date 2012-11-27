@@ -12,12 +12,12 @@ function Launch()
       reader.onload = function(e) { 
 	    contents = e.target.result;
 	    //alert(contents);
-	    document.getElementById("wait").innerHTML="<img src=../../../icons/waiting.gif width=\"150\" height=\"20\" />";
+	    document.getElementById("wait").innerHTML="<img src=icons/waiting.gif width=\"150\" height=\"20\" />";
 	    $.post("applets/tools/CsvImport/Executable.jsp",
-			{"id":<%=request.getParameter("id") %>,
-			"fileContent": contents,
-			"isBindingScore": document.getElementById("isBindingScore").checked,
-			},
+				{"id":<%=request.getParameter("id") %>,
+				 "fileContent": contents,
+				 "isBindingScore": document.getElementById("isBindingScore").checked,
+				},
 			function(results)
 			{		
 				//alert(results);

@@ -34,8 +34,7 @@
   }
 
   .node text{
-    font: normal 8pt Arial;
-  	text-shadow: 0px 1px 1px #fff;  	
+    font: normal 8pt Arial;  	
   	stroke: #000;
   }
   

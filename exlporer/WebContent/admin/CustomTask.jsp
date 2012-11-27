@@ -37,24 +37,42 @@ EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
 	
 	out.println("Unmatched sequences :: ");
 	Node[] peptideSequences = PeptideSequence.GetAllPeptides();
-	
+
+	double bestHLAscore, tmpScore;
+	String bestAllel;
 	for (Node sequence : peptideSequences)
 	{
-		int numberOfAssociatedProteins = 0;
-		
-		// GET PROTEIN SEQUENCES ASSOCIATED TO PEPTIDE SEQUENCES
- 		for (Relationship protSeq : sequence.getRelationships())
- 		{
- 			if (NodeHelper.getType(protSeq.getOtherNode(sequence)).equals("Protein Sequence"))
- 				numberOfAssociatedProteins ++;
- 				
- 		}
- 		if(numberOfAssociatedProteins == 0)
- 		{
- 			//out.println(sequence.getProperty("Sequence").toString() + ": " + sequence.getId() + "<br>");
- 			unmatched.add(sequence);
- 		}
+		bestHLAscore = Double.MAX_VALUE;
+		bestAllel="";
+		for(String attr: sequence.getPropertyKeys())
+		{
+			if(attr.startsWith("HLA"))
+			{
+				tmpScore = Double.valueOf(sequence.getProperty(attr).toString());
+				if (tmpScore < bestHLAscore)
+				{
+					bestHLAscore = tmpScore;
+					bestAllel = attr;
+				}
+			}
+		}
+		if(!bestAllel.isEmpty())
+		{
+	 		for (Relationship protSeq : sequence.getRelationships())
+	 		{
+	 			Node otherNode = protSeq.getOtherNode(sequence);
+	 			if(NodeHelper.getType(otherNode).equals("Peptide"))
+	 			{
+	 				Transaction tx = graphDb.beginTx(); 	
+	 				  otherNode.setProperty("best HLA allele", bestAllel);
+	 				  otherNode.setProperty("best HLA score", bestHLAscore);
+	 				tx.success();
+	 				tx.finish();
+				}
+			}
+		}
 	}
+	//*/
 /*
 	Node[] peptides = new Node[unmatched.size()];
 	
@@ -120,7 +138,7 @@ EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
  				numberOfAssociatedProteins = numberOfAssociatedProteins;
 		}
 	}//*/
-
+/*
 	Node[] peptides = new Node[unmatched.size()];//100];
 	
 	for(int i = 0; i < peptides.length; i++)

@@ -22,13 +22,13 @@
 	<%
 	long currentID = Long.valueOf(request.getParameter("id"));
 	EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
-	HashMap<String, Iterable<String>> typesAndPropertiesRelated = NodeHelper.getRelatedNodeTypesAndProperties( graphDb.getNodeById(currentID));
+	HashMap<String, HashMap<String, Integer>> typesAndPropertiesRelated = NodeHelper.getRelatedNodeTypesAndProperties( graphDb.getNodeById(currentID));
 	String nodeTypesOptions = "";
 	String properties;
 	for (String nodeType : typesAndPropertiesRelated.keySet()){
 		properties = "properties['"+nodeType+"']='[";
 		nodeTypesOptions += "<option value= \""+nodeType+"\">"+nodeType+"</option>\n";
-		for (String prop : typesAndPropertiesRelated.get(nodeType)){
+		for (String prop : typesAndPropertiesRelated.get(nodeType).keySet()){
 			//[{"property":"Link","direction":"ASC"},{"property":"Name","direction":"ASC"},{"property":"Description","direction":"ASC"},{"property":"creation date","direction":"ASC"}]
 			properties += "{\"property\":\""+prop+"\", \"direction\":\"ASC\"},";
 		}
