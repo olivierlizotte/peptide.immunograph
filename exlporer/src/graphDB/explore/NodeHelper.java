@@ -420,6 +420,11 @@ public class NodeHelper
 		{
 			return (int)Math.round((Double)value);									
 		}
+		
+		if(value instanceof Integer)
+		{
+			return (Integer)value;									
+		}
 		return 0;
 	}
 	
@@ -431,6 +436,11 @@ public class NodeHelper
 		if(value instanceof Double)
 		{
 			return (Double)value;									
+		}
+		
+		if(value instanceof Integer)
+		{
+			return (double)(Integer)value;									
 		}
 		return Double.NaN;
 	}
