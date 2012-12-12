@@ -1,5 +1,6 @@
 package graphDB.explore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.servlet.jsp.JspWriter;
@@ -73,7 +74,8 @@ public class ImmunoExtract
 													if(holder.ProteinID.equals(info.ProteinID) && holder.Proteome.equals("R") &&
 													   holder.Start < info.Stop && holder.Stop > info.Start)
 													{
-														out.println(info.GetString() + "," + holder.GetString());
+														out.println(info.GetString() + "," + 
+													                holder.GetString());
 														found = true;
 													}
 												}
@@ -133,5 +135,113 @@ public class ImmunoExtract
 		{
 			e.printStackTrace();
 		}	
+	}
+	
+	public static ArrayList<ImmunoInfo> GetSingle(Node nodePeptide, Node nodePeptidome)
+	{
+		ArrayList<ImmunoInfo> list = new ArrayList<ImmunoInfo>();
+		try
+		{
+			HashMap<Long, ImmunoInfo> theProtsM = new HashMap<Long, ImmunoInfo>();
+			HashMap<Long, ImmunoInfo> theProtsR = new HashMap<Long, ImmunoInfo>();
+			for (Relationship idRel : nodePeptide.getRelationships())
+			{
+				Node nodeSeq = idRel.getOtherNode(nodePeptide);
+				if (NodeHelper.getType(nodeSeq).equals("Peptide Sequence"))
+				{
+					for (Relationship protRel : nodeSeq.getRelationships())
+					{
+						Node nodeProt = protRel.getOtherNode(nodeSeq);
+						if (NodeHelper.getType(nodeProt).equals("Protein Sequence"))
+						{
+							ImmunoInfo holder = new ImmunoInfo(nodePeptide, NodeHelper.PropertyToInt(protRel.getProperty("Position")), nodeProt);									
+
+							if(holder.Proteome.equals("M"))
+								theProtsM.put(nodeProt.getId(), holder);
+							if(holder.Proteome.equals("R"))
+								theProtsR.put(nodeProt.getId(), holder);
+						}
+					}
+				}
+			}
+			if(theProtsM.size() > 0 && theProtsR.size() == 0)
+			{
+				//Find in M the corresponding sequences
+				for(ImmunoInfo info : theProtsM.values())
+				{
+					for (Relationship relPeptidome2 : nodePeptidome.getRelationships())
+					{
+						Node nodePeptide2 = relPeptidome2.getOtherNode(nodePeptidome);
+						if (NodeHelper.getType(nodePeptide2).equals("Peptide"))
+						{
+							//For each protein of M, look for matches from R at same position
+							for (Relationship idRel : nodePeptide2.getRelationships())
+							{
+								Node nodeSeq = idRel.getOtherNode(nodePeptide2);
+								if (NodeHelper.getType(nodeSeq).equals("Peptide Sequence"))
+								{
+									for (Relationship protRel : nodeSeq.getRelationships())
+									{
+										Node nodeProt = protRel.getOtherNode(nodeSeq);
+										if (NodeHelper.getType(nodeProt).equals("Protein Sequence"))
+										{
+											ImmunoInfo holder = new ImmunoInfo(nodePeptide2, NodeHelper.PropertyToInt(protRel.getProperty("Position")), nodeProt);									
+
+											if(holder.ProteinID.equals(info.ProteinID) && holder.Proteome.equals("R") &&
+											   holder.Start < info.Stop && holder.Stop > info.Start)
+											{
+												list.add(holder);
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				 }
+			}
+			
+			if(theProtsR.size() > 0 && theProtsM.size() == 0)
+			{
+				//Find in M the corresponding sequences
+				for(ImmunoInfo info : theProtsR.values())
+				{
+					for (Relationship relPeptidome2 : nodePeptidome.getRelationships())
+					{
+						Node nodePeptide2 = relPeptidome2.getOtherNode(nodePeptidome);
+						if (NodeHelper.getType(nodePeptide2).equals("Peptide"))
+						{
+							//For each protein of M, look for matches from R at same position
+							for (Relationship idRel : nodePeptide2.getRelationships())
+							{
+								Node nodeSeq = idRel.getOtherNode(nodePeptide2);
+								if (NodeHelper.getType(nodeSeq).equals("Peptide Sequence"))
+								{
+									for (Relationship protRel : nodeSeq.getRelationships())
+									{
+										Node nodeProt = protRel.getOtherNode(nodeSeq);
+										if (NodeHelper.getType(nodeProt).equals("Protein Sequence"))
+										{
+											ImmunoInfo holder = new ImmunoInfo(nodePeptide2, NodeHelper.PropertyToInt(protRel.getProperty("Position")), nodeProt);									
+
+											if(holder.ProteinID.equals(info.ProteinID) && holder.Proteome.equals("M") &&
+											   holder.Start < info.Stop && holder.Stop > info.Start)
+											{
+												list.add(holder);
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		catch(Exception e)		
+		{
+			e.printStackTrace();
+		}	
+		return list;
 	}
 }

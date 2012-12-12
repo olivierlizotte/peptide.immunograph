@@ -36,10 +36,9 @@ Node peptidome = graphDb.getNodeById(394015);
 
 	ArrayList<Node> potential = new ArrayList<Node>();	
 
-	HashMap<Node, ArrayList<Relationship>> peptides = new HashMap<Node, ArrayList<Relationship>>();
+	HashMap<Node, ArrayList<Node>> peptides = new HashMap<Node, ArrayList<Relationship>>();
 	HashMap<String, Integer> properties = new HashMap<String, Integer>();
 	
-		
 	//Cycle through peptides
 	for (Relationship relPeptidome : peptidome.getRelationships())
 	{
@@ -47,7 +46,7 @@ Node peptidome = graphDb.getNodeById(394015);
 		if (NodeHelper.getType(peptide).toString().equals("Peptide"))
 		{
 			String strSequence = peptide.getProperty("Sequence").toString();
-			ArrayList<Relationship> proteins = new ArrayList<Relationship>();
+			ArrayList<Relationship> proteins = new ArrayList<Node>();
 			
 			//Should we keep this peptide?
 			if(peptide.hasProperty("best HLA score") &&
@@ -68,98 +67,68 @@ Node peptidome = graphDb.getNodeById(394015);
 					Node sequence = relPeptide.getOtherNode(peptide);
 					if (NodeHelper.getType(sequence).equals("Peptide Sequence") &&
 						sequence.getProperty("Sequence").equals(strSequence))
-					{
+					{		
 						int found = 0;
 						for (Relationship relSequence : sequence.getRelationships())
 						{
 							Node protein = relSequence.getOtherNode(sequence);
 							if (NodeHelper.getType(relSequence.getOtherNode(sequence)).equals("Protein Sequence"))
-							{								
-								proteins.add(relSequence);
+							{
+								for(String key : relSequence.getPropertyKeys())
+									if(DefaultTemplate.keepRelation(key) && !properties.containsKey(key))
+										properties.put(key, 1);
+								
+								if(!proteins.containsKey(relSequence))
+									proteins.put(protein, new ArrayList<Node>());
+								proteins.get(protein).add(peptide);
 								found++; 
 							}
 						}
 						if(found == 0)
-							System.out.println("No protein associated :" + sequence.getProperty("Sequence"));
+							System.out.println(sequence.getProperty("Sequence"));
 					}
 				}
-				peptides.put(peptide, proteins);
 			}
 		}
 	}
 	
-	String titleLine = "Proteome(s),Protein(s),Index(es),Position(s),PyGeno(s)";
+	String titleLine = "Protein,Sequence";
 	for(String prop : properties.keySet())
 		titleLine += "," + prop;
-	out.println(titleLine + ",Url,Miha(s)...");
+	
+	//FileWriter fw = new FileWriter("outputImmunoPep.csv");
+	out.println(titleLine);
+	//fw.write(titleLine + "\n");
 		
-	for(Node peptide : peptides.keySet())
-	{		
-		//Lookup Proteome
-		String proteome = "";
-		String pyGenoHeader = "";
-		String positions = "";
-		String protIDs   = "";
-		String protIndex = "";
-		boolean M       = false;
-		boolean Ref     = false;
-		boolean R       = false;
-		boolean Reverse = false;
-		if(peptides.get(peptide).size() > 0)
+	for(Node protein : proteins.keySet())
+	{
+		//Chromosome number: 1 | Gene symbol: YBX1  Gene id: ENSG00000065978 | Transcript id: ENST00000318612 | Protein id: ENSP00000361621  Protein x1: 0
+		String header = "Chromosome number: " + protein.getProperty("Chromosome number").toString() + 
+						" | Gene symbol: " + protein.getProperty("Gene symbol").toString() + 
+						"  Gene id: " + protein.getProperty("Gene id").toString() + 
+						" | Transcript id: " + protein.getProperty("Transcript id").toString() +
+						" | Protein id: " + protein.getProperty("Protein id").toString() +
+						"  Protein x1: " + protein.getProperty("Protein x1").toString() +
+						",";
+		
+		for(Node peptide : proteins.get(protein))
 		{
-			for(Relationship relProt : peptides.get(peptide))
-			{
-				Node protein = relProt.getEndNode();
-				String id = protein.getProperty("Unique ID").toString();
-				if(id.startsWith("REVERSE"))
-					Reverse = true;
+			String line = peptide.getProperty("Sequence").toString();
+			for(String key : properties.keySet())
+				if(peptide.hasProperty(key))
+					line += "," + peptide.getProperty(key).toString();
 				else
-				{
-					//Chromosome number: 1 | Gene symbol: YBX1  Gene id: ENSG00000065978 | Transcript id: ENST00000318612 | Protein id: ENSP00000361621  Protein x1: 0		
-					pyGenoHeader += ";Chromosome number: " + protein.getProperty("Chromosome number").toString() + 
-								" | Gene symbol: " + protein.getProperty("Gene symbol").toString() + 
-								"  Gene id: " + protein.getProperty("Gene id").toString() + 
-								" | Transcript id: " + protein.getProperty("Transcript id").toString() +
-								" | Protein id: " + protein.getProperty("Protein id").toString() +
-								"  Protein x1: " + protein.getProperty("Protein x1").toString();
-					positions += ";" + relProt.getProperty("Position").toString();
-					protIDs   += ";" + protein.getProperty("Protein id").toString();
-					protIndex += ";" + id;
-					 if (id.startsWith("Ref"))
-						Ref = true;
-					else if (id.startsWith("M"))
-						M = true; 
-					else if (id.startsWith("R"))
-						R = true;
-				}
-			}
-			pyGenoHeader = pyGenoHeader.substring(1);
-			positions = positions.substring(1);
-			protIDs   = protIDs.substring(1);
-			protIndex = protIndex.substring(1);
-			
-			if(M || R || Ref)
-			{			
-				if(M) proteome += ";M";
-				if(R) proteome += ";R";
-				if(Ref) proteome += ";Ref";
-				proteome = proteome.substring(1);
-			}
+					line += ",";
+			out.println(header + line);
+			//fw.write(header + line + "\n");
 		}
-		String line = "[" + proteome + "],[" + protIDs + "],[" + protIndex + "],[" + positions + "],[" + pyGenoHeader + "]";
-		
-		for(String key : properties.keySet())
-			if(peptide.hasProperty(key))
-				line += "," + peptide.getProperty(key).toString();
-			else
-				line += ",";
-		line += ",http://proteo2.iric.ca:8080/explorer/index.jsp?id=" + peptide.getId();
-		
-		ArrayList<ImmunoInfo> mihas = ImmunoExtract.GetSingle(peptide, peptidome);
-		for(ImmunoInfo miha : mihas)
-			line += miha.GetString();
-		out.println(line);		
 	}
+	
+	//pw.flush();
+    //pw.close();    
+    //fw.close();
+
+	//out.println("L'Affaire Est Ketchup!");//
 }
 catch(Exception e)
 {

@@ -32,10 +32,10 @@ try{
 
 EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
 
-	Node nodeIds = graphDb.getNodeById(373291);
+	Node nodeIds = graphDb.getNodeById(394015);
 	HashMap<String, String> theSequences = new HashMap<String, String>();		
 	
-	out.println("Sequence,Protein ID,Position,Protein");
+	out.println("Gene,Transcript,Chromosome,Protein,PyGeno,Pos Start,Pos End,Sequence,NodeID,HLA,HLAScore,Precursor Error,  ");
 	for (Relationship idRel : nodeIds.getRelationships())
 	{
 		Node nodeId = idRel.getOtherNode(nodeIds);

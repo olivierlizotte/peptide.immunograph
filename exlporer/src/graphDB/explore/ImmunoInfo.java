@@ -46,9 +46,22 @@ public class ImmunoInfo
 		String d  	 	   = Protein.getProperty("Transcript id").toString();		
 		String f    	   = NodeHelper.decimalFormat(Protein.getProperty("Protein x1").toString());
 
+		String pepLine = "";
+		pepLine += "," + Peptide.getProperty("Condition 1").toString();
+		pepLine += "," + Peptide.getProperty("Condition 2").toString();
+		pepLine += "," + Peptide.getProperty("Precursor Error").toString();
+		pepLine += "," + Peptide.getProperty("Highest Score").toString();
+		if(Peptide.hasProperty("best HLA allele"))
+			pepLine += "," + Peptide.getProperty("best HLA allele").toString();
+		else
+			pepLine += ",";
+		if(Peptide.hasProperty("best HLA score"))
+			pepLine += "," + Peptide.getProperty("best HLA score").toString();
+		else
+			pepLine += ",";		
+		
 		return Proteome + "," + Sequence + "," + Peptide.getId() + "," + Start + "," + Stop + "," + 
 				"Chromosome number: " + chromo + " | Gene symbol: " + b + "; Gene id: " + c + 
-				" | Transcript id: " + d + " | Protein id: " + ProteinID + "; Protein x1: " + f + "," +
-				Peptide.getProperty("Highest Score");
+				" | Transcript id: " + d + " | Protein id: " + ProteinID + "; Protein x1: " + f + pepLine;
 	}
 }
