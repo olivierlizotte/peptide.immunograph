@@ -90,9 +90,9 @@ abstract public class DefaultTemplate
 		CloseDB(previousGraph);
 	}
 	
-	//public static String GraphDBString = "/home/antoine/neo4j/data/graph.db";
+	public static String GraphDBString = "/home/antoine/neo4j/data/graphProject981.db";
 	//public static String GraphDBString = "C:\\_IRIC\\Neo4J\\data\\graph8.db";
-	public static String GraphDBString = "C:\\_IRIC\\DATA\\M&R\\graphProject981.db";
+	//public static String GraphDBString = "C:\\_IRIC\\DATA\\M&R\\graphProject981.db";
 	
 	//public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graph3.db";
 	//public static String GraphDBString = "/apps/Neo4J/neo4j-community-1.8.M03/data/graphProject981.db";
@@ -409,6 +409,7 @@ abstract public class DefaultTemplate
 	public static double calculateFPR(EmbeddedGraphDatabase graphDb, Node groupingNode){
 		Node tmpNode;
 		double total = 0;
+		double targetHits = 0;
 		double decoyHits = 0;
 		boolean hasDecoy=false;
 		for (Relationship rel : groupingNode.getRelationships(Direction.OUTGOING)){
@@ -419,10 +420,14 @@ abstract public class DefaultTemplate
 				total += 1;
 				if ("True".equals(tmpNode.getProperty("Decoy")))
 					decoyHits += 1;
+				else{
+					targetHits += 1;
+				}
 			}
 		}
 		if (hasDecoy){
-			groupingNode.setProperty("FPR (decoy hits/ total)", Double.valueOf(decoyHits/total));
+			groupingNode.setProperty("FPR (decoy hits/ target hits)", Double.valueOf(decoyHits/targetHits));
+			groupingNode.setProperty("Decoy hits", Double.valueOf(decoyHits));
 			groupingNode.setProperty("Total hits", total);
 		}
 		return total;
