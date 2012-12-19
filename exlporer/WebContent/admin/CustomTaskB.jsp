@@ -46,7 +46,7 @@ EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
 	 			if (NodeHelper.getType(protSeq.getOtherNode(nodeSequence)).equals("Protein Sequence"))
 	 			{
 	 				String id = protSeq.getOtherNode(nodeSequence).getProperty("Unique ID").toString();	 				
-	 				if(id.startsWith("REVERSE"))
+	 				if(id.startsWith("REVERSE_M"))
 	 				{
 	 					nbReverse[lengthSeq] += 1;
 	 					reverse = true;
@@ -63,7 +63,6 @@ EmbeddedGraphDatabase graphDb = DefaultTemplate.graphDb();
 			nbTotalPeptide[lengthSeq] += 1;
 		}
 	}
-	
 	for(int i = 0; i < 4; i++)
 	{
 		out.println("Length " + (i + 8) + "<br/>");
