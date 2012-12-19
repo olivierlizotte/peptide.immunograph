@@ -255,9 +255,9 @@ function tick()
 			  									"translate(" + fcSize(d.source) + ",0)"; });
 	
 	link.selectAll("line").attr("x2", function(d) { return computeLength(d) - fcSize(d.target) - fcSize(d.source); });
-	link.selectAll("text").attr("x", function(d) { return (computeLength(d) - fcSize(d.target) - fcSize(d.source)) * 0.5 - (d.name.length * 3); });
+	link.selectAll("text").attr("x", function(d) { return (computeLength(d) - fcSize(d.target) - fcSize(d.source)) * 0.5 - (d.name.length * 3) + 0.5; });
 
-	node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });	
+	node.attr("transform", function(d) { return "translate(" + (d.x +0.5)+ "," + (d.y +0.5)+ ")"; });	
 }
 
 // Color leaf nodes orange, and packages white or blue.

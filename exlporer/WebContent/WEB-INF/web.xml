@@ -1,0 +1,25 @@
+<web-app>
+   <security-role> 
+      <description>Administrator</description> 
+      <role-name>editor</role-name> 
+   </security-role> 
+   <security-constraint>
+      <web-resource-collection>
+         <web-resource-name>
+            admin
+         </web-resource-name>
+         <url-pattern>/admin/*</url-pattern>         
+         <web-resource-name>
+            applets
+         </web-resource-name>
+         <url-pattern>/applets/*</url-pattern>
+      </web-resource-collection>
+      <auth-constraint>
+         <role-name>editor</role-name>
+      </auth-constraint>
+   </security-constraint>
+   <login-config> 
+      <auth-method>BASIC</auth-method> 
+      <realm-name>Admin Login</realm-name> 
+   </login-config>   
+</web-app> 

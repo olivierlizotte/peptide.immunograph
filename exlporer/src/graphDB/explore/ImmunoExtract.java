@@ -139,6 +139,7 @@ public class ImmunoExtract
 	
 	public static ArrayList<ImmunoInfo> GetSingle(Node nodePeptide, Node nodePeptidome)
 	{
+		int slider = 11;
 		ArrayList<ImmunoInfo> list = new ArrayList<ImmunoInfo>();
 		try
 		{
@@ -188,7 +189,7 @@ public class ImmunoExtract
 											ImmunoInfo holder = new ImmunoInfo(nodePeptide2, NodeHelper.PropertyToInt(protRel.getProperty("Position")), nodeProt);									
 
 											if(holder.ProteinID.equals(info.ProteinID) && holder.Proteome.equals("R") &&
-											   holder.Start < info.Stop && holder.Stop > info.Start)
+											   holder.Start < info.Stop + slider && holder.Stop > info.Start-slider)
 											{
 												list.add(holder);
 											}
@@ -225,7 +226,7 @@ public class ImmunoExtract
 											ImmunoInfo holder = new ImmunoInfo(nodePeptide2, NodeHelper.PropertyToInt(protRel.getProperty("Position")), nodeProt);									
 
 											if(holder.ProteinID.equals(info.ProteinID) && holder.Proteome.equals("M") &&
-											   holder.Start < info.Stop && holder.Stop > info.Start)
+												holder.Start < info.Stop + slider && holder.Stop > info.Start-slider)
 											{
 												list.add(holder);
 											}
